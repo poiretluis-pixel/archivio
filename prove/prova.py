@@ -53,6 +53,8 @@ def voci_nuove(T, oggi):
         add(area="finanze", tipo="movimento", data=k + "-05", descrizione="Compenso", categoria="Compensi e stipendio", valore=5000, conto="BPM personale")
         add(area="finanze", tipo="movimento", data=k + "-10", descrizione="Affitto", categoria="Casa", valore=-1500, conto="BPM famiglia")
         add(area="finanze", tipo="movimento", data=k + "-12", descrizione="Cene", categoria="Ristoranti e bar", valore=-600, conto="BPM personale")
+        add(area="finanze", tipo="movimento", data=k + "-22", descrizione="Capitale sociale", categoria="Investimenti e partecipazioni", valore=-3000, conto="BPM personale")
+        add(area="finanze", tipo="movimento", data=k + "-23", descrizione="Prestito", categoria="Prestiti ricevuti", valore=4000, conto="BPM personale")
         add(area="finanze", tipo="movimento", data=k + "-20", descrizione="Rata finanziamento", categoria="Rate e finanziamenti", valore=-1000, conto="BPM personale")
         add(area="finanze", tipo="movimento", data=k + "-15", descrizione="Bonifico al conto famiglia", categoria="Giroconto", valore=-2000, conto="BPM personale")
         add(area="finanze", tipo="movimento", data=k + "-15", descrizione="Bonifico dal conto personale", categoria="Giroconto", valore=2000, conto="BPM famiglia")
@@ -214,7 +216,7 @@ async def main():
         # --- finanze: indice, giroconti esclusi, tetti di spesa
         fin = await A.evaluate("(i => i && {v: i.valore, k: Object.keys(i.componenti), r: i.componenti.risparmio.punti, b: i.componenti.budget.punti})(indiceFinanze())")
         controlla(fin and sorted(fin["k"]) == ["budget", "debiti", "riserva", "risparmio"], f"indice finanziario con quattro componenti {fin}")
-        controlla(fin and abs(fin["r"] - 100) < 1e-6 and fin["b"] == 0, f"risparmio 38% (giroconti esclusi) e tetto ristoranti sforato {fin}")
+        controlla(fin and abs(fin["r"] - 100) < 1e-6 and fin["b"] == 0, f"risparmio 38% (giroconti, investimenti e prestiti esclusi) e tetto ristoranti sforato {fin}")
         deb = await A.evaluate("indiceFinanze().componenti.debiti.punti")
         controlla(abs(deb - 75) < 1e-6, f"rate pagate (1.000 €) prevalgono su quelle dichiarate (900 €): 20% delle entrate, 75 punti {deb}")
         await A.goto(URL + "#/a/finanze")

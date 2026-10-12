@@ -115,11 +115,11 @@ function pannelloIndice() {
    Riserva: mesi di spesa coperti dalla liquidità (conti correnti, risparmio, contanti) (100 da 6 mesi in su).
    Debiti: rate mensili (pagate o dichiarate, la più alta) rispetto alle entrate medie (100 fino al 10%, 0 dal 50% in su).
    Tetti di spesa: quota delle categorie con tetto rispettate nell'ultimo mese completo.
-   I giroconti tra conti propri non contano. */
+   Giroconti, investimenti e partecipazioni, prestiti ricevuti non contano (CAT_NEUTRE in 05-schema.js). */
 const PESI_FINANZE = { risparmio: 35, riserva: 35, debiti: 15, budget: 15 };
 const NOMI_MANCANTI_FIN = { risparmio: 'movimenti', riserva: 'saldi o movimenti', debiti: 'entrate', budget: 'tetti di spesa' };
 const LIQUIDI = new Set(['Conto corrente', 'Risparmio', 'Contanti']);
-const movimentiReali = () => voci('finanze', 'movimento').filter(v => v.categoria !== GIROCONTO && typeof v.valore === 'number');
+const movimentiReali = () => voci('finanze', 'movimento').filter(v => !CAT_NEUTRE.has(v.categoria) && typeof v.valore === 'number');
 function mesiCompleti(quanti) {
   const o = oggi(); let y = +o.slice(0, 4), m = +o.slice(5, 7); const out = [];
   for (let i = 0; i < quanti; i++) { if (--m < 1) { m = 12; y--; } out.unshift(`${y}-${String(m).padStart(2, '0')}`); }

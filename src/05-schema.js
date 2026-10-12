@@ -4,10 +4,12 @@
 const c = (k, etichetta, tipo = 'testo', extra = {}) => ({ k, etichetta, tipo, ...extra });
 const CAT_ESAMI = ['Rene', 'Lipidi', 'Glicemia', 'Fegato', 'Infiammazione', 'Ematologia', 'Ferro e vitamine', 'Tiroide e ormoni', 'Proteine', 'Elettroliti', 'Intestino', 'Urine', 'Sierologie', 'Allergologia', 'Altro'];
 const RIPETI = { mai: 0, mensile: 1, trimestrale: 3, semestrale: 6, annuale: 12 };
-/* Categorie dei movimenti. "Giroconto" (spostamenti tra conti propri) non conta né come entrata né come uscita. */
-const CAT_USCITE = ['Casa', 'Spesa alimentare', 'Ristoranti e bar', 'Auto e trasporti', 'Salute', 'Figli', 'Istruzione', 'Sport e benessere', 'Abbigliamento', 'Viaggi e svago', 'Abbonamenti', 'Assicurazioni', 'Tasse e imposte', 'Rate e finanziamenti', 'Lavori e ristrutturazioni', 'Regali e donazioni', 'Contanti prelevati', 'Commissioni bancarie', 'Altre uscite'];
-const CAT_ENTRATE = ['Compensi e stipendio', 'Utili e dividendi', 'Contributi famiglia', 'Rimborsi', 'Affitti', 'Altre entrate'];
+/* Categorie dei movimenti. Le categorie neutre non contano né come entrata né come uscita:
+   giroconti tra conti propri, soldi messi in società o investimenti (restano patrimonio), prestiti ricevuti (sono debiti). */
+const CAT_USCITE = ['Casa', 'Spesa alimentare', 'Ristoranti e bar', 'Auto e trasporti', 'Salute', 'Figli', 'Istruzione', 'Sport e benessere', 'Abbigliamento', 'Viaggi e svago', 'Abbonamenti', 'Assicurazioni', 'Tasse e imposte', 'Rate e finanziamenti', 'Lavori e ristrutturazioni', 'Regali e donazioni', 'Contanti prelevati', 'Commissioni bancarie', 'Investimenti e partecipazioni', 'Altre uscite'];
+const CAT_ENTRATE = ['Compensi e stipendio', 'Utili e dividendi', 'Contributi famiglia', 'Rimborsi', 'Affitti', 'Prestiti ricevuti', 'Altre entrate'];
 const GIROCONTO = 'Giroconto';
+const CAT_NEUTRE = new Set([GIROCONTO, 'Investimenti e partecipazioni', 'Prestiti ricevuti']);
 const AMBITI = ['Lavoro', 'Famiglia', 'Personale', 'Salute', 'Finanze'];
 
 const AREE_BASE = [
