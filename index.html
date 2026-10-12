@@ -1,0 +1,2312 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0d5c57">
+<title>Archivio</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d5c57'/%3E%3Cpath d='M18 46V22a4 4 0 0 1 4-4h8l4 5h8a4 4 0 0 1 4 4v19a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4z' fill='%23fff'/%3E%3C/svg%3E">
+<!-- Versione costruita il 2026-10-12. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
+<style>
+:root{
+  --fondo:#e9eeec; --carta:#ffffff; --inchiostro:#12211f; --inchiostro2:#465955; --tenue:#6f807c; --linea:#d5dedb; --linea2:#e6ecea;
+  --marca:#0d5c57; --marca-su:#ffffff; --marca-tenue:#dcebe8; --serie:#2a78d6; --serie2:#eb6834;
+  --ok:#0a7d0a; --attenzione:#8a5a00; --critico:#c0302f; --critico-tenue:#fbeaea; --attenzione-tenue:#fdf3d9;
+  --titoli:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+  --testo:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --fondo:#0e1514; --carta:#172120; --inchiostro:#eef4f2; --inchiostro2:#bccac6; --tenue:#8c9c98; --linea:#2b3937; --linea2:#212d2b;
+  --marca:#5fc0b8; --marca-su:#04201d; --marca-tenue:#1d3330; --serie:#3987e5; --serie2:#d95926;
+  --ok:#3fc13f; --attenzione:#f0b429; --critico:#f07a79; --critico-tenue:#3a1e1e; --attenzione-tenue:#3a2f12;
+  color-scheme:dark;
+}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--fondo);color:var(--inchiostro);font:16px/1.5 var(--testo)}
+h1,h2,h3,.marchio{font-family:var(--titoli);font-weight:600;letter-spacing:-.01em;text-wrap:balance}
+h1{font-size:1.9rem;line-height:1.15;margin:0}
+h2{font-size:1.2rem;margin:0 0 .7rem}
+h3{font-size:1.08rem;margin:0 0 .4rem}
+p{margin:.4rem 0}
+a{color:var(--marca)}
+.num{font-variant-numeric:tabular-nums}
+.attenuato{color:var(--tenue)} .piccolo{font-size:.86rem} .destra{text-align:right} .sotto{color:var(--inchiostro2);margin:.25rem 0 0}
+.largo-testo{max-width:68ch} .testo-lungo{white-space:pre-wrap;overflow-wrap:anywhere}
+:focus-visible{outline:2px solid var(--marca);outline-offset:2px;border-radius:4px}
+
+/* guscio: le cartelle sono linguette che si agganciano al foglio */
+.guscio{display:grid;grid-template-columns:236px minmax(0,1fr);grid-template-rows:auto 1fr;min-height:100vh;max-width:1280px;margin:0 auto}
+.barra{grid-column:1/-1;display:flex;align-items:center;gap:.75rem;padding:.7rem 1.25rem;min-width:0}
+.barra .btn{white-space:nowrap}
+.chi{min-width:0;flex-shrink:1}
+.marchio{font-size:1.35rem;color:var(--inchiostro);text-decoration:none}
+.marchio.grande{font-size:2.1rem;margin-bottom:.3rem}
+.spazio{flex:1}
+.chi,.chi-solo{font-size:.92rem;color:var(--inchiostro2)}
+.menu{padding:.5rem 0 2rem 1rem;display:flex;flex-direction:column;gap:2px}
+.menu a{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.55rem .9rem;color:var(--inchiostro2);text-decoration:none;border-radius:10px 0 0 10px;border:1px solid transparent;border-right:0}
+.menu a:hover{color:var(--inchiostro);background:var(--linea2)}
+.menu a.attiva{background:var(--carta);color:var(--inchiostro);font-weight:600;border-color:var(--linea);box-shadow:inset 4px 0 0 var(--marca);position:relative;z-index:1;margin-right:-1px}
+.menu-gruppo{font-size:.8rem;color:var(--tenue);padding:1rem .9rem .25rem}
+.conta{background:var(--marca);color:var(--marca-su);border-radius:99px;font-size:.75rem;font-weight:600;padding:0 .5rem;line-height:1.4rem;min-width:1.4rem;text-align:center}
+#vista{background:var(--carta);border:1px solid var(--linea);border-radius:0 14px 14px 14px;padding:1.6rem 1.8rem 3rem;margin:0 1rem 1.5rem 0;min-width:0}
+.testa{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap;margin-bottom:1.3rem}
+.briciole{font-size:.9rem;color:var(--tenue);margin:0 0 .5rem}
+
+.pannello{border-top:1px solid var(--linea);padding:1.15rem 0 .4rem;margin-top:1.1rem}
+.dati{display:flex;flex-wrap:wrap;gap:.5rem 2.6rem;margin:.2rem 0 .6rem}
+.dato-etichetta{font-size:.88rem;color:var(--inchiostro2)}
+.dato-valore{font-family:var(--titoli);font-size:1.75rem;line-height:1.2}
+.dato-nota{font-size:.86rem;color:var(--tenue)}
+.dato.allerta .dato-valore{color:var(--critico)}
+.griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:.8rem;margin:1.2rem 0}
+.scheda{display:block;border:1px solid var(--linea);border-radius:12px;padding:.9rem 1rem;text-decoration:none;color:inherit;background:var(--carta)}
+.scheda:hover{border-color:var(--marca)}
+.scheda .dato-valore{font-size:1.4rem}
+.elenco{list-style:none;margin:0;padding:0}
+.elenco>li{padding:.6rem 0;border-bottom:1px solid var(--linea2)}
+.elenco>li:last-child{border-bottom:0}
+.elenco a{text-decoration:none;color:inherit;font-weight:600}
+.elenco-nota{color:var(--inchiostro2);font-size:.93rem;margin-top:.15rem}
+.tra{display:flex;justify-content:space-between;align-items:baseline;gap:.4rem 1rem;flex-wrap:wrap}
+.cliccabile{cursor:pointer}
+li.cliccabile:hover strong{color:var(--marca)}
+.stato{display:inline-flex;align-items:baseline;gap:.4rem;font-size:.93rem}
+.stato-segno{display:inline-grid;place-items:center;width:1.25rem;height:1.25rem;border-radius:50%;font-size:.75rem;font-weight:700;flex:none;transform:translateY(-1px)}
+.stato.ok .stato-segno{background:var(--ok);color:var(--carta)}
+.stato.ritardo .stato-segno{background:var(--critico);color:var(--carta)}
+.stato.vuota .stato-segno{border:1.5px solid var(--tenue);color:var(--tenue);font-size:.6rem}
+.sezioni{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.4rem 1.5rem}
+.sezione{display:flex;align-items:center;gap:.5rem;padding:.3rem 0}
+.sezione .btn{margin-left:auto}
+details{border-bottom:1px solid var(--linea2);padding:.5rem 0}
+summary{cursor:pointer;font-weight:600;padding:.2rem 0}
+
+.btn{font:inherit;font-size:.93rem;padding:.48rem .9rem;border-radius:9px;border:1px solid var(--linea);background:var(--carta);color:var(--inchiostro);cursor:pointer;text-decoration:none;display:inline-block;line-height:1.3}
+.btn:hover{border-color:var(--marca)}
+.btn.primario{background:var(--marca);border-color:var(--marca);color:var(--marca-su);font-weight:600}
+.btn.primario:hover{filter:brightness(1.08)}
+.btn.piatto{border-color:transparent;background:none;color:var(--inchiostro2)}
+.btn.piatto:hover{background:var(--linea2)}
+.btn.piccolo{font-size:.84rem;padding:.25rem .6rem}
+.btn.pericolo{color:var(--critico);border-color:var(--critico)}
+.btn:disabled{opacity:.6;cursor:wait}
+.spia::before{content:"";display:inline-block;width:.55rem;height:.55rem;border-radius:50%;margin-right:.45rem;background:var(--tenue)}
+.spia.ok::before{background:var(--ok)} .spia.ko::before{background:var(--critico)}
+.azioni{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:.6rem 0}
+.azioni.colonna{flex-direction:column;align-items:stretch}
+.azioni-riga{white-space:nowrap} .azioni-riga .btn{margin-left:.25rem}
+
+.scorri{overflow-x:auto;margin:.4rem 0}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th{text-align:left;font-weight:600;color:var(--inchiostro2);font-size:.84rem;padding:.4rem .7rem .4rem 0;border-bottom:1px solid var(--linea);white-space:nowrap}
+td{padding:.5rem .7rem .5rem 0;border-bottom:1px solid var(--linea2);vertical-align:top}
+th.destra,td.destra{text-align:right}
+tbody tr[tabindex]{cursor:pointer}
+tbody tr[tabindex]:hover td{background:var(--linea2)}
+td.fuori{color:var(--critico);font-weight:600}
+.segno-fuori{font-size:.7rem}
+.nonspezza{white-space:nowrap} .unita{color:var(--tenue);font-weight:400} td.rif{min-width:9rem;color:var(--inchiostro2)}
+.azioni.stretta{margin:.35rem 0 0}
+.indice-testa{display:flex;gap:1.4rem;align-items:center;flex-wrap:wrap;margin:.4rem 0 1rem}
+.indice-giudizio{font-size:1.05rem;font-weight:600;margin:0 0 .3rem}
+.anello-fondo{fill:none;stroke:var(--linea2);stroke-width:12}
+.anello-valore{fill:none;stroke:var(--ok);stroke-width:12;stroke-linecap:round}
+.anello.vuota .anello-valore{stroke:var(--attenzione)} .anello.ritardo .anello-valore{stroke:var(--critico)}
+.anello-numero{font-family:var(--titoli);font-size:38px;font-weight:600;fill:var(--inchiostro)}
+.anello-unita{font-size:11px;fill:var(--tenue)}
+.componenti{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem 2rem}
+.componente .tra{flex-wrap:nowrap}
+.componente .rip-pista{display:block;height:8px;background:var(--linea2);border-radius:4px;margin:.35rem 0 .3rem;overflow:hidden}
+.componente .rip-barra{border-radius:4px;background:var(--ok)}
+.componente .rip-barra.vuota{background:var(--attenzione)} .componente .rip-barra.ritardo{background:var(--critico)}
+/* Barre di avanzamento in elenchi (obiettivi, tetti di spesa) */
+.elenco .rip-pista{display:block;height:8px;background:var(--linea2);border-radius:4px;margin:.4rem 0 .25rem;overflow:hidden}
+.elenco .rip-barra{border-radius:4px;background:var(--ok)}
+.elenco .rip-barra.vuota{background:var(--attenzione)} .elenco .rip-barra.ritardo{background:var(--critico)}
+.num.fuori{color:var(--critico);font-weight:600}
+.consigli>li{display:grid;grid-template-columns:2rem 1fr;gap:.6rem;align-items:start}
+.consiglio-num{display:grid;place-items:center;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--marca-tenue);color:var(--marca);font-weight:700;font-size:.9rem}
+.md h2{font-size:1.45rem;margin:1.4rem 0 .5rem} .md h3{font-size:1.15rem;margin:1.2rem 0 .4rem} .md h4,.md h5{font-size:1rem;margin:1rem 0 .3rem}
+.md p,.md li{line-height:1.6} .md ul,.md ol{padding-left:1.3rem} .md li{margin:.2rem 0}
+.md code,code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em;background:var(--linea2);border-radius:4px;padding:0 .25rem}
+article.largo-testo{max-width:72ch}
+.cerca{width:100%;max-width:320px}
+input,select,textarea{font:inherit;color:inherit;background:var(--carta);border:1px solid var(--linea);border-radius:9px;padding:.5rem .65rem;max-width:100%}
+input[type=checkbox]{width:1.1rem;height:1.1rem;accent-color:var(--marca)}
+textarea{width:100%;resize:vertical}
+.scheda-testo{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88rem;line-height:1.55}
+.modulo{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:.8rem 1rem;margin:.6rem 0}
+.campo{display:flex;flex-direction:column;gap:.25rem;font-size:.9rem;color:var(--inchiostro2)}
+.campo input,.campo select,.campo textarea{color:var(--inchiostro);font-size:1rem}
+.campo.riga{flex-direction:row-reverse;justify-content:flex-end;align-items:center;gap:.5rem}
+.campo.stretto{max-width:330px;margin-top:.8rem}
+.intero{grid-column:1/-1}
+.spunta{display:inline-flex;align-items:center;gap:.45rem;margin:.15rem 1rem .15rem 0;font-size:.93rem}
+fieldset{border:1px solid var(--linea);border-radius:9px;padding:.6rem .8rem}
+legend{font-size:.88rem;color:var(--inchiostro2);padding:0 .3rem}
+.errore{color:var(--critico);font-size:.93rem}
+.errore:empty{display:none}
+.vuoto{border:1px dashed var(--linea);border-radius:12px;padding:1.1rem 1.2rem;color:var(--inchiostro2);max-width:68ch}
+.zona-carica{border:1.5px dashed var(--linea);border-radius:12px;padding:1rem 1.2rem;margin-bottom:.5rem}
+.zona-carica.sopra{border-color:var(--marca);background:var(--marca-tenue)}
+.ricevuta .esito-ok{font-weight:600;color:var(--ok)} .ricevuta .esito-ko{font-weight:600;color:var(--critico)}
+
+.velo{position:fixed;inset:0;background:rgba(8,20,18,.5);display:grid;place-items:start center;padding:4vh 12px;overflow:auto;z-index:20}
+.finestra{background:var(--carta);border-radius:14px;width:min(560px,100%);border:1px solid var(--linea)}
+.finestra.larga{width:min(860px,100%)}
+.finestra-testa{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.9rem 1.2rem;border-bottom:1px solid var(--linea)}
+.finestra-testa h2{margin:0}
+.finestra-corpo{padding:.9rem 1.2rem 1.2rem}
+.visore{width:100%;height:70vh;border:1px solid var(--linea);border-radius:8px}
+.visore-img{max-width:100%;border-radius:8px}
+#avvisi{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;flex-direction:column;gap:.4rem;z-index:30;width:min(520px,calc(100% - 24px))}
+.avviso{background:var(--inchiostro);color:var(--carta);padding:.7rem 1rem;border-radius:10px;font-size:.93rem}
+.avviso.errore{background:var(--critico);color:#fff}
+
+.grafico{position:relative;width:100%;min-height:40px}
+.grafico svg{display:block;touch-action:pan-y}
+.g-griglia{stroke:var(--linea2);stroke-width:1}
+.g-base{stroke:var(--linea);stroke-width:1}
+.g-asse{fill:var(--tenue);font-size:11.5px;font-variant-numeric:tabular-nums}
+.g-linea{fill:none;stroke:var(--serie);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.g-punto{fill:var(--serie);stroke:var(--carta);stroke-width:2}
+.g-fuori,.g-punto-fuori{fill:var(--critico);stroke:var(--carta);stroke-width:2}
+.g-banda{fill:var(--serie);opacity:.11}
+.g-cursore{stroke:var(--tenue);stroke-width:1;stroke-dasharray:3 3}
+.g-barra1{fill:var(--serie)} .g-barra2{fill:var(--serie2)}
+.g-fumetto{position:absolute;pointer-events:none;background:var(--inchiostro);color:var(--carta);border-radius:8px;padding:.4rem .6rem;font-size:.82rem;line-height:1.35;white-space:nowrap;z-index:5}
+.g-f-titolo{opacity:.75} .g-f-forte{font-weight:700;font-size:.95rem}
+.legenda{display:flex;gap:1rem;font-size:.86rem;color:var(--inchiostro2);margin:.2rem 0 .4rem}
+.chiave{display:inline-block;width:.75rem;height:.75rem;border-radius:3px;margin-right:.35rem;vertical-align:-1px}
+i.g-barra1{background:var(--serie)} i.g-barra2{background:var(--serie2)}
+.scintilla{display:block}
+.ripartizione{display:grid;gap:.45rem;margin:.5rem 0}
+.rip-riga{display:grid;grid-template-columns:minmax(90px,200px) 1fr auto;gap:.8rem;align-items:center;font-size:.93rem}
+.rip-pista{height:12px}
+.rip-barra{display:block;height:100%;background:var(--serie);border-radius:0 4px 4px 0;min-width:3px}
+
+.blocco{min-height:100vh;display:grid;place-items:center;padding:20px}
+.blocco-scheda{background:var(--carta);border:1px solid var(--linea);border-radius:16px;padding:1.8rem;width:min(460px,100%)}
+.promemoria{background:var(--marca-tenue);border-radius:9px;padding:.5rem .7rem;font-size:.93rem;margin:0}
+.collegamenti{display:flex;flex-wrap:wrap;gap:.2rem;margin-top:.8rem}
+.forza{font-size:.86rem;margin-top:-.4rem}
+.forza.debole{color:var(--critico)} .forza.media{color:var(--attenzione)} .forza.buona{color:var(--ok)}
+.codice-box .codice{font-size:1.25rem;font-weight:700;letter-spacing:.04em;background:var(--marca-tenue);border-radius:10px;padding:.8rem 1rem;overflow-wrap:anywhere;font-family:ui-monospace,Menlo,Consolas,monospace}
+
+@media (max-width:820px){
+  .guscio{grid-template-columns:minmax(0,1fr)}
+  .barra{padding:.6rem 16px}
+  .menu{flex-direction:row;overflow-x:auto;padding:0 16px .5rem;gap:.3rem;scrollbar-width:none}
+  .menu a{white-space:nowrap;border-radius:99px;border:1px solid var(--linea);padding:.35rem .8rem;font-size:.92rem;background:var(--carta)}
+  .menu a.attiva{box-shadow:none;background:var(--marca);border-color:var(--marca);color:var(--marca-su);margin-right:0}
+  .menu a.attiva .conta{background:var(--marca-su);color:var(--marca)}
+  .menu-gruppo{display:none}
+  #vista{border-radius:14px;margin:0 8px 16px;padding:1.1rem 16px 2.5rem}
+  h1{font-size:1.55rem}
+  .solo-largo{display:none}
+  .barra{gap:.4rem}
+  .spia-testo{display:none} .spia::before{margin-right:0}
+  td.rif{min-width:7rem}
+  .rip-riga{grid-template-columns:minmax(70px,110px) 1fr auto}
+}
+@media (prefers-reduced-motion:no-preference){.btn,.menu a,.scheda{transition:border-color .12s,background-color .12s}}
+@media print{.barra,.menu,.azioni,.btn{display:none!important}#vista{border:0}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<noscript>Questa pagina ha bisogno di JavaScript per decifrare i dati.</noscript>
+<script>
+'use strict';
+/* ===== 1. Utilità di base ===== */
+const $ = (s, r = document) => r.querySelector(s);
+const SVGNS = 'http://www.w3.org/2000/svg';
+const PROP = new Set(['value', 'checked', 'disabled', 'selected', 'required', 'hidden', 'multiple', 'open']);
+
+function _el(el, attrs, kids) {
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2), v);
+    else if (PROP.has(k) && !(el instanceof SVGElement)) el[k] = v;
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  const add = c => {
+    if (c == null || c === false || c === '') return;
+    if (Array.isArray(c)) c.forEach(add);
+    else el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  };
+  kids.forEach(add);
+  return el;
+}
+/* Tutti i dati dell'utente passano da qui come testo, mai come HTML. */
+const h = (tag, attrs, ...kids) => _el(document.createElement(tag), attrs, kids);
+const s = (tag, attrs, ...kids) => _el(document.createElementNS(SVGNS, tag), attrs, kids);
+
+const adesso = () => new Date().toISOString();
+const oggi = () => { const d = new Date(); return isoData(d.getFullYear(), d.getMonth() + 1, d.getDate()); };
+const isoData = (y, m, d) => `${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join(''));
+const MS_G = 86400000;
+const tempo = iso => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
+const giorniDa = iso => Math.floor((tempo(oggi()) - tempo(iso.slice(0, 10))) / MS_G);
+
+const _fd = new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const _fm = new Intl.DateTimeFormat('it-IT', { month: 'short', year: '2-digit', timeZone: 'UTC' });
+const fmtData = iso => (iso && /^\d{4}-\d{2}-\d{2}/.test(iso) ? _fd.format(new Date(tempo(iso))) : (iso || ''));
+const fmtMese = ym => _fm.format(new Date(Date.UTC(+ym.slice(0, 4), +ym.slice(5, 7) - 1, 1)));
+const fmtQuando = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleString('it-IT', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); };
+function fmtNum(n, dec = 2) {
+  if (n == null || n === '' || isNaN(n)) return '';
+  return Number(n).toLocaleString('it-IT', { maximumFractionDigits: dec });
+}
+const fmtEuro = n => (n == null || isNaN(n) ? '' : Number(n).toLocaleString('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }));
+const fmtDim = b => (b > 1048576 ? fmtNum(b / 1048576, 1) + ' MB' : fmtNum(Math.max(1, Math.round(b / 1024)), 0) + ' kB');
+function fa(giorni) {
+  if (giorni <= 0) return 'oggi';
+  if (giorni === 1) return 'ieri';
+  if (giorni < 60) return `${giorni} giorni fa`;
+  if (giorni < 730) return `${Math.round(giorni / 30)} mesi fa`;
+  return `${Math.round(giorni / 365)} anni fa`;
+}
+
+/* Lettura tollerante di numeri e date scritti in formati diversi (file CSV di banche, dispositivi, laboratori). */
+function leggiNum(x) {
+  if (typeof x === 'number') return isFinite(x) ? x : null;
+  if (x == null) return null;
+  let t = String(x).trim().replace(/[\s€$£% ]/g, '').replace(/^\+/, '');
+  if (!t || !/^-?[\d.,]+$/.test(t)) return null;
+  const v = t.lastIndexOf(','), p = t.lastIndexOf('.');
+  if (v >= 0 && p >= 0) t = v > p ? t.replace(/\./g, '').replace(',', '.') : t.replace(/,/g, '');
+  else if (v >= 0) t = /^-?\d{1,3}(,\d{3}){2,}$/.test(t) ? t.replace(/,/g, '') : t.replace(',', '.');
+  else if (/^-?\d{1,3}(\.\d{3}){2,}$/.test(t)) t = t.replace(/\./g, '');
+  const n = Number(t);
+  return isFinite(n) ? n : null;
+}
+/* In una colonna, "12,450" è dodicimila se accanto ci sono interi di almeno tre cifre (passi, calorie), altrimenti è un decimale. */
+function lettoreColonna(valori) {
+  const v = valori.map(x => String(x == null ? '' : x).trim()).filter(Boolean);
+  const conVirgola = v.filter(x => x.includes(','));
+  const migliaia = conVirgola.length > 0 && conVirgola.every(x => /^-?\d{1,3}(,\d{3})+$/.test(x)) && v.some(x => /^-?\d{3,}$/.test(x)) && !v.some(x => /\d\.\d/.test(x) && x.includes(','));
+  return migliaia ? x => leggiNum(String(x == null ? '' : x).replace(/,/g, '')) : leggiNum;
+}
+const MESI = { gen: 1, feb: 2, mar: 3, apr: 4, mag: 5, giu: 6, lug: 7, ago: 8, set: 9, ott: 10, nov: 11, dic: 12, jan: 1, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, dec: 12 };
+function leggiData(x) {
+  if (!x) return null;
+  const t = String(x).trim();
+  let m;
+  const ok = (y, mo, d) => (mo >= 1 && mo <= 12 && d >= 1 && d <= 31 && y > 1900 && y < 2200 ? isoData(y, mo, d) : null);
+  if ((m = t.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/))) return ok(+m[1], +m[2], +m[3]);
+  if ((m = t.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/))) return ok(+m[3], +m[2], +m[1]);
+  if ((m = t.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2})(?!\d)/))) return ok(2000 + +m[3], +m[2], +m[1]);
+  if ((m = t.match(/^(\d{1,2})\s+([a-zA-Z]{3})[a-zA-Z]*\.?,?\s+(\d{4})/)) && MESI[m[2].toLowerCase()]) return ok(+m[3], MESI[m[2].toLowerCase()], +m[1]);
+  if ((m = t.match(/^([a-zA-Z]{3})[a-zA-Z]*\.?\s+(\d{1,2}),?\s+(\d{4})/)) && MESI[m[1].toLowerCase()]) return ok(+m[3], MESI[m[1].toLowerCase()], +m[2]);
+  return null;
+}
+
+const cod = new TextEncoder(), decod = new TextDecoder();
+function b64(bytes) {
+  const u = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  let t = '';
+  for (let i = 0; i < u.length; i += 0x8000) t += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000));
+  return btoa(t);
+}
+function daB64(t) {
+  const bin = atob(String(t).replace(/\s/g, ''));
+  const u = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  return u;
+}
+function scarica(nome, contenuto, mime = 'application/octet-stream') {
+  const url = URL.createObjectURL(contenuto instanceof Blob ? contenuto : new Blob([contenuto], { type: mime }));
+  const a = h('a', { href: url, download: nome });
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+const leggiFile = (f, come = 'text') => (come === 'text' ? f.text() : f.arrayBuffer());
+function raggruppa(lista, chiave) {
+  const m = new Map();
+  for (const x of lista) { const k = chiave(x); if (!m.has(k)) m.set(k, []); m.get(k).push(x); }
+  return m;
+}
+const somma = l => l.reduce((a, b) => a + (Number(b) || 0), 0);
+const perData = (a, b) => (a.data || '').localeCompare(b.data || '');
+const nomeFile = t => String(t).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'file';
+
+/* CSV: riconosce da solo il separatore e gestisce le virgolette. */
+function leggiCsv(testo) {
+  testo = testo.replace(/^﻿/, '');
+  const prima = testo.split(/\r?\n/, 1)[0];
+  const sep = [';', '\t', ','].map(c => [c, prima.split(c).length]).sort((a, b) => b[1] - a[1])[0][0];
+  const righe = []; let riga = [], campo = '', q = false;
+  for (let i = 0; i < testo.length; i++) {
+    const c = testo[i];
+    if (q) { if (c === '"') { if (testo[i + 1] === '"') { campo += '"'; i++; } else q = false; } else campo += c; }
+    else if (c === '"') q = true;
+    else if (c === sep) { riga.push(campo); campo = ''; }
+    else if (c === '\n') { riga.push(campo); righe.push(riga); riga = []; campo = ''; }
+    else if (c !== '\r') campo += c;
+  }
+  if (campo !== '' || riga.length) { riga.push(campo); righe.push(riga); }
+  const piene = righe.filter(r => r.some(x => x.trim() !== ''));
+  return { intestazioni: (piene[0] || []).map(x => x.trim()), righe: piene.slice(1) };
+}
+function creaCsv(intestazioni, righe) {
+  const q = v => { const t = v == null ? '' : String(v); return /[";\n\r]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+  return '﻿' + [intestazioni, ...righe].map(r => r.map(q).join(';')).join('\r\n');
+}
+
+/* ===== 2. Cifratura =====
+   Schema: una chiave dati casuale (256 bit) cifra tutto con AES-256-GCM.
+   La chiave dati è a sua volta cifrata in uno o più "slot", ognuno apribile con un segreto
+   (frase segreta oppure codice di recupero) tramite PBKDF2-HMAC-SHA256.
+   Cambiare frase significa riscrivere solo lo slot, non i dati. Il formato è descritto in LEGGIMI.md. */
+const ITERAZIONI = 600000;
+const casuale = n => crypto.getRandomValues(new Uint8Array(n));
+const normFrase = t => String(t).normalize('NFKC').trim();
+const normCodice = t => String(t).toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+async function chiaveDaSegreto(segreto, sale, iter) {
+  const base = await crypto.subtle.importKey('raw', cod.encode(segreto), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: sale, iterations: iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+}
+async function creaSlot(tipo, segreto, chiaveDati) {
+  const sale = casuale(16), iv = casuale(12);
+  const k = await chiaveDaSegreto(tipo === 'recupero' ? normCodice(segreto) : normFrase(segreto), sale, ITERAZIONI);
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, k, chiaveDati);
+  return { tipo, kdf: 'PBKDF2-HMAC-SHA256', iterazioni: ITERAZIONI, sale: b64(sale), iv: b64(iv), chiave: b64(ct), creato: adesso() };
+}
+async function apriSlot(slot, segreto) {
+  const k = await chiaveDaSegreto(slot.tipo === 'recupero' ? normCodice(segreto) : normFrase(segreto), daB64(slot.sale), slot.iterazioni);
+  return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: daB64(slot.iv) }, k, daB64(slot.chiave)));
+}
+const importaChiaveDati = grezza => crypto.subtle.importKey('raw', grezza, 'AES-GCM', false, ['encrypt', 'decrypt']);
+
+async function flusso(bytes, trasformazione) {
+  return new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(trasformazione)).arrayBuffer());
+}
+const haGzip = typeof CompressionStream !== 'undefined';
+
+/* Busta: il file che finisce su disco e nel cloud. Contiene solo testo cifrato più i parametri per riaprirlo. */
+async function sigilla(oggetto, chiave, testata) {
+  let chiaro = cod.encode(JSON.stringify(oggetto));
+  if (haGzip) chiaro = await flusso(chiaro, new CompressionStream('gzip'));
+  const iv = casuale(12);
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, chiave, chiaro);
+  return {
+    formato: 'archivio-vita', versione: 1, promemoria: testata.promemoria || '', slot: testata.slot, slot_agg: testata.slot_agg,
+    cifra: 'AES-256-GCM', compressione: haGzip ? 'gzip' : 'nessuna', iv: b64(iv), dati: b64(ct), salvato: adesso(),
+  };
+}
+async function dissigilla(busta, chiave) {
+  let chiaro = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: daB64(busta.iv) }, chiave, daB64(busta.dati)));
+  if (busta.compressione === 'gzip') chiaro = await flusso(chiaro, new DecompressionStream('gzip'));
+  return JSON.parse(decod.decode(chiaro));
+}
+/* Allegati: 12 byte di IV seguiti dal testo cifrato, con la stessa chiave dati. */
+async function cifraBytes(bytes, chiave) {
+  const iv = casuale(12);
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, chiave, bytes));
+  const out = new Uint8Array(12 + ct.length); out.set(iv); out.set(ct, 12);
+  return out;
+}
+async function decifraBytes(bytes, chiave) {
+  const u = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  return new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: u.subarray(0, 12) }, chiave, u.subarray(12)));
+}
+function forzaFrase(t) {
+  const n = normFrase(t).length;
+  if (n === 0) return null;
+  if (n < 10) return { livello: 'debole', testo: 'Debole: meno di 10 caratteri si indovina in poco tempo se il file cifrato finisce in mani sbagliate.' };
+  if (n < 16 && !/\s/.test(t.trim())) return { livello: 'media', testo: 'Discreta. Meglio una frase di 4 o 5 parole.' };
+  return { livello: 'buona', testo: 'Buona.' };
+}
+
+/* ===== 3. Archivio: stato in memoria e salvataggio locale cifrato =====
+   S.A    : l'archivio vero e proprio, identico ad archivio.json nel repository dei dati.
+   S.est  : dati scritti da altri (Garmin, rapporti di Claude), letti dal repository e mai riscritti dalla pagina.
+   S.disp : impostazioni di questo dispositivo (token di GitHub). Restano solo qui, cifrate. */
+const S = {
+  sbloccato: false, chiave: null, chiaveGrezza: null, testata: null, A: null, est: {}, disp: {}, estVoci: [],
+  persona: '', sync: { stato: 'spento', ultimo: null, errore: '' }, sporco: false, ultimaAttivita: Date.now(),
+};
+const SCHEMA = 'archivio-vita/1';
+
+/* IndexedDB: 'kv' per la busta e le note locali del dispositivo, 'blob' per gli allegati cifrati. */
+let _db;
+function db() {
+  return _db || (_db = new Promise((ok, ko) => {
+    const r = indexedDB.open('archivio-vita', 1);
+    r.onupgradeneeded = () => { r.result.createObjectStore('kv'); r.result.createObjectStore('blob'); };
+    r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error);
+  }));
+}
+async function idb(negozio, modo, fn) {
+  const d = await db();
+  return new Promise((ok, ko) => {
+    const tx = d.transaction(negozio, modo); const rq = fn(tx.objectStore(negozio));
+    tx.oncomplete = () => ok(rq ? rq.result : undefined); tx.onerror = tx.onabort = () => ko(tx.error);
+  });
+}
+const kvLeggi = k => idb('kv', 'readonly', st => st.get(k));
+const kvScrivi = (k, v) => idb('kv', 'readwrite', st => st.put(v, k));
+const kvTogli = k => idb('kv', 'readwrite', st => st.delete(k));
+const blobLeggi = id => idb('blob', 'readonly', st => st.get(id));
+const blobScrivi = (id, bytes) => idb('blob', 'readwrite', st => st.put(bytes, id));
+const blobTogli = id => idb('blob', 'readwrite', st => st.delete(id));
+const blobChiavi = () => idb('blob', 'readonly', st => st.getAllKeys());
+
+function archivioVuoto() {
+  return { schema: SCHEMA, meta: { creato: adesso(), aggiornato: adesso() }, persone: [], voci: [], allegati: [], aree: [], registro: [], impostazioni: { agg: adesso(), blocco_min: 15 } };
+}
+function completa(a) {
+  const v = archivioVuoto();
+  for (const k of Object.keys(v)) if (a[k] == null) a[k] = v[k];
+  return a;
+}
+
+/* --- Creazione, sblocco, blocco --- */
+/* Prepara la cifratura locale con una frase nuova. L'archivio (S.A) lo imposta chi chiama. */
+async function preparaLocale(frase, promemoria) {
+  for (const k of await blobChiavi()) await blobTogli(k);
+  await kvTogli('sporco');
+  const grezza = casuale(32);
+  S.testata = { promemoria, slot: [await creaSlot('frase', frase, grezza)], slot_agg: adesso() };
+  S.chiaveGrezza = grezza; S.chiave = await importaChiaveDati(grezza);
+  S.est = {}; S.disp = {}; S.estVoci = []; S.sporco = false;
+}
+async function creaArchivio(frase, promemoria, nomePersona, nascita) {
+  await preparaLocale(frase, promemoria);
+  S.A = archivioVuoto();
+  S.A.persone.push({ id: uid(), nome: nomePersona, nascita: nascita || '', ruolo: 'titolare', creato: adesso(), agg: adesso() });
+  S.sbloccato = true;
+  await persisti();
+}
+/* Contenuto della busta locale: dalla versione 2 contiene archivio, dati esterni e impostazioni del dispositivo. */
+function apriContenuto(x) {
+  if (x && x.formato_locale === 2) return { A: completa(x.A), est: x.est || {}, disp: x.disp || {} };
+  const A = completa(x), disp = {};
+  if (A.impostazioni.github) { disp.github = A.impostazioni.github; delete A.impostazioni.github; }
+  return { A, est: {}, disp };
+}
+async function apriBusta(busta, segreto, tipo) {
+  if (!busta || busta.formato !== 'archivio-vita') throw new Error('Il file non è un archivio valido.');
+  for (const slot of busta.slot.filter(x => x.tipo === tipo)) {
+    try {
+      const grezza = await apriSlot(slot, segreto);
+      const chiave = await importaChiaveDati(grezza);
+      return { grezza, chiave, ...apriContenuto(await dissigilla(busta, chiave)) };
+    } catch (e) { /* segreto sbagliato per questo slot: provo il prossimo */ }
+  }
+  throw new Error(tipo === 'recupero' ? 'Codice di recupero non valido.' : 'Frase segreta non corretta.');
+}
+async function sblocca(busta, segreto, tipo) {
+  const r = await apriBusta(busta, segreto, tipo);
+  S.chiaveGrezza = r.grezza; S.chiave = r.chiave; S.A = r.A; S.est = r.est; S.disp = r.disp;
+  ricostruisciEsterni();
+  S.testata = { promemoria: busta.promemoria || '', slot: busta.slot, slot_agg: busta.slot_agg };
+  S.sbloccato = true; S.ultimaAttivita = Date.now();
+  S.sporco = !!(await kvLeggi('sporco'));
+  const p = S.A.persone.filter(x => !x.canc);
+  S.persona = p.length === 1 ? p[0].id : '';
+}
+function blocca() {
+  if (S.chiaveGrezza) S.chiaveGrezza.fill(0);
+  Object.assign(S, { sbloccato: false, chiave: null, chiaveGrezza: null, A: null, est: {}, disp: {}, estVoci: [], persona: '' });
+  chiudiModale();
+  disegna();
+}
+
+/* --- Salvataggio --- */
+let _tSalva, _codaSalva = Promise.resolve();
+async function persisti() {
+  if (!S.sbloccato) return;
+  const busta = await sigilla({ formato_locale: 2, A: S.A, est: S.est, disp: S.disp }, S.chiave, S.testata);
+  await kvScrivi('busta', busta);
+  return busta;
+}
+function salva(ridisegna = true) {
+  S.A.meta.aggiornato = adesso();
+  S.sporco = true; kvScrivi('sporco', 1);
+  clearTimeout(_tSalva);
+  _tSalva = setTimeout(() => { _codaSalva = _codaSalva.then(persisti).then(programmaSync).catch(e => avviso('Salvataggio non riuscito: ' + e.message, 'errore')); }, 250);
+  if (ridisegna) disegna();
+}
+const salvaSubito = () => { clearTimeout(_tSalva); return (_codaSalva = _codaSalva.then(persisti)); };
+
+/* --- Accesso ai dati --- */
+const persone = () => S.A.persone.filter(p => !p.canc);
+const nomePersona = id => (S.A.persone.find(p => p.id === id) || {}).nome || '';
+const personaPredefinita = () => S.persona || (persone()[0] || {}).id || '';
+function voci(area, tipo, tutti = false) {
+  const filtro = v => !v.canc && v.area === area && (!tipo || v.tipo === tipo) && (tutti || !S.persona || !v.persona || v.persona === S.persona);
+  const l = S.A.voci.filter(filtro);
+  return area === 'salute' && S.estVoci.length ? l.concat(S.estVoci.filter(filtro)) : l;
+}
+/* Righe dei file garmin/*.csv trasformate in voci di sola lettura. */
+function ricostruisciEsterni() {
+  const titolare = (S.A.persone.find(p => !p.canc && p.ruolo === 'titolare') || S.A.persone.find(p => !p.canc) || {}).id || '';
+  const out = [];
+  for (const righe of Object.values((S.est && S.est.file) || {})) for (const [data, tipo, metrica, valore, unita] of righe) {
+    out.push({ id: 'g-' + data + '-' + nomeFile(metrica), area: 'salute', tipo: tipo === 'corpo' ? 'corpo' : 'sensore', persona: titolare, data, metrica, valore, unita, fonte: 'Garmin', auto: true, creato: data });
+  }
+  S.estVoci = out;
+}
+const voce = id => S.A.voci.find(v => v.id === id && !v.canc);
+function metti(v, ridisegna = true) {
+  const t = adesso();
+  if (!v.id) v.id = uid();
+  if (!v.creato) v.creato = t;
+  v.agg = t;
+  const i = S.A.voci.findIndex(x => x.id === v.id);
+  if (i >= 0) S.A.voci[i] = v; else S.A.voci.push(v);
+  salva(ridisegna);
+  return v;
+}
+/* Le cancellazioni lasciano una lapide (canc: true), così la sincronizzazione tra dispositivi non le fa riapparire. */
+function togli(lista, id) {
+  const i = S.A[lista].findIndex(x => x.id === id);
+  if (i < 0) return;
+  const x = S.A[lista][i];
+  S.A[lista][i] = { id: x.id, area: x.area, tipo: x.tipo, canc: true, agg: adesso() };
+  salva();
+}
+function annota(azione, origine, esito) {
+  S.A.registro.push({ id: uid(), quando: adesso(), agg: adesso(), azione, origine, ...esito });
+  if (S.A.registro.length > 400) S.A.registro.splice(0, S.A.registro.length - 400);
+}
+const allegati = () => S.A.allegati.filter(a => !a.canc && (!S.persona || !a.persona || a.persona === S.persona));
+
+async function aggiungiAllegato(file, extra = {}) {
+  const bytes = new Uint8Array(await leggiFile(file, 'bytes'));
+  return aggiungiAllegatoBytes(bytes, { nome: file.name, mime: file.type || 'application/octet-stream', ...extra });
+}
+async function aggiungiAllegatoBytes(bytes, meta) {
+  const id = meta.id || uid();
+  await blobScrivi(id, await cifraBytes(bytes, S.chiave));
+  const est = ((meta.nome || '').match(/\.[a-z0-9]{1,6}$/i) || ['.bin'])[0].toLowerCase();
+  const a = { area: '', persona: personaPredefinita(), data: oggi(), stato: 'da elaborare', nota: '', rif: '', file: 'documenti/' + id + est, ...meta, id, dim: bytes.length, creato: meta.creato || adesso(), agg: adesso() };
+  const i = S.A.allegati.findIndex(x => x.id === id);
+  if (i >= 0) S.A.allegati[i] = a; else S.A.allegati.push(a);
+  return a;
+}
+async function contenutoAllegato(a) {
+  const c = await blobLeggi(a.id);
+  if (c) return decifraBytes(c, S.chiave);
+  if (ghPronto() && a.file) {
+    const chiaro = await ghScaricaAllegato(a.file);
+    if (chiaro) { await blobScrivi(a.id, await cifraBytes(chiaro, S.chiave)); return chiaro; }
+  }
+  throw new Error(ghPronto() ? 'Documento non trovato nel repository dei dati.' : 'Il contenuto di questo documento non è su questo dispositivo. Collega il repository dei dati per scaricarlo.');
+}
+
+/* --- Unione di due archivi: per ogni elemento vince la modifica più recente --- */
+const LISTE = ['persone', 'voci', 'allegati', 'aree', 'registro'];
+function unisci(locale, remoto) {
+  let daRemoto = 0, daLocale = 0;
+  const out = { schema: SCHEMA, meta: { creato: locale.meta.creato < remoto.meta.creato ? locale.meta.creato : remoto.meta.creato, aggiornato: adesso() } };
+  for (const nome of LISTE) {
+    const m = new Map((locale[nome] || []).map(x => [x.id, x]));
+    const visti = new Set();
+    for (const r of remoto[nome] || []) {
+      visti.add(r.id);
+      const l = m.get(r.id);
+      if (!l || (r.agg || '') > (l.agg || '')) { m.set(r.id, r); daRemoto++; }
+      else if ((l.agg || '') > (r.agg || '')) daLocale++;
+    }
+    for (const id of m.keys()) if (!visti.has(id)) daLocale++;
+    out[nome] = [...m.values()];
+  }
+  const il = locale.impostazioni || {}, ir = remoto.impostazioni || {};
+  if ((ir.agg || '') > (il.agg || '')) { out.impostazioni = ir; daRemoto++; } else { out.impostazioni = il; if ((il.agg || '') > (ir.agg || '')) daLocale++; }
+  return { unito: out, daRemoto, daLocale };
+}
+
+/* --- Forma del file archivio.json: un elemento per riga, ordinati per id, così le modifiche nel repository si leggono riga per riga.
+   strumenti/archivio.py nel repository dei dati scrive esattamente nello stesso modo. --- */
+function serializza(A) {
+  const d = x => JSON.stringify(x);
+  const testa = ['{', ` "schema": ${d(A.schema || SCHEMA)},`, ` "meta": ${d(A.meta)},`, ` "impostazioni": ${d(A.impostazioni)},`];
+  const liste = LISTE.map(n => {
+    const el = [...(A[n] || [])].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    return ` "${n}": [` + (el.length ? '\n' + el.map(x => '  ' + d(x)).join(',\n') + '\n ]' : ']');
+  });
+  return testa.join('\n') + '\n' + liste.join(',\n') + '\n}\n';
+}
+
+/* --- Esportazione in chiaro: il formato aperto da cui ricostruire tutto --- */
+async function esportaChiaro(conAllegati) {
+  const copia = JSON.parse(JSON.stringify(S.A));
+  for (const n of LISTE) copia[n] = copia[n].filter(x => !x.canc);
+  copia.esportato = adesso();
+  if (conAllegati) for (const a of copia.allegati) {
+    try { a.contenuto_base64 = b64(await contenutoAllegato(a)); } catch (e) { a.contenuto_mancante = true; }
+  }
+  return copia;
+}
+/* Importazione di un file nel formato aperto. mappaPersone: id nel file -> id nell'archivio ('' = crea). */
+async function importaChiaro(dati, mappaPersone, origine) {
+  const esito = { aggiunti: 0, aggiornati: 0, saltati: 0, errori: [] };
+  const map = {};
+  for (const p of dati.persone || []) {
+    const dest = mappaPersone[p.id];
+    if (dest) { map[p.id] = dest; const q = S.A.persone.find(x => x.id === dest); if (q && !q.nascita && p.nascita) { q.nascita = p.nascita; q.agg = adesso(); } }
+    else { const n = { ...p, id: S.A.persone.some(x => x.id === p.id) ? uid() : p.id, creato: p.creato || adesso(), agg: adesso() }; S.A.persone.push(n); map[p.id] = n.id; esito.aggiunti++; }
+  }
+  const rimappa = x => (x.persona && map[x.persona] ? { ...x, persona: map[x.persona] } : x);
+  const fondi = (lista, x) => {
+    if (!x || !x.id) { esito.errori.push('Elemento senza identificativo ignorato.'); return false; }
+    const i = S.A[lista].findIndex(y => y.id === x.id);
+    if (i < 0) { S.A[lista].push({ creato: adesso(), ...x, agg: x.agg || adesso() }); esito.aggiunti++; return true; }
+    if ((x.agg || '') > (S.A[lista][i].agg || '')) { S.A[lista][i] = x; esito.aggiornati++; return true; }
+    esito.saltati++; return false;
+  };
+  for (const v of dati.voci || []) {
+    if (!v.area || !v.tipo) { esito.errori.push(`Voce ${v.id || '?'} senza area o tipo: ignorata.`); continue; }
+    fondi('voci', rimappa(v));
+  }
+  for (const a of dati.aree || []) fondi('aree', a);
+  for (const a0 of dati.allegati || []) {
+    const { contenuto_base64, contenuto_mancante, ...a } = rimappa(a0);
+    const presente = S.A.allegati.find(y => y.id === a.id && !y.canc);
+    if (contenuto_base64) {
+      if (presente && (await blobLeggi(a.id))) { esito.saltati++; continue; }
+      try { await aggiungiAllegatoBytes(daB64(contenuto_base64), a); esito.aggiunti++; }
+      catch (e) { esito.errori.push(`Documento "${a.nome}" non caricato: ${e.message}`); }
+    } else if (!presente && a.file) { S.A.allegati.push({ creato: adesso(), ...a, agg: a.agg || adesso() }); esito.aggiunti++; }
+    else if (!presente) esito.errori.push(`Documento "${a.nome}" presente nell'elenco ma senza contenuto: non caricato.`);
+    else esito.saltati++;
+  }
+  annota('Importazione file dati', origine, esito);
+  salva();
+  return esito;
+}
+
+/* ===== 4. Sincronizzazione con il repository privato dei dati =====
+   Nel repository i file sono leggibili, così Claude e le automazioni possono lavorarci:
+     archivio.json        l'archivio (scritto dalla pagina e da Claude)
+     documenti/           gli originali dei documenti
+     garmin/*.csv         dati del dispositivo, scritti ogni notte dall'automazione (sola lettura per la pagina)
+     garmin/stato.json    esito dell'ultimo scaricamento
+     rapporti/*.md        rapporti periodici scritti da Claude (sola lettura per la pagina)
+   Sul dispositivo tutto resta cifrato con la frase segreta, token compreso. */
+const GH = 'https://api.github.com';
+const FILE_ARCHIVIO = 'archivio.json';
+const gh = () => (S.disp && S.disp.github) || null;
+const ghPronto = () => { const g = gh(); return !!(g && g.proprietario && g.repo && g.token); };
+
+function ghUrl(g, percorso, conRef) {
+  const p = percorso.split('/').map(encodeURIComponent).join('/');
+  return `${GH}/repos/${encodeURIComponent(g.proprietario)}/${encodeURIComponent(g.repo)}/contents/${p}` + (conRef && g.ramo ? '?ref=' + encodeURIComponent(g.ramo) : '');
+}
+async function ghChiama(g, metodo, percorso, corpo, grezzo) {
+  const r = await fetch(ghUrl(g, percorso, metodo === 'GET'), {
+    method: metodo, cache: 'no-store',
+    headers: { Authorization: 'Bearer ' + g.token, Accept: grezzo ? 'application/vnd.github.raw+json' : 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
+    body: corpo ? JSON.stringify(corpo) : undefined,
+  });
+  if (r.status === 404 && metodo === 'GET') return null;
+  if (r.status === 401) throw new Error('GitHub rifiuta il token: è scaduto o errato. Creane uno nuovo e incollalo in Impostazioni.');
+  if (r.status === 403) throw new Error('GitHub nega l\'accesso: il token non ha il permesso "Contents: read and write" su questo repository.');
+  if (r.status === 404) throw new Error('Repository non trovato: controlla nome e permessi del token.');
+  if (r.status === 409 || r.status === 422) { const e = new Error('conflitto'); e.conflitto = true; throw e; }
+  if (!r.ok) throw new Error('GitHub ha risposto con errore ' + r.status + '.');
+  return grezzo ? new Uint8Array(await r.arrayBuffer()) : r.json();
+}
+/* Distingue "repository inesistente o token senza accesso" da "repository vuoto". */
+async function ghControllaRepo(g) {
+  const r = await fetch(`${GH}/repos/${encodeURIComponent(g.proprietario)}/${encodeURIComponent(g.repo)}`, { cache: 'no-store', headers: { Authorization: 'Bearer ' + g.token, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' } });
+  if (r.status === 401) throw new Error('GitHub rifiuta il token: è scaduto o errato.');
+  if (r.status === 404 || r.status === 403) throw new Error(`Il repository "${g.proprietario}/${g.repo}" non esiste oppure il token non ha accesso: controlla utente, nome del repository e permessi del token.`);
+  if (!r.ok) throw new Error('GitHub ha risposto con errore ' + r.status + '.');
+}
+async function ghLeggiTesto(g, percorso) {
+  const b = await ghChiama(g, 'GET', percorso, null, true);
+  return b ? decod.decode(b) : null;
+}
+async function ghLeggiArchivio(g) {
+  const j = await ghChiama(g, 'GET', FILE_ARCHIVIO);
+  if (!j) return null;
+  const testo = j.content ? decod.decode(daB64(j.content)) : await ghLeggiTesto(g, FILE_ARCHIVIO);
+  let A;
+  try { A = JSON.parse(testo); } catch (e) { throw new Error('archivio.json nel repository non è un JSON valido: non lo tocco. Va corretto a mano o da Claude.'); }
+  if (!A || !String(A.schema || '').startsWith('archivio-vita/')) throw new Error('archivio.json nel repository non è nel formato dell\'archivio: non lo tocco.');
+  return { sha: j.sha, A: completa(A) };
+}
+function ghScrivi(g, percorso, bytes, sha, messaggio) {
+  const corpo = { message: messaggio, content: b64(bytes) };
+  if (sha) corpo.sha = sha;
+  if (g.ramo) corpo.branch = g.ramo;
+  return ghChiama(g, 'PUT', percorso, corpo);
+}
+async function ghScaricaAllegato(percorso) {
+  try { return await ghChiama(gh(), 'GET', percorso, null, true); } catch (e) { return null; }
+}
+const elencoCartella = async (g, c) => ((await ghChiama(g, 'GET', c)) || []).filter(x => x.type === 'file');
+
+let _tSync, _inSync = false;
+function programmaSync() {
+  if (!S.sbloccato || !ghPronto()) return;
+  clearTimeout(_tSync);
+  _tSync = setTimeout(() => sincronizza(false), 4000);
+}
+function statoSync(stato, errore = '') {
+  S.sync.stato = stato; S.sync.errore = errore;
+  if (stato === 'ok') S.sync.ultimo = adesso();
+  const el = $('#stato-sync'); if (el) el.replaceWith(spiaSync());
+}
+async function sincronizza(manuale) {
+  if (!ghPronto()) { if (manuale) avviso('Repository dei dati non collegato: vai in Impostazioni.', 'errore'); return; }
+  if (_inSync) return;
+  if (!navigator.onLine) { statoSync('errore', 'Sei offline: le modifiche restano su questo dispositivo e partiranno alla prossima connessione.'); return; }
+  _inSync = true; statoSync('in corso');
+  const g = gh();
+  try {
+    await salvaSubito();
+    let fatto = false, cambiato = false;
+    for (let giro = 0; giro < 4 && !fatto; giro++) {
+      const remoto = await ghLeggiArchivio(g);
+      if (!remoto) { await ghScrivi(g, FILE_ARCHIVIO, cod.encode(serializza(S.A)), null, 'Primo salvataggio dalla pagina'); fatto = true; break; }
+      const u = unisci(S.A, remoto.A);
+      if (u.daRemoto > 0) { S.A = u.unito; cambiato = true; }
+      if (u.daLocale > 0) {
+        try { await ghScrivi(g, FILE_ARCHIVIO, cod.encode(serializza(u.unito)), remoto.sha, 'Modifica dalla pagina'); S.A = u.unito; fatto = true; }
+        catch (e) { if (!e.conflitto) throw e; /* qualcun altro ha scritto nel frattempo: rileggo e riunisco */ }
+      } else fatto = true;
+    }
+    if (!fatto) throw new Error('Troppi tentativi in conflitto con un\'altra modifica: riprova tra poco.');
+    const esitoDoc = await sincronizzaAllegati(g);
+    if (await leggiEsterni(g)) cambiato = true;
+    await persisti();
+    S.sporco = false; await kvTogli('sporco');
+    statoSync('ok');
+    if (cambiato) disegna();
+    if (manuale) avviso('Sincronizzato.' + (esitoDoc.caricati ? ` Documenti inviati: ${esitoDoc.caricati}.` : ''), 'ok');
+  } catch (e) {
+    statoSync('errore', e.message === 'Failed to fetch' ? 'Impossibile raggiungere GitHub: controlla la connessione.' : e.conflitto ? 'GitHub ha rifiutato la scrittura per un conflitto: riprova tra poco.' : e.message);
+    if (manuale) avviso(S.sync.errore, 'errore');
+  } finally { _inSync = false; }
+}
+async function sincronizzaAllegati(g) {
+  const esito = { caricati: 0, rimossi: 0 };
+  const remoti = new Map((await elencoCartella(g, 'documenti')).map(x => ['documenti/' + x.name, x.sha]));
+  const locali = new Set(await blobChiavi());
+  for (const a of S.A.allegati) {
+    const file = a.file;
+    if (a.canc) {
+      if (locali.has(a.id)) await blobTogli(a.id);
+      const f = file || [...remoti.keys()].find(k => k.startsWith('documenti/' + a.id + '.'));
+      if (f && remoti.has(f)) { const c = { message: 'Rimozione documento', sha: remoti.get(f) }; if (g.ramo) c.branch = g.ramo; await ghChiama(g, 'DELETE', f, c); remoti.delete(f); esito.rimossi++; }
+    } else if (file && locali.has(a.id) && !remoti.has(file)) {
+      await ghScrivi(g, file, await decifraBytes(await blobLeggi(a.id), S.chiave), null, 'Nuovo documento: ' + (a.nome || a.id));
+      esito.caricati++;
+    }
+  }
+  return esito;
+}
+/* Garmin e rapporti: si riscaricano solo i file cambiati (GitHub dà un'impronta per ogni file). */
+function leggiCsvGarmin(testo) {
+  const { intestazioni, righe } = leggiCsv(testo);
+  const i = n => intestazioni.indexOf(n);
+  const [id, it, im, iv, iu] = ['data', 'tipo', 'metrica', 'valore', 'unita'].map(i);
+  return righe.map(r => [r[id], it >= 0 ? r[it] : 'sensore', r[im], Number(r[iv]), iu >= 0 ? r[iu] : '']).filter(r => /^\d{4}-\d{2}-\d{2}$/.test(r[0]) && r[2] && isFinite(r[3]));
+}
+async function leggiEsterni(g) {
+  const E = S.est; let cambiato = false;
+  E.file = E.file || {}; E.sha = E.sha || {}; E.rapporti = E.rapporti || {};
+  const garmin = await elencoCartella(g, 'garmin');
+  const visti = new Set();
+  for (const f of garmin.filter(x => /\.csv$/i.test(x.name))) {
+    visti.add(f.name);
+    if (E.sha[f.name] === f.sha && E.file[f.name]) continue;
+    E.file[f.name] = leggiCsvGarmin(await ghLeggiTesto(g, 'garmin/' + f.name)); E.sha[f.name] = f.sha; cambiato = true;
+  }
+  for (const n of Object.keys(E.file)) if (!visti.has(n)) { delete E.file[n]; delete E.sha[n]; cambiato = true; }
+  const st = garmin.find(x => x.name === 'stato.json');
+  if (st && st.sha !== E.statoSha) {
+    try { E.stato = JSON.parse(await ghLeggiTesto(g, 'garmin/stato.json')); } catch (e) { E.stato = { esito: 'errore', messaggio: 'garmin/stato.json non leggibile' }; }
+    E.statoSha = st.sha; cambiato = true;
+  }
+  const rap = (await elencoCartella(g, 'rapporti')).filter(x => /\.md$/i.test(x.name));
+  const nomi = new Set(rap.map(x => x.name));
+  for (const f of rap) {
+    const r = E.rapporti[f.name];
+    if (r && r.sha === f.sha) continue;
+    E.rapporti[f.name] = { sha: f.sha, testo: await ghLeggiTesto(g, 'rapporti/' + f.name) }; cambiato = true;
+  }
+  for (const n of Object.keys(E.rapporti)) if (!nomi.has(n)) { delete E.rapporti[n]; cambiato = true; }
+  if (cambiato) ricostruisciEsterni();
+  return cambiato;
+}
+
+/* ===== 5. Schema: aree, tipi di voce e campi =====
+   Per aggiungere un'area o un tipo basta aggiungere una descrizione qui: tabelle, moduli,
+   importazione CSV ed esportazione si generano da soli. I dati già salvati non vanno toccati. */
+const c = (k, etichetta, tipo = 'testo', extra = {}) => ({ k, etichetta, tipo, ...extra });
+const CAT_ESAMI = ['Rene', 'Lipidi', 'Glicemia', 'Fegato', 'Infiammazione', 'Ematologia', 'Ferro e vitamine', 'Tiroide e ormoni', 'Proteine', 'Elettroliti', 'Intestino', 'Urine', 'Sierologie', 'Allergologia', 'Altro'];
+const RIPETI = { mai: 0, mensile: 1, trimestrale: 3, semestrale: 6, annuale: 12 };
+/* Categorie dei movimenti. "Giroconto" (spostamenti tra conti propri) non conta né come entrata né come uscita. */
+const CAT_USCITE = ['Casa', 'Spesa alimentare', 'Ristoranti e bar', 'Auto e trasporti', 'Salute', 'Figli', 'Istruzione', 'Sport e benessere', 'Abbigliamento', 'Viaggi e svago', 'Abbonamenti', 'Assicurazioni', 'Tasse e imposte', 'Regali e donazioni', 'Commissioni bancarie', 'Altre uscite'];
+const CAT_ENTRATE = ['Compensi e stipendio', 'Utili e dividendi', 'Rimborsi', 'Affitti', 'Altre entrate'];
+const GIROCONTO = 'Giroconto';
+const AMBITI = ['Lavoro', 'Famiglia', 'Personale', 'Salute', 'Finanze'];
+
+const AREE_BASE = [
+  { id: 'finanze', nome: 'Finanze', tipi: {
+    saldo: { nome: 'Saldo di un conto', plur: 'Saldi dei conti', titolo: v => v.conto, colonne: ['data', 'conto', 'categoria', 'valore'], campi: [
+      c('data', 'Data', 'data', { obbl: true }), c('conto', 'Conto', 'testo', { obbl: true, suggerisci: true, esempi: ['BPM personale', 'BPM famiglia'] }), c('categoria', 'Tipo', 'scelta', { opzioni: ['Conto corrente', 'Risparmio', 'Investimenti', 'Previdenza', 'Contanti', 'Carta di credito', 'Debito'] }), c('valore', 'Saldo in euro', 'numero', { obbl: true, euro: true }), c('nota', 'Nota')] },
+    movimento: { nome: 'Movimento', plur: 'Entrate e uscite', titolo: v => v.descrizione, colonne: ['data', 'descrizione', 'categoria', 'valore', 'conto'], campi: [
+      c('data', 'Data', 'data', { obbl: true }), c('descrizione', 'Descrizione', 'testo', { obbl: true }), c('categoria', 'Categoria', 'scelta', { opzioni: [...CAT_USCITE, ...CAT_ENTRATE, GIROCONTO] }),
+      c('valore', 'Importo in euro (negativo per le uscite)', 'numero', { obbl: true, euro: true }), c('conto', 'Conto', 'testo', { suggerisci: true }), c('ricorrente', 'Spesa o entrata ricorrente', 'si_no'), c('nota', 'Nota')] },
+    budget: { nome: 'Tetto di spesa', plur: 'Tetti di spesa mensili', titolo: v => v.categoria, colonne: ['categoria', 'valore', 'data'], campi: [
+      c('categoria', 'Categoria', 'scelta', { obbl: true, opzioni: CAT_USCITE }), c('valore', 'Tetto mensile in euro', 'numero', { obbl: true, euro: true }), c('data', 'In vigore dal', 'data', { obbl: true }), c('nota', 'Nota')] },
+  } },
+  { id: 'patrimonio', nome: 'Patrimonio', tipi: {
+    bene: { nome: 'Bene', plur: 'Beni', titolo: v => v.titolo, colonne: ['titolo', 'categoria', 'valore', 'data'], campi: [
+      c('titolo', 'Nome', 'testo', { obbl: true }), c('categoria', 'Tipo', 'scelta', { opzioni: ['Immobile', 'Quote societarie', 'Investimenti finanziari', 'Polizze e previdenza', 'Veicolo', 'Oggetti di valore', 'Altro'] }), c('valore', 'Valore stimato oggi in euro', 'numero', { obbl: true, euro: true }),
+      c('data', 'Data della stima', 'data'), c('costo', 'Costo di acquisto in euro', 'numero', { euro: true }), c('acquisto', 'Data di acquisto', 'data'), c('nota', 'Nota', 'lungo')] },
+    debito: { nome: 'Debito', plur: 'Debiti', titolo: v => v.titolo, colonne: ['titolo', 'categoria', 'valore', 'scadenza'], campi: [
+      c('titolo', 'Nome', 'testo', { obbl: true }), c('categoria', 'Tipo', 'scelta', { opzioni: ['Mutuo', 'Finanziamento', 'Leasing', 'Altro'] }), c('valore', 'Residuo in euro', 'numero', { obbl: true, euro: true }),
+      c('data', 'Data del residuo', 'data'), c('rata', 'Rata mensile in euro', 'numero', { euro: true }), c('scadenza', 'Fine prevista', 'data'), c('nota', 'Nota', 'lungo')] },
+  } },
+  { id: 'organizzazione', nome: 'Organizzazione', tipi: {
+    obiettivo: { nome: 'Obiettivo', plur: 'Obiettivi', titolo: v => v.titolo, colonne: ['titolo', 'ambito', 'avanzamento', 'scadenza', 'stato'], campi: [
+      c('titolo', 'Obiettivo', 'testo', { obbl: true }), c('ambito', 'Ambito', 'scelta', { opzioni: AMBITI }), c('data', 'Fissato il', 'data', { obbl: true }), c('scadenza', 'Da raggiungere entro', 'data'),
+      c('misura', 'Come si misura (es. 10 kg in meno, 20.000 € di riserva)', 'lungo'), c('avanzamento', 'Avanzamento in %', 'numero'), c('stato', 'Stato', 'scelta', { opzioni: ['attivo', 'raggiunto', 'in pausa', 'abbandonato'] }), c('nota', 'Nota', 'lungo')] },
+    attivita: { nome: 'Cosa da fare', plur: 'Cose da fare', titolo: v => v.titolo, colonne: ['data', 'titolo', 'ambito', 'priorita', 'stato'], campi: [
+      c('titolo', 'Cosa', 'testo', { obbl: true }), c('ambito', 'Ambito', 'scelta', { opzioni: AMBITI }), c('data', 'Entro il', 'data', { obbl: true }),
+      c('priorita', 'Priorità', 'scelta', { opzioni: ['alta', 'media', 'bassa'] }), c('stato', 'Stato', 'scelta', { opzioni: ['da fare', 'in corso', 'fatta'] }), c('nota', 'Nota', 'lungo')] },
+    revisione: { nome: 'Revisione della settimana', plur: 'Revisioni settimanali', titolo: v => 'Settimana del ' + fmtData(v.data), colonne: ['data', 'voto', 'focus'], campi: [
+      c('data', 'Lunedì della settimana', 'data', { obbl: true }), c('voto', 'Come è andata, da 1 a 5', 'numero'), c('bene', 'Cosa è andato bene', 'lungo'), c('male', 'Cosa non è andato', 'lungo'),
+      c('focus', 'Le tre cose della prossima settimana', 'lungo'), c('famiglia', 'Tempo per la famiglia: cosa ho fatto', 'lungo')] },
+  } },
+  { id: 'salute', nome: 'Salute e longevità', tipi: {
+    misura: { nome: 'Esame di laboratorio', plur: 'Esami di laboratorio', titolo: v => v.parametro, colonne: ['data', 'parametro', 'valore', 'unita', 'rif_testo', 'laboratorio'], campi: [
+      c('data', 'Data del prelievo', 'data', { obbl: true }), c('parametro', 'Parametro', 'testo', { obbl: true, suggerisci: true }), c('categoria', 'Categoria', 'scelta', { opzioni: CAT_ESAMI }),
+      c('valore', 'Valore', 'numero'), c('testo', 'Risultato a parole (es. Negativo)'), c('unita', 'Unità di misura', 'testo', { suggerisci: true }),
+      c('rif_min', 'Riferimento minimo', 'numero'), c('rif_max', 'Riferimento massimo', 'numero'), c('rif_testo', 'Riferimento come scritto sul referto'),
+      c('fuori', 'Segnalato fuori intervallo dal laboratorio', 'si_no'), c('laboratorio', 'Laboratorio', 'testo', { suggerisci: true }), c('doc', 'Referto di origine', 'allegato'), c('nota', 'Nota', 'lungo')] },
+    visita: { nome: 'Visita o referto', plur: 'Visite e referti', titolo: v => v.specialista, colonne: ['data', 'specialista', 'struttura', 'conclusioni'], campi: [
+      c('data', 'Data', 'data', { obbl: true }), c('specialista', 'Specialista o tipo di esame', 'testo', { obbl: true }), c('struttura', 'Struttura'), c('motivo', 'Motivo'),
+      c('conclusioni', 'Conclusioni', 'lungo'), c('indicazioni', 'Indicazioni ricevute', 'lungo'), c('doc', 'Referto di origine', 'allegato')] },
+    sensore: { nome: 'Dato del dispositivo', plur: 'Dati del dispositivo', titolo: v => v.metrica, colonne: ['data', 'metrica', 'valore', 'unita', 'fonte'], largo: 'metrica', campi: [
+      c('data', 'Data', 'data', { obbl: true }), c('metrica', 'Metrica', 'testo', { obbl: true, suggerisci: true }), c('valore', 'Valore', 'numero', { obbl: true }), c('unita', 'Unità'), c('fonte', 'Dispositivo', 'testo', { suggerisci: true })] },
+    corpo: { nome: 'Misura del corpo', plur: 'Peso e misure', titolo: v => v.metrica, colonne: ['data', 'metrica', 'valore', 'unita'], largo: 'metrica', campi: [
+      c('data', 'Data', 'data', { obbl: true }), c('metrica', 'Misura', 'testo', { obbl: true, suggerisci: true, esempi: ['Peso', 'Altezza', 'Massa grassa', 'Massa magra', 'Circonferenza vita', 'Pressione sistolica', 'Pressione diastolica'] }), c('valore', 'Valore', 'numero', { obbl: true }), c('unita', 'Unità')] },
+    alimentazione: { nome: 'Piano alimentare', plur: 'Piani alimentari', titolo: v => v.titolo, colonne: ['data', 'titolo', 'calorie', 'stato'], campi: [
+      c('titolo', 'Nome del piano', 'testo', { obbl: true }), c('data', 'Dal', 'data', { obbl: true }), c('autore', 'Prescritto da'), c('obiettivo', 'Obiettivo', 'scelta', { opzioni: ['Dimagrimento', 'Mantenimento', 'Massa', 'Salute'] }),
+      c('calorie', 'Calorie giornaliere', 'numero'), c('stato', 'Stato', 'scelta', { opzioni: ['in uso', 'seguito poco', 'concluso'] }), c('sintesi', 'Sintesi del piano', 'lungo'), c('doc', 'Documento di origine', 'allegato')] },
+    osservazione: { nome: 'Osservazione', plur: 'Osservazioni e piano', titolo: v => v.titolo, colonne: ['data', 'titolo', 'priorita', 'stato'], campi: [
+      c('data', 'Data', 'data', { obbl: true }), c('titolo', 'Titolo', 'testo', { obbl: true }), c('testo', 'Testo', 'lungo'), c('priorita', 'Priorità', 'scelta', { opzioni: ['alta', 'media', 'bassa'] }),
+      c('stato', 'Stato', 'scelta', { opzioni: ['aperta', 'in corso', 'chiusa'] }), c('origine', 'Scritta da')] },
+  } },
+  { id: 'sport', nome: 'Sport', tipi: {
+    attivita: { nome: 'Attività sportiva', plur: 'Attività sportive', titolo: v => v.disciplina, colonne: ['data', 'disciplina', 'minuti', 'intensita'], campi: [
+      c('data', 'Data', 'data', { obbl: true }), c('disciplina', 'Disciplina', 'testo', { obbl: true, suggerisci: true, esempi: ['Palestra', 'Corsa', 'Camminata', 'Padel', 'Pilates', 'Nuoto', 'Bici'] }),
+      c('minuti', 'Durata in minuti', 'numero'), c('intensita', 'Intensità', 'scelta', { opzioni: ['leggera', 'moderata', 'intensa'] }), c('distanza', 'Distanza in km', 'numero'), c('nota', 'Nota', 'lungo')] },
+    allenamento: { nome: 'Seduta di allenamento', plur: 'Sedute da scheda', titolo: v => v.seduta || v.scheda, colonne: ['data', 'scheda', 'seduta', 'serie', 'stimato'], campi: [
+      c('data', 'Data', 'data', { obbl: true }), c('scheda', 'Scheda', 'testo', { obbl: true, suggerisci: true }), c('settimana', 'Settimana della scheda', 'numero'), c('seduta', 'Seduta', 'testo'),
+      c('serie', 'Serie eseguite', 'numero'), c('dettaglio', 'Esercizi (serie × ripetizioni, carico)', 'lungo'), c('stimato', 'Valori stimati', 'si_no'), c('stime', 'Cosa è stimato', 'lungo'),
+      c('doc', 'Scheda di origine', 'allegato'), c('nota', 'Nota', 'lungo')] },
+    massimale: { nome: 'Massimale', plur: 'Massimali', titolo: v => v.esercizio, colonne: ['data', 'esercizio', 'valore', 'ripetizioni'], campi: [
+      c('data', 'Data', 'data', { obbl: true }), c('esercizio', 'Esercizio', 'testo', { obbl: true, suggerisci: true }), c('valore', 'Chili', 'numero', { obbl: true }), c('ripetizioni', 'Ripetizioni', 'numero'), c('nota', 'Nota', 'lungo')] },
+  } },
+  { id: 'mindfulness', nome: 'Mindfulness', tipi: {
+    pratica: { nome: 'Pratica', plur: 'Pratiche', titolo: v => v.pratica, colonne: ['data', 'pratica', 'minuti', 'umore'], campi: [
+      c('data', 'Data', 'data', { obbl: true }), c('pratica', 'Pratica', 'testo', { obbl: true, suggerisci: true, esempi: ['Meditazione', 'Respirazione', 'Diario', 'Gratitudine', 'Passeggiata consapevole'] }),
+      c('minuti', 'Minuti', 'numero'), c('umore', 'Umore dopo, da 1 a 5', 'numero'), c('nota', 'Nota', 'lungo')] },
+  } },
+  { id: 'lettura', nome: 'Lettura', tipi: {
+    libro: { nome: 'Libro', plur: 'Libri', titolo: v => v.titolo, colonne: ['titolo', 'autore', 'stato', 'fine', 'voto'], campi: [
+      c('titolo', 'Titolo', 'testo', { obbl: true }), c('autore', 'Autore', 'testo', { suggerisci: true }), c('categoria', 'Genere', 'testo', { suggerisci: true, esempi: ['Business', 'Crescita personale', 'Salute', 'Finanza', 'Narrativa', 'Storia'] }),
+      c('stato', 'Stato', 'scelta', { opzioni: ['da leggere', 'in lettura', 'letto', 'abbandonato'] }), c('data', 'Iniziato il', 'data'), c('fine', 'Finito il', 'data'), c('pagine', 'Pagine', 'numero'),
+      c('voto', 'Voto da 1 a 5', 'numero'), c('idee', 'Idee da tenere e da applicare', 'lungo')] },
+    sessione: { nome: 'Sessione di lettura', plur: 'Sessioni di lettura', titolo: v => v.libro, colonne: ['data', 'libro', 'minuti', 'pagine'], campi: [
+      c('data', 'Data', 'data', { obbl: true }), c('libro', 'Libro', 'testo', { suggerisci: true }), c('minuti', 'Minuti', 'numero'), c('pagine', 'Pagine lette', 'numero')] },
+  } },
+  { id: 'viaggi', nome: 'Viaggi ed esperienze', tipi: {
+    viaggio: { nome: 'Viaggio', plur: 'Viaggi', titolo: v => v.titolo, colonne: ['data', 'titolo', 'luogo', 'con', 'voto'], campi: [
+      c('titolo', 'Titolo', 'testo', { obbl: true }), c('luogo', 'Luogo', 'testo'), c('paese', 'Paese', 'testo', { suggerisci: true }), c('data', 'Partenza', 'data', { obbl: true }), c('fine', 'Rientro', 'data'),
+      c('con', 'Con chi'), c('valore', 'Costo in euro', 'numero', { euro: true }), c('voto', 'Voto da 1 a 5', 'numero'), c('nota', 'Ricordi e note', 'lungo')] },
+    esperienza: { nome: 'Esperienza', plur: 'Esperienze', titolo: v => v.titolo, colonne: ['data', 'titolo', 'categoria', 'voto'], campi: [
+      c('titolo', 'Titolo', 'testo', { obbl: true }), c('data', 'Data', 'data', { obbl: true }), c('categoria', 'Categoria', 'testo', { suggerisci: true }), c('luogo', 'Luogo'),
+      c('con', 'Con chi'), c('valore', 'Costo in euro', 'numero', { euro: true }), c('voto', 'Voto da 1 a 5', 'numero'), c('nota', 'Note', 'lungo')] },
+  } },
+  { id: 'progetti', nome: 'Progetti', tipi: {
+    progetto: { nome: 'Progetto', plur: 'Progetti', titolo: v => v.titolo, colonne: ['titolo', 'stato', 'agg'], campi: [
+      c('titolo', 'Titolo', 'testo', { obbl: true }), c('stato', 'Stato', 'scelta', { opzioni: ['idea', 'attivo', 'in pausa', 'concluso'] }), c('obiettivo', 'Obiettivo in una frase', 'lungo')] },
+  } },
+];
+const TIPO_SCADENZA = { nome: 'Scadenza', plur: 'Scadenze', titolo: v => v.titolo, colonne: ['data', 'titolo', 'ripeti', 'stato'], campi: [
+  c('titolo', 'Cosa', 'testo', { obbl: true }), c('data', 'Entro il', 'data', { obbl: true }), c('zona', 'Area', 'testo', { suggerisci: true }),
+  c('ripeti', 'Si ripete', 'scelta', { opzioni: Object.keys(RIPETI) }), c('stato', 'Stato', 'scelta', { opzioni: ['da fare', 'fatta'] }), c('nota', 'Nota', 'lungo')] };
+const TIPO_LIBERO = { nome: 'Voce', plur: 'Voci', titolo: v => v.titolo, colonne: ['data', 'titolo', 'categoria', 'valore'], campi: [
+  c('titolo', 'Titolo', 'testo', { obbl: true }), c('data', 'Data', 'data', { obbl: true }), c('categoria', 'Categoria', 'testo', { suggerisci: true }), c('valore', 'Valore numerico (facoltativo)', 'numero'), c('unita', 'Unità'), c('nota', 'Note', 'lungo')] };
+/* Consigli: presenti in ogni cartella, anche in quelle personalizzate. Li scrive Claude e li mette in ordine; si possono anche aggiungere a mano. */
+const TIPO_CONSIGLIO = { nome: 'Consiglio', plur: 'Consigli', titolo: v => v.titolo, colonne: ['priorita', 'titolo', 'stato', 'data'], campi: [
+  c('titolo', 'Consiglio', 'testo', { obbl: true }), c('data', 'Data', 'data', { obbl: true }), c('priorita', 'Priorità (1 = il più importante)', 'numero'),
+  c('azione', 'Cosa fare', 'lungo'), c('perche', 'Perché, in base ai dati', 'lungo'), c('stato', 'Stato', 'scelta', { opzioni: ['da fare', 'in corso', 'fatto', 'scartato'] }), c('origine', 'Scritto da')] };
+const AREA_SISTEMA = { id: 'sistema', nome: 'Scadenze', tipi: { scadenza: TIPO_SCADENZA } };
+
+function aree() {
+  const extra = S.A.aree.filter(a => !a.canc).map(a => ({ id: a.id, nome: a.nome, libera: true, tipi: { voce: TIPO_LIBERO } }));
+  return [...AREE_BASE, ...extra].map(a => ({ ...a, tipi: { ...a.tipi, consiglio: TIPO_CONSIGLIO } }));
+}
+const area = id => (id === 'sistema' ? AREA_SISTEMA : aree().find(a => a.id === id));
+const tipoDef = (a, t) => (area(a) || { tipi: {} }).tipi[t];
+const ETICHETTE = { agg: 'Ultima modifica', persona: 'Persona' };
+const etichetta = (def, k) => (def.campi.find(f => f.k === k) || {}).etichetta || ETICHETTE[k] || k;
+
+/* Fonti da tenere aggiornate: la pagina segnala da quanto tempo non arrivano dati nuovi. */
+const FONTI = [
+  { id: 'movimenti', nome: 'Movimenti dei conti BPM', area: 'finanze', tipi: ['movimento'], giorni: 35, come: 'Scarica dall\'home banking i movimenti del mese (Excel o CSV) e caricali in Documenti, oppure mandali a Claude in chat: li classifica lui.' },
+  { id: 'saldi', nome: 'Saldi dei conti', area: 'finanze', tipi: ['saldo'], giorni: 35, come: 'Li ricava Claude dagli estratti conto. Puoi anche aggiungerli a mano in Finanze.' },
+  { id: 'dispositivo', nome: 'Dati del Garmin', area: 'salute', tipi: ['sensore'], giorni: 3, come: 'Arrivano da soli ogni notte da Garmin Connect. Se sono fermi, guarda lo stato in Impostazioni.' },
+  { id: 'corpo', nome: 'Peso e misure', area: 'salute', tipi: ['corpo'], giorni: 35, come: 'Registra il peso nell\'app Garmin Connect (arriva da solo) oppure aggiungilo qui in Salute.' },
+  { id: 'referti', nome: 'Esami e referti', area: 'salute', tipi: ['misura', 'visita'], giorni: 200, come: 'Carica il PDF in Documenti o mandalo a Claude in chat: i valori li inserisce lui.' },
+  { id: 'allenamenti', nome: 'Schede di allenamento', area: 'sport', tipi: ['allenamento', 'attivita'], giorni: 21, come: 'Carica la scheda in Documenti o mandala a Claude: le sedute le ricava lui.' },
+  { id: 'revisione', nome: 'Revisione della settimana', area: 'organizzazione', tipi: ['revisione'], giorni: 9, come: 'Dieci minuti la domenica sera: cosa è andato, cosa no, le tre cose della prossima settimana. Puoi dettarla a Claude.' },
+];
+function statoFonte(f) {
+  const l = voci(f.area).filter(v => f.tipi.includes(v.tipo));
+  if (!l.length) return { stato: 'vuota', testo: 'Mai caricati' };
+  const caricato = l.reduce((m, v) => ((v.creato || '') > m ? v.creato : m), '');
+  const dato = l.reduce((m, v) => ((v.data || '') > m ? v.data : m), '');
+  const g = giorniDa(caricato);
+  return { stato: g > f.giorni ? 'ritardo' : 'ok', testo: `Ultimo caricamento ${fa(g)}` + (dato ? `, dati fino al ${fmtData(dato)}` : ''), giorni: g };
+}
+function fuoriIntervallo(v) {
+  if (v.fuori === true) return true;
+  if (typeof v.valore !== 'number') return false;
+  return (typeof v.rif_min === 'number' && v.valore < v.rif_min) || (typeof v.rif_max === 'number' && v.valore > v.rif_max);
+}
+function testoRif(v) {
+  if (v.rif_testo) return v.rif_testo;
+  const a = typeof v.rif_min === 'number', b = typeof v.rif_max === 'number';
+  return a && b ? `${fmtNum(v.rif_min, 3)} - ${fmtNum(v.rif_max, 3)}` : a ? `≥ ${fmtNum(v.rif_min, 3)}` : b ? `≤ ${fmtNum(v.rif_max, 3)}` : '';
+}
+const valoreTesto = v => (typeof v.valore === 'number' ? fmtNum(v.valore, 3) : (v.testo || ''));
+function prossimaData(iso, ripeti) {
+  const mesi = RIPETI[ripeti] || 0; if (!mesi) return null;
+  const d = new Date(tempo(iso)); const giorno = d.getUTCDate();
+  d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() + mesi);
+  const ultimo = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + 1, 0)).getUTCDate();
+  return isoData(d.getUTCFullYear(), d.getUTCMonth() + 1, Math.min(giorno, ultimo));
+}
+
+/* ===== 6. Grafici (SVG disegnato a mano, nessuna libreria esterna) ===== */
+function grafico(descrizione, disegnaFn) {
+  const box = h('div', { class: 'grafico', role: 'img', 'aria-label': descrizione });
+  const ro = new ResizeObserver(() => {
+    const w = Math.floor(box.clientWidth);
+    if (w > 0 && w !== box._w) { box._w = w; box.replaceChildren(...disegnaFn(w)); }
+  });
+  ro.observe(box);
+  return box;
+}
+function tacche(min, max, quante = 4) {
+  if (min === max) { min -= 1; max += 1; }
+  const grezzo = (max - min) / quante, mag = Math.pow(10, Math.floor(Math.log10(grezzo)));
+  const passo = [1, 2, 2.5, 5, 10].map(m => m * mag).find(p => p >= grezzo) || 10 * mag;
+  const out = [];
+  for (let v = Math.ceil(min / passo) * passo; v <= max + passo * 1e-9; v += passo) out.push(Math.round(v / passo) * passo);
+  return out;
+}
+function fumetto() { return h('div', { class: 'g-fumetto', hidden: true }); }
+function mostraFumetto(f, x, y, w, righe) {
+  f.replaceChildren(...righe.map((r, i) => h('div', { class: i === 0 ? 'g-f-titolo' : (r.forte ? 'g-f-forte' : '') }, r.testo || r)));
+  f.hidden = false;
+  const fw = f.offsetWidth;
+  f.style.left = Math.max(0, Math.min(w - fw, x + (x + fw + 14 > w ? -fw - 10 : 10))) + 'px';
+  f.style.top = Math.max(0, y - f.offsetHeight - 8) + 'px';
+}
+
+/* Serie nel tempo, con fascia di riferimento. punti: [{data, y, fuori, righe: [testo...]}] */
+function graficoLinea(w, { punti, banda, unita, alto = 210, fmt = v => fmtNum(v, 2) }) {
+  const xs = punti.map(p => tempo(p.data)), ys = punti.map(p => p.y);
+  const m = { s: 46, d: 14, a: 12, b: 26 };
+  let x0 = Math.min(...xs), x1 = Math.max(...xs);
+  if (x0 === x1) { x0 -= 30 * MS_G; x1 += 30 * MS_G; }
+  let y0 = Math.min(...ys), y1 = Math.max(...ys);
+  if (banda) { if (typeof banda.min === 'number') y0 = Math.min(y0, banda.min); if (typeof banda.max === 'number') y1 = Math.max(y1, banda.max); }
+  const margine = (y1 - y0 || Math.abs(y1) || 1) * 0.12; y0 -= margine; y1 += margine;
+  m.s = Math.max(m.s, 14 + 6.6 * Math.max(...tacche(y0, y1).map(v => fmt(v).length)));
+  const pw = w - m.s - m.d, ph = alto - m.a - m.b;
+  const fx = x1 - x0 < 800 * MS_G ? new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', year: '2-digit', timeZone: 'UTC' }) : _fm;
+  const X = t => m.s + ((t - x0) / (x1 - x0)) * pw, Y = v => m.a + (1 - (v - y0) / (y1 - y0)) * ph;
+  const svg = s('svg', { width: w, height: alto, viewBox: `0 0 ${w} ${alto}` });
+  if (banda && (typeof banda.min === 'number' || typeof banda.max === 'number')) {
+    const su = typeof banda.max === 'number' ? Y(banda.max) : m.a, giu = typeof banda.min === 'number' ? Y(banda.min) : m.a + ph;
+    svg.append(s('rect', { class: 'g-banda', x: m.s, y: su, width: pw, height: Math.max(0, giu - su) }));
+  }
+  for (const v of tacche(y0, y1)) {
+    svg.append(s('line', { class: 'g-griglia', x1: m.s, x2: m.s + pw, y1: Y(v), y2: Y(v) }), s('text', { class: 'g-asse', x: m.s - 8, y: Y(v) + 4, 'text-anchor': 'end' }, fmt(v)));
+  }
+  const etichetteX = w > 460 && punti.length > 2 ? [x0, (x0 + x1) / 2, x1] : [x0, x1];
+  etichetteX.forEach((t, i) => svg.append(s('text', { class: 'g-asse', x: X(t), y: alto - 6, 'text-anchor': i === 0 ? 'start' : i === etichetteX.length - 1 ? 'end' : 'middle' }, fx.format(new Date(t)))));
+  if (punti.length > 1) svg.append(s('path', { class: 'g-linea', d: punti.map((p, i) => (i ? 'L' : 'M') + X(tempo(p.data)).toFixed(1) + ' ' + Y(p.y).toFixed(1)).join(' ') }));
+  const cursore = s('line', { class: 'g-cursore', y1: m.a, y2: m.a + ph, visibility: 'hidden' });
+  svg.append(cursore);
+  const pochi = punti.length <= 60;
+  punti.forEach(p => {
+    const px = X(tempo(p.data)), py = Y(p.y);
+    if (p.fuori) svg.append(s('path', { class: 'g-fuori', d: `M${px} ${py - 6} L${px + 6} ${py} L${px} ${py + 6} L${px - 6} ${py} Z` }));
+    else if (pochi) svg.append(s('circle', { class: 'g-punto', cx: px, cy: py, r: 4.5 }));
+  });
+  const f = fumetto();
+  const tocco = s('rect', { x: m.s - 8, y: 0, width: pw + 16, height: alto, fill: 'transparent' });
+  tocco.addEventListener('pointermove', e => {
+    const r = svg.getBoundingClientRect(), mx = e.clientX - r.left;
+    let best = 0; punti.forEach((p, i) => { if (Math.abs(X(tempo(p.data)) - mx) < Math.abs(X(tempo(punti[best].data)) - mx)) best = i; });
+    const p = punti[best], px = X(tempo(p.data));
+    cursore.setAttribute('x1', px); cursore.setAttribute('x2', px); cursore.setAttribute('visibility', 'visible');
+    mostraFumetto(f, px, Y(p.y), w, [fmtData(p.data), { testo: fmt(p.y) + (unita ? ' ' + unita : ''), forte: true }, ...(p.fuori ? ['Fuori intervallo'] : []), ...(p.righe || [])]);
+  });
+  tocco.addEventListener('pointerleave', () => { f.hidden = true; cursore.setAttribute('visibility', 'hidden'); });
+  svg.append(tocco);
+  return [svg, f];
+}
+
+/* Barre affiancate per categoria. serie: [{nome, classe, valori}] con valori >= 0 */
+function graficoBarre(w, { categorie, serie, fmt = v => fmtNum(v, 0), alto = 200 }) {
+  const max = Math.max(1e-9, ...serie.flatMap(x => x.valori));
+  const tk = tacche(0, max), tetto = Math.max(max, tk[tk.length - 1]);
+  const m = { s: Math.max(40, 14 + 6.6 * Math.max(...tk.map(v => fmt(v).length))), d: 8, a: 10, b: 26 }, pw = w - m.s - m.d, ph = alto - m.a - m.b;
+  const Y = v => m.a + (1 - v / tetto) * ph;
+  const svg = s('svg', { width: w, height: alto, viewBox: `0 0 ${w} ${alto}` });
+  for (const v of tk) svg.append(s('line', { class: 'g-griglia', x1: m.s, x2: m.s + pw, y1: Y(v), y2: Y(v) }), s('text', { class: 'g-asse', x: m.s - 8, y: Y(v) + 4, 'text-anchor': 'end' }, fmt(v)));
+  const gw = pw / categorie.length, bw = Math.max(2, Math.min(22, (gw - 8) / serie.length - 2));
+  const ogni = Math.ceil(categorie.length / Math.max(1, Math.floor(pw / 56)));
+  const f = fumetto();
+  categorie.forEach((cat, i) => {
+    const cx = m.s + gw * i + gw / 2, largh = serie.length * (bw + 2) - 2;
+    serie.forEach((sr, j) => {
+      const v = sr.valori[i] || 0; if (v <= 0) return;
+      const x = cx - largh / 2 + j * (bw + 2), y = Y(v), r = Math.min(4, bw / 2, (m.a + ph - y));
+      svg.append(s('path', { class: sr.classe, d: `M${x} ${m.a + ph} V${y + r} Q${x} ${y} ${x + r} ${y} H${x + bw - r} Q${x + bw} ${y} ${x + bw} ${y + r} V${m.a + ph} Z` }));
+    });
+    if (i % ogni === 0) svg.append(s('text', { class: 'g-asse', x: cx, y: alto - 6, 'text-anchor': 'middle' }, cat));
+    const zona = s('rect', { x: m.s + gw * i, y: 0, width: gw, height: m.a + ph, fill: 'transparent' });
+    zona.addEventListener('pointerenter', () => mostraFumetto(f, cx, Y(Math.max(...serie.map(x => x.valori[i] || 0))), w, [cat, ...serie.map(x => ({ testo: (serie.length > 1 ? x.nome + ': ' : '') + fmt(x.valori[i] || 0), forte: serie.length === 1 }))]));
+    zona.addEventListener('pointerleave', () => { f.hidden = true; });
+    svg.append(zona);
+  });
+  svg.append(s('line', { class: 'g-base', x1: m.s, x2: m.s + pw, y1: m.a + ph, y2: m.a + ph }));
+  return [svg, f];
+}
+function legenda(serie) {
+  return h('div', { class: 'legenda' }, serie.map(x => h('span', {}, h('i', { class: 'chiave ' + x.classe }), x.nome)));
+}
+/* Ripartizione: barre orizzontali in HTML, con il valore scritto accanto. */
+function barreOrizzontali(voci_, fmt) {
+  const max = Math.max(1e-9, ...voci_.map(x => Math.abs(x.valore)));
+  return h('div', { class: 'ripartizione' }, voci_.map(x => h('div', { class: 'rip-riga' },
+    h('span', { class: 'rip-nome' }, x.nome),
+    h('span', { class: 'rip-pista' }, h('span', { class: 'rip-barra', style: `width:${Math.max(1.5, (Math.abs(x.valore) / max) * 100)}%` })),
+    h('span', { class: 'rip-valore num' }, fmt(x.valore)))));
+}
+function scintilla(valori, ultimoFuori) {
+  if (valori.length < 2) return h('span', { class: 'attenuato' }, valori.length ? '1 misura' : '');
+  const w = 84, a = 24, min = Math.min(...valori), max = Math.max(...valori), amp = max - min || 1;
+  const X = i => 4 + (i / (valori.length - 1)) * (w - 8), Y = v => 4 + (1 - (v - min) / amp) * (a - 8);
+  return s('svg', { class: 'scintilla', width: w, height: a, viewBox: `0 0 ${w} ${a}`, 'aria-hidden': 'true' },
+    s('path', { class: 'g-linea', d: valori.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join(' ') }),
+    s('circle', { class: ultimoFuori ? 'g-punto-fuori' : 'g-punto', cx: X(valori.length - 1), cy: Y(valori[valori.length - 1]), r: 3.5 }));
+}
+
+/* ===== 7. Interfaccia: guscio, finestre, moduli, tabelle, importazione ===== */
+function avviso(testo, tipo = 'ok') {
+  let box = $('#avvisi'); if (!box) { box = h('div', { id: 'avvisi', 'aria-live': 'polite' }); document.body.append(box); }
+  const el = h('div', { class: 'avviso ' + tipo }, testo);
+  box.append(el); setTimeout(() => el.remove(), tipo === 'errore' ? 9000 : 4500);
+}
+function apriModale(titolo, contenuto, largo) {
+  chiudiModale();
+  const m = h('div', { id: 'modale', class: 'velo', onclick: e => { if (e.target.id === 'modale') chiudiModale(); } },
+    h('div', { class: 'finestra' + (largo ? ' larga' : ''), role: 'dialog', 'aria-modal': 'true', 'aria-label': titolo },
+      h('div', { class: 'finestra-testa' }, h('h2', {}, titolo), h('button', { class: 'btn piatto', 'aria-label': 'Chiudi', onclick: chiudiModale }, 'Chiudi')),
+      h('div', { class: 'finestra-corpo' }, contenuto)));
+  document.body.append(m);
+  const primo = m.querySelector('input,select,textarea'); if (primo) primo.focus();
+}
+function chiudiModale() { const m = $('#modale'); if (m) m.remove(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') chiudiModale(); });
+const btn = (testo, onclick, classe = '') => h('button', { type: 'button', class: 'btn ' + classe, onclick }, testo);
+const vuoto = (testo, ...azioni) => h('div', { class: 'vuoto' }, h('p', {}, testo), azioni.length ? h('div', { class: 'azioni' }, azioni) : null);
+const pannello = (titolo, ...kids) => h('section', { class: 'pannello' }, titolo ? h('h2', {}, titolo) : null, kids);
+const dato = (etich, valore, nota, classe = '') => h('div', { class: 'dato ' + classe }, h('div', { class: 'dato-etichetta' }, etich), h('div', { class: 'dato-valore num' }, valore), nota ? h('div', { class: 'dato-nota' }, nota) : null);
+const stato = (tipo, testo) => h('span', { class: 'stato ' + tipo }, h('span', { class: 'stato-segno', 'aria-hidden': 'true' }, { ok: '✓', ritardo: '!', vuota: '○', fuori: '◆' }[tipo] || '•'), testo);
+
+/* --- Modulo generato dallo schema --- */
+function controllo(f, v, idArea, idTipo) {
+  const val = v[f.k];
+  const base = { name: f.k, id: 'f-' + f.k, required: !!f.obbl };
+  if (f.tipo === 'lungo') return h('textarea', { ...base, rows: 4 }, val || '');
+  if (f.tipo === 'data') return h('input', { ...base, type: 'date', value: val || '' });
+  if (f.tipo === 'numero') return h('input', { ...base, type: 'text', inputmode: 'decimal', value: val == null ? '' : String(val).replace('.', ','), autocomplete: 'off' });
+  if (f.tipo === 'si_no') return h('input', { ...base, type: 'checkbox', checked: !!val });
+  if (f.tipo === 'scelta') return h('select', base, h('option', { value: '' }, ''), f.opzioni.map(o => h('option', { value: o, selected: o === val }, o)));
+  if (f.tipo === 'allegato') return h('select', base, h('option', { value: '' }, 'Nessuno'), S.A.allegati.filter(a => !a.canc).map(a => h('option', { value: a.id, selected: a.id === val }, `${a.nome} (${fmtData(a.data)})`)));
+  const attr = { ...base, type: 'text', value: val || '', autocomplete: 'off' };
+  if (f.suggerisci) {
+    const usati = [...new Set([...(f.esempi || []), ...S.A.voci.filter(x => !x.canc && x.area === idArea && x.tipo === idTipo).map(x => x[f.k]).filter(Boolean)])].sort();
+    if (usati.length) { attr.list = 'dl-' + f.k; return [h('input', attr), h('datalist', { id: 'dl-' + f.k }, usati.map(u => h('option', { value: u })))]; }
+  }
+  return h('input', attr);
+}
+function leggiModulo(form, def) {
+  const out = {}, errori = [];
+  for (const f of def.campi) {
+    const el = form.elements[f.k]; if (!el) continue;
+    if (f.tipo === 'si_no') { if (el.checked) out[f.k] = true; continue; }
+    const grezzo = el.value.trim();
+    if (!grezzo) { if (f.obbl) errori.push(`Manca "${f.etichetta}".`); continue; }
+    if (f.tipo === 'numero') { const n = leggiNum(grezzo); if (n == null) errori.push(`"${f.etichetta}" non è un numero.`); else out[f.k] = n; }
+    else out[f.k] = grezzo;
+  }
+  return { out, errori };
+}
+function apriModulo(idArea, idTipo, esistente, predefiniti = {}) {
+  const def = tipoDef(idArea, idTipo);
+  const v = esistente || { data: def.campi.some(f => f.k === 'data' && f.obbl) ? oggi() : undefined, persona: personaPredefinita(), ...predefiniti };
+  const pp = persone();
+  const err = h('div', { class: 'errore', role: 'alert' });
+  const form = h('form', { class: 'modulo', onsubmit: e => {
+    e.preventDefault();
+    const { out, errori } = leggiModulo(form, def);
+    if (errori.length) { err.textContent = errori.join(' '); return; }
+    const extra = {}; for (const k of Object.keys(v)) if (!def.campi.some(f => f.k === k)) extra[k] = v[k];
+    metti({ ...extra, ...out, area: idArea, tipo: idTipo, persona: pp.length > 1 ? form.elements.persona.value : v.persona });
+    chiudiModale(); avviso('Salvato.');
+  } },
+    def.campi.map(f => h('label', { class: 'campo' + (f.tipo === 'si_no' ? ' riga' : '') + (f.tipo === 'lungo' ? ' intero' : '') }, h('span', {}, f.etichetta + (f.obbl ? ' *' : '')), controllo(f, v, idArea, idTipo))),
+    pp.length > 1 ? h('label', { class: 'campo' }, h('span', {}, 'Persona'), h('select', { name: 'persona' }, pp.map(p => h('option', { value: p.id, selected: p.id === v.persona }, p.nome)))) : null,
+    err,
+    h('div', { class: 'azioni intero' }, h('button', { class: 'btn primario', type: 'submit' }, 'Salva'),
+      esistente ? btn('Elimina', () => { if (confirm('Eliminare questa voce?')) { togli('voci', esistente.id); chiudiModale(); } }, 'pericolo') : null));
+  apriModale((esistente ? 'Modifica: ' : 'Nuovo: ') + def.nome.toLowerCase(), form);
+}
+
+/* --- Tabella generata dallo schema --- */
+function cella(def, v, k) {
+  const f = def.campi.find(x => x.k === k) || {};
+  const x = v[k];
+  if (k === 'agg') return fmtData((x || '').slice(0, 10));
+  if (k === 'valore' && typeof x !== 'number' && v.testo && def.campi.some(q => q.k === 'testo' && q.tipo === 'testo')) return v.testo;
+  if (k === 'rif_testo') return testoRif(v);
+  if (x == null || x === '') return '';
+  if (f.tipo === 'si_no') return x ? 'sì' : '';
+  if (f.tipo === 'data') return fmtData(x);
+  if (f.tipo === 'numero') return f.euro ? fmtEuro(x) : fmtNum(x, 3);
+  const t = String(x); return t.length > 90 ? t.slice(0, 88) + '…' : t;
+}
+function tabella(idArea, idTipo, lista, { limite, filtro = true } = {}) {
+  const def = tipoDef(idArea, idTipo);
+  const cols = [...def.colonne, ...(persone().length > 1 && !S.persona ? ['persona'] : [])];
+  const ordinata = [...lista].sort((a, b) => (b.data || b.agg || '').localeCompare(a.data || a.agg || ''));
+  const corpo = h('tbody');
+  const riempi = q => {
+    const righe = (q ? ordinata.filter(v => JSON.stringify(v).toLowerCase().includes(q)) : ordinata).slice(0, limite || 2000);
+    const apri = v => (v.auto ? avviso('Dato scaricato da Garmin: si corregge nell\'app Garmin Connect.') : apriModulo(idArea, idTipo, v));
+    corpo.replaceChildren(...righe.map(v => h('tr', { tabindex: 0, onclick: () => apri(v), onkeydown: e => { if (e.key === 'Enter') apri(v); } },
+      cols.map(k => { const f = def.campi.find(x => x.k === k) || {}; return h('td', { class: (f.tipo === 'numero' ? 'num destra' : '') + (k === 'valore' && idTipo === 'misura' && fuoriIntervallo(v) ? ' fuori' : '') }, k === 'persona' ? nomePersona(v.persona) : cella(def, v, k), k === 'valore' && idTipo === 'misura' && fuoriIntervallo(v) ? h('span', { class: 'segno-fuori', title: 'Fuori intervallo' }, ' ◆') : null); }))));
+    if (!righe.length) corpo.append(h('tr', {}, h('td', { colspan: cols.length, class: 'attenuato' }, 'Nessun risultato.')));
+  };
+  riempi('');
+  return h('div', {},
+    filtro && lista.length > 8 ? h('input', { class: 'cerca', type: 'search', placeholder: 'Cerca', 'aria-label': 'Cerca nella tabella', oninput: e => riempi(e.target.value.trim().toLowerCase()) }) : null,
+    h('div', { class: 'scorri' }, h('table', {}, h('thead', {}, h('tr', {}, cols.map(k => { const f = def.campi.find(x => x.k === k) || {}; return h('th', { class: f.tipo === 'numero' ? 'destra' : '' }, k === 'rif_testo' ? 'Riferimento' : etichetta(def, k).replace(/ \(.*\)$/, '').replace(/ in euro.*$/, '')); }))), corpo)));
+}
+function esportaCsvTipo(idArea, idTipo) {
+  const def = tipoDef(idArea, idTipo), l = voci(idArea, idTipo);
+  const ks = [...def.campi.map(f => f.k), 'persona', 'id'];
+  scarica(`${idArea}-${idTipo}-${oggi()}.csv`, creaCsv(ks, l.map(v => ks.map(k => (k === 'persona' ? nomePersona(v.persona) : typeof v[k] === 'number' ? String(v[k]).replace('.', ',') : v[k])))), 'text/csv');
+}
+function vistaTipo(idArea, idTipo) {
+  const a = area(idArea), def = tipoDef(idArea, idTipo);
+  if (!def) return vuoto('Questa sezione non esiste.');
+  const l = voci(idArea, idTipo);
+  return h('div', {},
+    h('p', { class: 'briciole' }, h('a', { href: '#/a/' + idArea }, a.nome), ' / ', def.plur),
+    h('div', { class: 'testa' }, h('h1', {}, def.plur), h('div', { class: 'azioni' },
+      btn('Aggiungi', () => apriModulo(idArea, idTipo), 'primario'), btn('Importa CSV', () => apriImportaCsv(idArea, idTipo)), l.length ? btn('Esporta CSV', () => esportaCsvTipo(idArea, idTipo)) : null)),
+    l.length ? tabella(idArea, idTipo, l) : vuoto(`Ancora nessun dato in "${def.plur}".`, btn('Aggiungi', () => apriModulo(idArea, idTipo), 'primario'), btn('Importa CSV', () => apriImportaCsv(idArea, idTipo))));
+}
+
+/* --- Importazione CSV con abbinamento delle colonne --- */
+function apriImportaCsv(idArea, idTipo) {
+  const def = tipoDef(idArea, idTipo);
+  const corpo = h('div', {});
+  const scegli = h('input', { type: 'file', accept: '.csv,.txt,text/csv', onchange: async e => {
+    const file = e.target.files[0]; if (!file) return;
+    const csv = leggiCsv(await leggiFile(file));
+    if (!csv.intestazioni.length || !csv.righe.length) { corpo.replaceChildren(h('p', { class: 'errore' }, 'Il file è vuoto o non è un CSV leggibile. Nessun dato importato.')); return; }
+    corpo.replaceChildren(abbinamento(file.name, csv));
+  } });
+  const norm = t => nomeFile(t).replace(/-/g, '');
+  function abbinamento(nome, csv, modoScelto) {
+    const opz = sel => [h('option', { value: '' }, 'Non importare'), ...csv.intestazioni.map((x, i) => h('option', { value: i, selected: i === sel }, x || `Colonna ${i + 1}`))];
+    const indovina = f => csv.intestazioni.findIndex(x => { const a = norm(x), b = norm(f.etichetta), k = norm(f.k); return a && (a === k || a === b || b.startsWith(a) || a.startsWith(k) || (f.k === 'data' && /^(date|data|giorno|day)/.test(a))); });
+    const largo = def.largo && csv.intestazioni.length > 2;
+    const usaLargo = largo && (modoScelto || 'largo') === 'largo';
+    const modo = h('select', { onchange: () => corpo.replaceChildren(abbinamento(nome, csv, modo.value)) },
+      h('option', { value: 'largo', selected: usaLargo }, 'Una colonna per ogni metrica (tipico dei dispositivi)'), h('option', { value: 'lungo', selected: !usaLargo }, 'Una riga per ogni valore'));
+    let campi, spunta, selData;
+    if (usaLargo) {
+      const iData = Math.max(0, csv.intestazioni.findIndex(x => /^(date|data|giorno|day)/i.test(x.trim())));
+      selData = h('select', {}, opz(iData).slice(1));
+      spunta = csv.intestazioni.map((x, i) => { const numerica = csv.righe.slice(0, 20).some(r => leggiNum(r[i]) != null); return h('input', { type: 'checkbox', value: i, checked: i !== iData && numerica }); });
+      campi = h('div', { class: 'modulo' }, h('label', { class: 'campo' }, h('span', {}, 'Colonna della data'), selData),
+        h('fieldset', { class: 'intero' }, h('legend', {}, 'Metriche da importare'), csv.intestazioni.map((x, i) => h('label', { class: 'spunta' }, spunta[i], x || `Colonna ${i + 1}`))));
+    } else {
+      campi = h('div', { class: 'modulo' }, def.campi.filter(f => f.tipo !== 'allegato').map(f => h('label', { class: 'campo' }, h('span', {}, f.etichetta + (f.obbl ? ' *' : '')), h('select', { 'data-k': f.k }, opz(indovina(f))))));
+    }
+    const fonte = h('input', { type: 'text', placeholder: 'es. Garmin Cirqa' });
+    const err = h('div', { class: 'errore', role: 'alert' });
+    return h('div', {},
+      h('p', {}, `File "${nome}": ${csv.righe.length} righe, ${csv.intestazioni.length} colonne.`),
+      largo ? h('label', { class: 'campo' }, h('span', {}, 'Com\'è fatto il file'), modo) : null,
+      campi,
+      usaLargo && def.campi.some(f => f.k === 'fonte') ? h('label', { class: 'campo' }, h('span', {}, 'Dispositivo o fonte'), fonte) : null,
+      h('details', {}, h('summary', {}, 'Anteprima delle prime righe'), h('div', { class: 'scorri' }, h('table', {}, h('thead', {}, h('tr', {}, csv.intestazioni.map(x => h('th', {}, x)))), h('tbody', {}, csv.righe.slice(0, 5).map(r => h('tr', {}, r.map(x => h('td', {}, x)))))))),
+      err,
+      h('div', { class: 'azioni' }, btn('Importa', () => {
+        const esito = { aggiunti: 0, aggiornati: 0, saltati: 0, errori: [] };
+        const persona = personaPredefinita(), t = adesso();
+        const impronta = v => [v.persona || persona, v.data, v[def.largo || 'titolo'] || v.parametro || v.descrizione || v.conto || '', v.valore, v.testo || ''].join('|');
+        const esistenti = new Map(S.A.voci.filter(v => !v.canc && v.area === idArea && v.tipo === idTipo).map(v => [impronta(v), v]));
+        const nuova = (v, nRiga) => {
+          const k = impronta(v);
+          if (esistenti.has(k)) { esito.saltati++; return; }
+          const n = { id: uid(), area: idArea, tipo: idTipo, persona, creato: t, agg: t, ...v };
+          S.A.voci.push(n); esistenti.set(k, n); esito.aggiunti++;
+        };
+        if (usaLargo) {
+          const iD = +selData.value, cols = spunta.filter(x => x.checked).map(x => +x.value);
+          const lettori = {}; cols.forEach(i => { lettori[i] = lettoreColonna(csv.righe.map(r => r[i])); });
+          if (!cols.length) { err.textContent = 'Seleziona almeno una metrica.'; return; }
+          csv.righe.forEach((r, n) => {
+            const d = leggiData(r[iD]); if (!d) { esito.errori.push(`Riga ${n + 2}: data non riconosciuta ("${r[iD] || ''}").`); return; }
+            for (const i of cols) { const val = lettori[i](r[i]); if (val == null) continue; const v = { data: d, [def.largo]: csv.intestazioni[i], valore: val }; if (fonte.value.trim()) v.fonte = fonte.value.trim(); nuova(v, n); }
+          });
+        } else {
+          const mappa = {}; campi.querySelectorAll('select[data-k]').forEach(sl => { if (sl.value !== '') mappa[sl.dataset.k] = +sl.value; });
+          const lettori = {}; for (const [k, i] of Object.entries(mappa)) lettori[k] = lettoreColonna(csv.righe.map(r => r[i]));
+          const mancanti = def.campi.filter(f => f.obbl && !(f.k in mappa)); if (mancanti.length) { err.textContent = 'Abbina una colonna a: ' + mancanti.map(f => f.etichetta).join(', ') + '.'; return; }
+          csv.righe.forEach((r, n) => {
+            const v = {}; let ko = '';
+            for (const f of def.campi) {
+              if (!(f.k in mappa)) continue; const g = (r[mappa[f.k]] || '').trim(); if (!g) { if (f.obbl) ko = `manca "${f.etichetta}"`; continue; }
+              if (f.tipo === 'data') { const d = leggiData(g); if (d) v[f.k] = d; else ko = `data non riconosciuta ("${g}")`; }
+              else if (f.tipo === 'numero') { const x = lettori[f.k](g); if (x != null) v[f.k] = x; else if (f.obbl) ko = `"${g}" non è un numero`; }
+              else if (f.tipo === 'si_no') { if (/^(1|si|sì|true|x|\*)$/i.test(g)) v[f.k] = true; }
+              else v[f.k] = g;
+            }
+            if (ko) esito.errori.push(`Riga ${n + 2}: ${ko}.`); else nuova(v, n);
+          });
+        }
+        annota('Importazione CSV in ' + def.plur, nome, { ...esito, errori: esito.errori.slice(0, 50) });
+        salva();
+        corpo.replaceChildren(ricevuta(esito));
+      }, 'primario')));
+  }
+  apriModale('Importa CSV in ' + def.plur.toLowerCase(), h('div', {}, h('p', {}, 'Scegli il file. Nel passo successivo indichi quale colonna corrisponde a quale dato; le righe già presenti non vengono duplicate.'), scegli, corpo), true);
+}
+function ricevuta(esito) {
+  const tot = esito.aggiunti + esito.aggiornati;
+  return h('div', { class: 'ricevuta' },
+    h('p', { class: tot ? 'esito-ok' : 'esito-ko' }, tot ? `Caricati: ${esito.aggiunti} nuovi` + (esito.aggiornati ? `, ${esito.aggiornati} aggiornati.` : '.') : 'Nessun dato nuovo caricato.'),
+    esito.saltati ? h('p', {}, `Già presenti e non duplicati: ${esito.saltati}.`) : null,
+    esito.errori.length ? h('div', { class: 'errore' }, h('p', {}, `Non caricati: ${esito.errori.length}.`), h('ul', {}, esito.errori.slice(0, 12).map(e => h('li', {}, e))), esito.errori.length > 12 ? h('p', {}, 'L\'elenco completo è nel registro dei caricamenti.') : null) : null,
+    h('div', { class: 'azioni' }, btn('Chiudi', chiudiModale, 'primario')));
+}
+
+/* --- Guscio dell'applicazione --- */
+function leggiRotta() { return location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent); }
+function spiaSync() {
+  const st = S.sync, pronto = S.sbloccato && ghPronto();
+  const testo = !pronto ? 'Solo su questo dispositivo' : st.stato === 'in corso' ? 'Sincronizzo…' : st.stato === 'errore' ? 'Non sincronizzato' : S.sporco ? 'Modifiche da inviare' : st.ultimo ? 'Sincronizzato ' + new Date(st.ultimo).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'Sincronizzazione attiva';
+  return h('button', { id: 'stato-sync', class: 'btn piatto spia ' + (!pronto ? 'spenta' : st.stato === 'errore' ? 'ko' : 'ok'), title: st.errore || (pronto ? 'Sincronizza adesso' : 'Configura la sincronizzazione'), 'aria-label': testo, onclick: () => (pronto ? sincronizza(true) : (location.hash = '#/impostazioni')) }, h('span', { class: 'spia-testo' }, testo));
+}
+function menu(rotta) {
+  const attiva = r => (rotta.join('/') || 'casa').startsWith(r);
+  const v = (href, testo, chiave, n) => h('a', { href, class: attiva(chiave) ? 'attiva' : '', 'aria-current': attiva(chiave) ? 'page' : null }, testo, n ? h('span', { class: 'conta' }, n) : null);
+  const scadute = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta' && x.data <= oggi()).length;
+  return h('nav', { class: 'menu', 'aria-label': 'Cartelle' },
+    v('#/', 'Quadro generale', 'casa'),
+    h('div', { class: 'menu-gruppo' }, 'Cartelle'),
+    aree().map(a => v('#/a/' + a.id, a.nome, 'a/' + a.id)),
+    h('div', { class: 'menu-gruppo' }, 'Archivio'),
+    v('#/rapporti', 'Rapporti', 'rapporti'), v('#/scadenze', 'Scadenze', 'scadenze', scadute), v('#/documenti', 'Documenti', 'documenti', allegati().filter(a => a.stato === 'da elaborare').length), v('#/impostazioni', 'Impostazioni', 'impostazioni'));
+}
+function barra() {
+  const pp = persone();
+  return h('header', { class: 'barra' },
+    h('a', { class: 'marchio', href: '#/' }, 'Archivio'),
+    pp.length > 1 ? h('select', { class: 'chi', 'aria-label': 'Persona', onchange: e => { S.persona = e.target.value; disegna(); } }, h('option', { value: '' }, 'Tutta la famiglia'), pp.map(p => h('option', { value: p.id, selected: p.id === S.persona }, p.nome))) : h('span', { class: 'chi-solo' }, (pp[0] || {}).nome || ''),
+    h('span', { class: 'spazio' }), spiaSync(), btn('Blocca', blocca, 'piatto'));
+}
+function disegna() {
+  const app = $('#app');
+  if (!S.sbloccato) { if (!$('.blocco')) schermataBlocco().then(el => app.replaceChildren(el)); return; }
+  const rotta = leggiRotta();
+  const vecchia = $('#vista'), scroll = vecchia && vecchia.dataset.rotta === rotta.join('/') ? window.scrollY : 0;
+  const vista = h('main', { id: 'vista', 'data-rotta': rotta.join('/') });
+  try { vista.append(vistaPer(rotta)); } catch (e) { console.error(e); vista.append(h('div', { class: 'errore' }, 'Errore nel mostrare questa pagina: ' + e.message)); }
+  app.replaceChildren(h('div', { class: 'guscio' }, barra(), menu(rotta), vista));
+  window.scrollTo(0, scroll);
+}
+function vistaPer(r) {
+  if (!r.length) return vistaCasa();
+  if (r[0] === 'a' && r[1]) {
+    const a = area(r[1]); if (!a) return vuoto('Questa cartella non esiste più.');
+    if (r[2] === 'p' && r[3]) return vistaProgetto(r[3]);
+    if (r[2]) return vistaTipo(r[1], r[2]);
+    return vistaArea(a);
+  }
+  if (r[0] === 'scadenze') return vistaScadenze();
+  if (r[0] === 'rapporti') return vistaRapporti(r[1]);
+  if (r[0] === 'documenti') return vistaDocumenti();
+  if (r[0] === 'impostazioni') return vistaImpostazioni();
+  return vuoto('Pagina non trovata.');
+}
+window.addEventListener('hashchange', () => { chiudiModale(); disegna(); });
+
+/* ===== 8. Viste: quadro generale e cruscotti delle cartelle ===== */
+const segnoSaldo = v => (v.categoria === 'Debito' || v.categoria === 'Carta di credito' ? -Math.abs(v.valore) : v.valore);
+function totaleFinanze(lista) {
+  const ultimi = new Map();
+  for (const v of [...lista].sort(perData)) ultimi.set((v.persona || '') + '|' + v.conto, v);
+  return somma([...ultimi.values()].map(segnoSaldo));
+}
+function patrimonioNetto() {
+  return totaleFinanze(voci('finanze', 'saldo')) + somma(voci('patrimonio', 'bene').map(v => v.valore)) - somma(voci('patrimonio', 'debito').map(v => Math.abs(v.valore)));
+}
+function riassuntoEsito(r) {
+  const p = [];
+  if (r.aggiunti) p.push(`${r.aggiunti} nuovi`); if (r.aggiornati) p.push(`${r.aggiornati} aggiornati`); if (r.saltati) p.push(`${r.saltati} già presenti`);
+  if (r.errori && r.errori.length) p.push(`${r.errori.length} non caricati`);
+  return p.join(', ') || 'nessuna modifica';
+}
+
+function vistaCasa() {
+  const daFare = [];
+  const sc = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta').sort(perData);
+  for (const x of sc) { const g = -giorniDa(x.data); if (g <= 30) daFare.push({ tipo: g < 0 ? 'ritardo' : 'vuota', testo: x.titolo, nota: g < 0 ? `Scaduta il ${fmtData(x.data)}` : g === 0 ? 'Scade oggi' : `Entro il ${fmtData(x.data)}`, href: '#/scadenze' }); }
+  const att = voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta' && -giorniDa(x.data) <= 7).sort(perData);
+  for (const x of att) { const g = -giorniDa(x.data); daFare.push({ tipo: g < 0 ? 'ritardo' : 'vuota', testo: x.titolo, nota: (x.ambito ? x.ambito + ', ' : '') + (g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`), href: '#/a/organizzazione' }); }
+  const daElab = allegati().filter(a => a.stato === 'da elaborare').length;
+  if (daElab) daFare.push({ tipo: 'vuota', testo: daElab === 1 ? '1 documento in attesa che Claude ne inserisca i valori' : `${daElab} documenti in attesa che Claude ne inserisca i valori`, nota: 'Sono al sicuro. Li elabora alla verifica del lunedì, oppure subito se glielo chiedi in chat.', href: '#/documenti' });
+  if (!ghPronto()) daFare.push({ tipo: 'ritardo', testo: 'I dati sono solo su questo dispositivo', nota: 'Collega il repository dei dati in Impostazioni.', href: '#/impostazioni' });
+  else if (S.sync.stato === 'errore') daFare.push({ tipo: 'ritardo', testo: 'La sincronizzazione non riesce', nota: S.sync.errore, href: '#/impostazioni' });
+  const sg = statoGarmin(); if (sg && sg.tipo !== 'ok') daFare.push({ ...sg, href: '#/impostazioni' });
+
+  const mis = voci('salute', 'misura');
+  const perPar = [...raggruppa(mis.sort(perData), v => v.parametro).values()].map(l => l[l.length - 1]);
+  const nFuori = perPar.filter(fuoriIntervallo).length;
+  const ultimoPrelievo = mis.length ? mis[mis.length - 1].data : null;
+  const viaggi = voci('viaggi', 'viaggio'), prossimo = viaggi.filter(v => v.data > oggi()).sort(perData)[0];
+  const prog = voci('progetti', 'progetto');
+  const schede = {
+    salute: mis.length || S.estVoci.length ? [(ind => (ind ? dato('Indice di salute', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceSalute()), mis.length ? dato('Fuori intervallo all\'ultima misura', nFuori, `su ${perPar.length} parametri seguiti`, nFuori ? 'allerta' : '') : null] : null,
+    finanze: voci('finanze').length ? [(ind => (ind ? dato('Indice finanziario', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceFinanze()), voci('finanze', 'saldo').length ? dato('Disponibilità finanziaria', fmtEuro(totaleFinanze(voci('finanze', 'saldo')))) : null] : null,
+    organizzazione: voci('organizzazione').length ? [dato('Obiettivi attivi', voci('organizzazione', 'obiettivo').filter(o => o.stato === 'attivo' || !o.stato).length), dato('Cose da fare aperte', voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta').length)] : null,
+    sport: voci('sport').length ? [dato('Sedute nelle ultime 4 settimane', [...voci('sport', 'allenamento'), ...voci('sport', 'attivita')].filter(v => giorniDa(v.data) < 28).length)] : null,
+    mindfulness: voci('mindfulness').length ? [dato('Giorni di pratica negli ultimi 30', new Set(voci('mindfulness', 'pratica').filter(v => giorniDa(v.data) < 30).map(v => v.data)).size)] : null,
+    lettura: voci('lettura').length ? [dato('Libri letti quest\'anno', voci('lettura', 'libro').filter(v => v.stato === 'letto' && (v.fine || '').startsWith(oggi().slice(0, 4))).length, (l => (l.length ? 'In lettura: ' + l.map(v => v.titolo).join(', ') : ''))(voci('lettura', 'libro').filter(v => v.stato === 'in lettura')))] : null,
+    patrimonio: voci('patrimonio').length || voci('finanze', 'saldo').length ? [dato('Patrimonio netto', fmtEuro(patrimonioNetto()), 'beni e disponibilità meno debiti')] : null,
+    viaggi: viaggi.length ? [dato('Viaggi registrati', viaggi.length, prossimo ? `Prossimo: ${prossimo.titolo}, ${fmtData(prossimo.data)}` : '')] : null,
+    progetti: prog.length ? [dato('Progetti', prog.length, `${prog.filter(p => p.stato === 'attivo').length} attivi`)] : null,
+  };
+  return h('div', {},
+    h('div', { class: 'testa' }, h('div', {}, h('h1', {}, 'Quadro generale'), h('p', { class: 'sotto' }, new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })))),
+    pannello('Da fare', daFare.length ? h('ul', { class: 'elenco' }, daFare.map(x => h('li', {}, h('a', { href: x.href }, stato(x.tipo, x.testo)), h('div', { class: 'elenco-nota' }, x.nota)))) : h('p', { class: 'attenuato' }, 'Niente in sospeso.')),
+    consigliPrincipali(),
+    h('div', { class: 'griglia' }, aree().map(a => h('a', { class: 'scheda', href: '#/a/' + a.id }, h('h3', {}, a.nome),
+      schede[a.id] || (a.libera && voci(a.id).length ? dato('Voci', voci(a.id).length) : h('p', { class: 'attenuato' }, 'Ancora vuota.'))))),
+    pannello('Stato dei caricamenti', h('ul', { class: 'elenco' }, FONTI.map(f => { const st = statoFonte(f); return h('li', {}, h('div', { class: 'tra' }, h('strong', {}, f.nome), stato(st.stato, st.stato === 'ok' ? 'In regola' : st.stato === 'ritardo' ? 'In ritardo' : 'Mai caricati')), h('div', { class: 'elenco-nota' }, st.stato === 'ok' ? st.testo : (st.stato === 'ritardo' ? st.testo + '. ' : '') + f.come)); }))),
+    ultimoRapporto(),
+    pannello('Ultimi caricamenti', ultimiCaricamenti()));
+}
+function ultimiCaricamenti() {
+  const l = S.A.registro.filter(r => !r.canc).map(r => ({ quando: r.quando, titolo: r.azione, nota: (r.origine ? r.origine + ': ' : '') + riassuntoEsito(r) }));
+  const st = S.est.stato;
+  if (st && st.ultimo_avvio) l.push({ quando: st.ultimo_avvio, titolo: 'Scaricamento Garmin', nota: st.esito === 'ok' ? `${st.righe || 0} valori aggiornati` + (st.ultima_data ? `, dati fino al ${fmtData(st.ultima_data)}` : '') : (st.messaggio || st.esito) });
+  if (!l.length) return h('p', { class: 'attenuato' }, 'Qui compare la ricevuta di ogni caricamento: quanti dati sono entrati e quali no.');
+  return h('ul', { class: 'elenco' }, l.sort((a, b) => b.quando.localeCompare(a.quando)).slice(0, 6).map(r => h('li', {}, h('div', { class: 'tra' }, h('strong', {}, r.titolo), h('span', { class: 'attenuato' }, fmtQuando(r.quando))), h('div', { class: 'elenco-nota' }, r.nota))));
+}
+/* Stato dello scaricamento automatico. tipo: ok, vuota (da attivare), ritardo (problema). */
+function statoGarmin() {
+  if (!ghPronto()) return null;
+  const st = S.est.stato;
+  const nota = 'Serve inserire email e password di Garmin nel repository dei dati: istruzioni in Impostazioni.';
+  if (!st || st.esito === 'non configurato') return { tipo: 'vuota', testo: 'Scaricamento Garmin non ancora attivo', nota };
+  if (st.esito === 'errore') return { tipo: 'ritardo', testo: 'Garmin: l\'ultimo scaricamento non è riuscito', nota: (st.messaggio || '') + ' Claude lo vede alla verifica del lunedì.' };
+  const ultima = S.estVoci.reduce((m, v) => (v.data > m ? v.data : m), '');
+  if (!ultima) return { tipo: 'vuota', testo: 'Garmin collegato, nessun dato ancora', nota: 'Controlla che l\'app Garmin Connect sul telefono abbia sincronizzato il dispositivo.' };
+  if (giorniDa(ultima) > 3) return { tipo: 'ritardo', testo: `Dati Garmin fermi al ${fmtData(ultima)}`, nota: 'Apri l\'app Garmin Connect sul telefono per sincronizzare il dispositivo.' };
+  return { tipo: 'ok', testo: `Dati Garmin aggiornati al ${fmtData(ultima)}`, nota: '' };
+}
+
+/* --- Rapporti scritti da Claude (rapporti/*.md nel repository dei dati) --- */
+function inLinea(testo) {
+  const out = []; let ultimo = 0;
+  const re = /\*\*([^*]+)\*\*|`([^`]+)`|\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g; let m;
+  while ((m = re.exec(testo))) {
+    out.push(testo.slice(ultimo, m.index));
+    out.push(m[1] ? h('strong', {}, m[1]) : m[2] ? h('code', {}, m[2]) : h('a', { href: m[4], target: '_blank', rel: 'noopener noreferrer' }, m[3]));
+    ultimo = re.lastIndex;
+  }
+  out.push(testo.slice(ultimo));
+  return out;
+}
+/* Markdown essenziale, costruito come elementi della pagina: il testo non viene mai interpretato come HTML. */
+function mdInDom(testo) {
+  const box = h('div', { class: 'md' }); let lista = null, par = [], tab = [];
+  const chiudi = () => {
+    if (par.length) { box.append(h('p', {}, inLinea(par.join(' ')))); par = []; }
+    if (tab.length) { const righe = tab.filter(r => !/^\|?\s*:?-{2,}/.test(r)).map(r => r.replace(/^\||\|$/g, '').split('|').map(x => x.trim()));
+      box.append(h('div', { class: 'scorri' }, h('table', {}, h('thead', {}, h('tr', {}, righe[0].map(x => h('th', {}, inLinea(x))))), h('tbody', {}, righe.slice(1).map(r => h('tr', {}, r.map(x => h('td', {}, inLinea(x))))))))); tab = []; }
+    lista = null;
+  };
+  for (const riga of String(testo || '').split(/\r?\n/)) {
+    const t = riga.trim(); let m;
+    if (!t) { chiudi(); continue; }
+    if (t.startsWith('|')) { if (par.length || lista) { const tt = tab; chiudi(); tab = tt; } tab.push(t); continue; }
+    if (tab.length) chiudi();
+    if ((m = t.match(/^(#{1,4})\s+(.*)$/))) { chiudi(); box.append(h('h' + Math.min(5, m[1].length + 1), {}, inLinea(m[2]))); continue; }
+    if ((m = t.match(/^(?:[-*]|(\d+)\.)\s+(.*)$/))) {
+      if (par.length) { box.append(h('p', {}, inLinea(par.join(' ')))); par = []; }
+      const tipo = m[1] ? 'ol' : 'ul';
+      if (!lista || lista.tagName.toLowerCase() !== tipo) { lista = h(tipo, {}); box.append(lista); }
+      lista.append(h('li', {}, inLinea(m[2]))); continue;
+    }
+    if (lista && /^\s{2,}/.test(riga)) { lista.lastChild.append(' ', ...inLinea(t)); continue; }
+    lista = null; par.push(t.replace(/^>\s?/, ''));
+  }
+  chiudi();
+  return box;
+}
+const titoloRapporto = (nome, r) => ((r.testo.match(/^#\s+(.+)$/m) || [])[1] || nome.replace(/\.md$/, ''));
+function rapporti() { return Object.entries(S.est.rapporti || {}).sort((a, b) => b[0].localeCompare(a[0])); }
+function ultimoRapporto() {
+  const l = rapporti(); if (!l.length) return null;
+  const [nome, r] = l[0];
+  const primo = r.testo.replace(/^#.*$/m, '').trim().split(/\n\s*\n/)[0] || '';
+  return pannello('Ultimo rapporto di Claude', h('p', {}, h('a', { href: '#/rapporti/' + encodeURIComponent(nome) }, titoloRapporto(nome, r))), h('div', { class: 'elenco-nota largo-testo' }, mdInDom(primo)));
+}
+function vistaRapporti(scelto) {
+  const l = rapporti();
+  if (!l.length) return h('div', {}, h('div', { class: 'testa' }, h('h1', {}, 'Rapporti')), vuoto('Nessun rapporto ancora. Claude ne scrive uno a inizio mese con l\'andamento dei dati e le cose da fare, e compare qui.'));
+  const [nome, r] = l.find(x => x[0] === scelto) || l[0];
+  return h('div', {},
+    h('div', { class: 'testa' }, h('h1', {}, 'Rapporti'), l.length > 1 ? h('select', { 'aria-label': 'Rapporto', onchange: e => { location.hash = '#/rapporti/' + encodeURIComponent(e.target.value); } }, l.map(([n, x]) => h('option', { value: n, selected: n === nome }, titoloRapporto(n, x)))) : null),
+    h('article', { class: 'largo-testo' }, mdInDom(r.testo)));
+}
+
+function vistaArea(a) {
+  const cr = { salute: cruscottoSalute, finanze: cruscottoFinanze, patrimonio: cruscottoPatrimonio, organizzazione: cruscottoOrganizzazione, sport: cruscottoSport, mindfulness: cruscottoMindfulness, lettura: cruscottoLettura, viaggi: cruscottoViaggi, progetti: cruscottoProgetti }[a.id] || cruscottoLibero;
+  return h('div', {},
+    h('div', { class: 'testa' }, h('h1', {}, a.nome)),
+    a.id === 'salute' ? pannelloIndice() : a.id === 'finanze' ? pannelloIndiceFinanze() : null,
+    pannelloConsigli(a.id),
+    cr(a),
+    a.id === 'progetti' ? null : pannello('Sezioni di questa cartella', h('div', { class: 'sezioni' }, Object.entries(a.tipi).map(([k, d]) => h('div', { class: 'sezione' },
+      h('a', { href: `#/a/${a.id}/${k}` }, d.plur), h('span', { class: 'attenuato' }, ` ${voci(a.id, k).length}`), btn('Aggiungi', () => apriModulo(a.id, k), 'piccolo'))))));
+}
+
+/* --- Salute e longevità --- */
+function apriParametro(nome) {
+  const l = voci('salute', 'misura').filter(v => v.parametro === nome).sort(perData);
+  const num = l.filter(v => typeof v.valore === 'number');
+  const u = num[num.length - 1];
+  const corpo = h('div', {});
+  if (num.length) corpo.append(grafico(`Andamento di ${nome}`, w => graficoLinea(w, {
+    punti: num.map(v => ({ data: v.data, y: v.valore, fuori: fuoriIntervallo(v), righe: [testoRif(v) ? 'Riferimento: ' + testoRif(v) : '', v.laboratorio || ''].filter(Boolean) })),
+    banda: { min: u.rif_min, max: u.rif_max }, unita: u.unita, fmt: v => fmtNum(v, 3) })),
+    h('p', { class: 'attenuato piccolo' }, 'Fascia colorata: intervallo di riferimento dell\'ultimo referto. Ogni misura è valutata con l\'intervallo del proprio laboratorio; il rombo segna i valori fuori intervallo.'));
+  corpo.append(h('div', { class: 'scorri' }, h('table', {}, h('thead', {}, h('tr', {}, ['Data', 'Valore', 'Riferimento', 'Laboratorio', ''].map(x => h('th', {}, x)))),
+    h('tbody', {}, [...l].reverse().map(v => h('tr', {}, h('td', {}, fmtData(v.data)), h('td', { class: 'num' + (fuoriIntervallo(v) ? ' fuori' : '') }, valoreTesto(v) + (v.unita ? ' ' + v.unita : ''), fuoriIntervallo(v) ? ' ◆' : ''), h('td', {}, testoRif(v)), h('td', {}, v.laboratorio || ''),
+      h('td', { class: 'destra' }, v.doc && S.A.allegati.some(a => a.id === v.doc && !a.canc) ? btn('Referto', () => apriAllegato(S.A.allegati.find(a => a.id === v.doc)), 'piccolo') : null, btn('Modifica', () => apriModulo('salute', 'misura', v), 'piccolo'))))))));
+  apriModale(nome, corpo, true);
+}
+function rigaParametro(l) {
+  const u = l[l.length - 1], num = l.filter(v => typeof v.valore === 'number'), f = fuoriIntervallo(u);
+  return h('tr', { tabindex: 0, onclick: () => apriParametro(u.parametro), onkeydown: e => { if (e.key === 'Enter') apriParametro(u.parametro); } },
+    h('td', {}, u.parametro), h('td', { class: 'num destra nonspezza' + (f ? ' fuori' : '') }, valoreTesto(u), u.unita && typeof u.valore === 'number' ? h('span', { class: 'unita' }, ' ' + u.unita) : null, f ? h('span', { class: 'segno-fuori', title: 'Fuori intervallo' }, ' ◆') : null),
+    h('td', { class: 'rif' }, testoRif(u)), h('td', {}, fmtData(u.data)), h('td', {}, scintilla(num.map(v => v.valore), f)));
+}
+function pannelloSerie(titolo, lista, descrVuoto, azione) {
+  if (!lista.length) return pannello(titolo, vuoto(descrVuoto, azione));
+  const per = raggruppa(lista.sort(perData), v => v.metrica), nomi = [...per.keys()].sort();
+  const box = h('div', {});
+  const mostra = n => { const l = per.get(n); box.replaceChildren(grafico(`Andamento di ${n}`, w => graficoLinea(w, { punti: l.map(v => ({ data: v.data, y: v.valore })), unita: l[l.length - 1].unita })), h('p', { class: 'attenuato piccolo' }, `${l.length} valori dal ${fmtData(l[0].data)} al ${fmtData(l[l.length - 1].data)}. Ultimo: ${fmtNum(l[l.length - 1].valore)} ${l[l.length - 1].unita || ''}`)); };
+  mostra(nomi[0]);
+  return pannello(titolo, nomi.length > 1 ? h('select', { 'aria-label': 'Metrica', onchange: e => mostra(e.target.value) }, nomi.map(n => h('option', { value: n }, n))) : h('strong', {}, nomi[0]), box);
+}
+/* Sedute per settimana (ultime 12) e massimali: contesto per leggere recupero e sonno, non una valutazione degli esercizi. */
+function lunedi(iso) { const t = tempo(iso), g = (new Date(t).getUTCDay() + 6) % 7, d = new Date(t - g * MS_G); return isoData(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()); }
+function pannelloAllenamenti() {
+  const al = voci('sport', 'allenamento').sort(perData), ma = voci('sport', 'massimale');
+  if (!al.length && !ma.length) return null;
+  const kids = [];
+  if (al.length) {
+    const sett = []; let l = lunedi(al[0].data); const fine = lunedi(oggi());
+    while (l <= fine) { sett.push(l); l = isoData(...((d) => [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()])(new Date(tempo(l) + 7 * MS_G))); }
+    const ultime = sett.slice(-12);
+    const serie = [{ nome: 'Serie eseguite', classe: 'g-barra1', valori: ultime.map(s => somma(al.filter(v => lunedi(v.data) === s).map(v => v.serie))) }];
+    kids.push(h('div', { class: 'dati' }, dato('Sedute nelle ultime 4 settimane', al.filter(v => giorniDa(v.data) < 28).length), dato('Ultima seduta', fmtData(al[al.length - 1].data), al[al.length - 1].scheda)),
+      serie[0].valori.some(x => x > 0) ? [grafico('Serie eseguite per settimana', w => graficoBarre(w, { categorie: ultime.map(s => fmtData(s).replace(/ \d{4}$/, '')), serie, alto: 160 })),
+        h('p', { class: 'attenuato piccolo' }, 'Serie eseguite per settimana, dalla scheda. I valori non segnati sono stimati secondo le tue regole e indicati nella seduta.')] : null,
+      tabella('sport', 'allenamento', al, { limite: 6, filtro: false }));
+  }
+  if (ma.length) kids.push(h('h3', {}, 'Massimali'), tabella('sport', 'massimale', ma, { filtro: false }));
+  return pannello('Sedute da scheda', kids);
+}
+function cruscottoSalute() {
+  const mis = voci('salute', 'misura').sort(perData);
+  const gruppi = [...raggruppa(mis, v => v.parametro).values()];
+  const fuori = gruppi.filter(l => fuoriIntervallo(l[l.length - 1]));
+  const oss = voci('salute', 'osservazione').filter(o => o.stato !== 'chiusa').sort((a, b) => ['alta', 'media', 'bassa'].indexOf(a.priorita) - ['alta', 'media', 'bassa'].indexOf(b.priorita));
+  const visite = voci('salute', 'visita');
+  const perCat = raggruppa(gruppi, l => l[l.length - 1].categoria || 'Altro');
+  const testaTab = () => h('thead', {}, h('tr', {}, h('th', {}, 'Parametro'), h('th', { class: 'destra' }, 'Ultimo valore'), h('th', {}, 'Riferimento'), h('th', {}, 'Data'), h('th', {}, 'Andamento')));
+  return [
+    mis.length ? h('div', { class: 'dati' },
+      dato('Fuori intervallo all\'ultima misura', fuori.length, `su ${gruppi.length} parametri seguiti`, fuori.length ? 'allerta' : ''),
+      dato('Ultimo prelievo', fmtData(mis[mis.length - 1].data), fa(giorniDa(mis[mis.length - 1].data))),
+      dato('Prelievi in archivio', new Set(mis.map(v => v.data)).size, `dal ${fmtData(mis[0].data)}`)) : null,
+    mis.length ? pannello('Da tenere d\'occhio', fuori.length ? [h('div', { class: 'scorri' }, h('table', { class: 'cliccabile' }, testaTab(), h('tbody', {}, fuori.map(rigaParametro)))),
+      h('p', { class: 'attenuato piccolo' }, 'Sono i parametri il cui ultimo valore è fuori dall\'intervallo indicato dal laboratorio. È un aiuto alla lettura: il significato clinico lo stabilisce il medico.')] : h('p', {}, 'Tutti gli ultimi valori sono nell\'intervallo di riferimento.')) : pannello('Esami di laboratorio', vuoto('Nessun esame inserito. Puoi inserire i valori a mano, importare un file dati, oppure caricare intanto il PDF in Documenti.', btn('Aggiungi un valore', () => apriModulo('salute', 'misura'), 'primario'))),
+    pannello('Osservazioni e piano', oss.length ? h('ul', { class: 'elenco' }, oss.map(o => h('li', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('salute', 'osservazione', o) }, h('div', { class: 'tra' }, h('strong', {}, o.titolo), h('span', { class: 'attenuato' }, [o.priorita ? 'priorità ' + o.priorita : '', fmtData(o.data)].filter(Boolean).join(', '))), h('div', { class: 'elenco-nota testo-lungo' }, o.testo || ''), o.origine ? h('div', { class: 'attenuato piccolo' }, 'Scritta da: ' + o.origine) : null))) : h('p', { class: 'attenuato' }, 'Nessuna osservazione aperta.'), h('div', { class: 'azioni' }, btn('Aggiungi osservazione', () => apriModulo('salute', 'osservazione', null, { stato: 'aperta' }), 'piccolo'))),
+    mis.length ? pannello('Tutti i parametri per categoria', CAT_ESAMI.filter(k => perCat.has(k)).map(k => { const gl = perCat.get(k), nf = gl.filter(l => fuoriIntervallo(l[l.length - 1])).length; return h('details', { open: nf > 0 }, h('summary', {}, k, h('span', { class: 'attenuato' }, ` ${gl.length} parametri` + (nf ? `, ${nf} fuori intervallo` : ''))), h('div', { class: 'scorri' }, h('table', { class: 'cliccabile' }, testaTab(), h('tbody', {}, gl.sort((a, b) => a[0].parametro.localeCompare(b[0].parametro)).map(rigaParametro))))); })) : null,
+    pannelloSerie('Dati del dispositivo', voci('salute', 'sensore'), 'Nessun dato del dispositivo. Arrivano da soli ogni notte una volta attivato lo scaricamento Garmin (Impostazioni). In alternativa puoi importare un CSV.', btn('Importa CSV', () => apriImportaCsv('salute', 'sensore'))),
+    pannelloSerie('Peso e misure', voci('salute', 'corpo'), 'Nessuna misura del corpo registrata.', btn('Aggiungi misura', () => apriModulo('salute', 'corpo'), 'primario')),
+    visite.length ? pannello('Visite e referti', tabella('salute', 'visita', visite, { limite: 6, filtro: false })) : null,
+    voci('salute', 'alimentazione').length ? pannello('Alimentazione', tabella('salute', 'alimentazione', voci('salute', 'alimentazione'), { filtro: false })) : null,
+  ];
+}
+
+/* --- Finanze --- */
+function cruscottoFinanze() {
+  const saldi = voci('finanze', 'saldo').sort(perData), mov = movimentiReali();
+  if (!saldi.length && !mov.length) return pannello('', vuoto('Cartella vuota. Il modo più rapido: carica in Documenti i movimenti BPM degli ultimi mesi (Excel o CSV) oppure mandali a Claude in chat. Li classifica lui e da lì si calcolano entrate, uscite, risparmio e indice finanziario.', btn('Aggiungi un saldo', () => apriModulo('finanze', 'saldo'), 'primario'), btn('Importa movimenti', () => apriImportaCsv('finanze', 'movimento'))));
+  const date = [...new Set(saldi.map(v => v.data))];
+  const serie = date.map(d => ({ data: d, y: totaleFinanze(saldi.filter(v => v.data <= d)) }));
+  const ultimi = new Map(); for (const v of saldi) ultimi.set(v.conto, v);
+  const mesi = []; { const o = oggi(); let y = +o.slice(0, 4), m = +o.slice(5, 7); for (let i = 0; i < 12; i++) { mesi.unshift(`${y}-${String(m).padStart(2, '0')}`); if (--m < 1) { m = 12; y--; } } }
+  const entrate = mesi.map(k => somma(mov.filter(v => v.data.startsWith(k) && v.valore > 0).map(v => v.valore)));
+  const uscite = mesi.map(k => -somma(mov.filter(v => v.data.startsWith(k) && v.valore < 0).map(v => v.valore)));
+  const perCat = [...raggruppa(mov.filter(v => v.valore < 0 && v.data >= mesi[0]), v => v.categoria || 'Senza categoria')].map(([nome, l]) => ({ nome, valore: -somma(l.map(v => v.valore)) })).sort((a, b) => b.valore - a.valore).slice(0, 8);
+  const serieBarre = [{ nome: 'Entrate', classe: 'g-barra1', valori: entrate }, { nome: 'Uscite', classe: 'g-barra2', valori: uscite }];
+  return [
+    h('div', { class: 'dati' },
+      saldi.length ? dato('Disponibilità finanziaria', fmtEuro(serie[serie.length - 1].y), serie.length > 1 ? `${serie[serie.length - 1].y >= serie[0].y ? '+' : ''}${fmtEuro(serie[serie.length - 1].y - serie[0].y)} dal ${fmtData(serie[0].data)}` : `al ${fmtData(serie[0].data)}`) : null,
+      mov.length ? dato('Entrate negli ultimi 12 mesi', fmtEuro(somma(entrate))) : null, mov.length ? dato('Uscite negli ultimi 12 mesi', fmtEuro(somma(uscite)), `risparmio ${fmtEuro(somma(entrate) - somma(uscite))}`) : null),
+    saldi.length ? pannello('Disponibilità nel tempo', grafico('Disponibilità finanziaria nel tempo', w => graficoLinea(w, { punti: serie, unita: '€', fmt: v => fmtNum(v, 0) })), h('p', { class: 'attenuato piccolo' }, 'Somma dell\'ultimo saldo noto di ogni conto a ciascuna data. I conti di tipo Debito sono sottratti.')) : null,
+    saldi.length ? pannello('Dove sono i soldi oggi', barreOrizzontali([...ultimi.values()].map(v => ({ nome: v.conto, valore: segnoSaldo(v) })).sort((a, b) => b.valore - a.valore), fmtEuro)) : null,
+    mov.length ? pannello('Entrate e uscite per mese', legenda(serieBarre), grafico('Entrate e uscite per mese', w => graficoBarre(w, { categorie: mesi.map(fmtMese), serie: serieBarre, fmt: v => fmtNum(v, 0) }))) : null,
+    perCat.length ? pannello('Uscite per categoria negli ultimi 12 mesi', barreOrizzontali(perCat, fmtEuro)) : null,
+    pannelloTetti(mov),
+    mov.length ? pannello('Ultimi movimenti', tabella('finanze', 'movimento', voci('finanze', 'movimento'), { limite: 12, filtro: false })) : null,
+  ];
+}
+/* Tetti di spesa: spesa del mese in corso e dell'ultimo mese completo per ogni categoria con un tetto. */
+function pannelloTetti(mov) {
+  const tetti = new Map(); for (const b of voci('finanze', 'budget').sort(perData)) tetti.set(b.categoria, b);
+  if (!tetti.size) return mov.length ? pannello('Tetti di spesa', h('p', { class: 'attenuato' }, 'Nessun tetto impostato. Fissane uno per le categorie che vuoi tenere sotto controllo (per esempio ristoranti): l\'indice finanziario controlla ogni mese se lo rispetti.'), h('div', { class: 'azioni' }, btn('Aggiungi un tetto', () => apriModulo('finanze', 'budget', null, { data: oggi() }), 'piccolo'))) : null;
+  const corrente = oggi().slice(0, 7), prec = mesiCompleti(1)[0];
+  const spesa = (cat, mese) => Math.abs(somma(mov.filter(v => v.data.startsWith(mese) && v.categoria === cat && v.valore < 0).map(v => v.valore)));
+  return pannello('Tetti di spesa', h('ul', { class: 'elenco' }, [...tetti.values()].map(b => {
+    const ora = spesa(b.categoria, corrente), prima = spesa(b.categoria, prec), q = b.valore ? ora / b.valore : 0;
+    return h('li', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('finanze', 'budget', b) },
+      h('div', { class: 'tra' }, h('strong', {}, b.categoria), h('span', { class: 'num' + (ora > b.valore ? ' fuori' : '') }, `${fmtEuro(ora)} di ${fmtEuro(b.valore)}`)),
+      h('span', { class: 'rip-pista' }, h('span', { class: 'rip-barra ' + (q > 1 ? 'ritardo' : q > 0.8 ? 'vuota' : 'ok'), style: `width:${Math.max(2, Math.min(100, q * 100))}%` })),
+      h('div', { class: 'elenco-nota' }, `Questo mese. ${fmtMese(prec)}: ${fmtEuro(prima)}` + (prima > b.valore ? ', sforato.' : '.')));
+  })));
+}
+
+/* --- Organizzazione: obiettivi, cose da fare, revisione settimanale --- */
+function cruscottoOrganizzazione() {
+  const ob = voci('organizzazione', 'obiettivo'), att = voci('organizzazione', 'attivita'), rev = voci('organizzazione', 'revisione').sort(perData);
+  if (!ob.length && !att.length && !rev.length) return pannello('', vuoto('Cartella vuota. Parti da 3-5 obiettivi per i prossimi 12 mesi, divisi tra lavoro, famiglia e personale. Gli appuntamenti restano nei tuoi calendari Google e iCloud: qui ci sono le priorità.', btn('Aggiungi un obiettivo', () => apriModulo('organizzazione', 'obiettivo', null, { data: oggi(), stato: 'attivo', avanzamento: 0 }), 'primario'), btn('Aggiungi una cosa da fare', () => apriModulo('organizzazione', 'attivita', null, { stato: 'da fare', priorita: 'media' }))));
+  const attivi = ob.filter(o => o.stato === 'attivo' || !o.stato);
+  const aperte = att.filter(x => x.stato !== 'fatta').sort((a, b) => ['alta', 'media', 'bassa'].indexOf(a.priorita) - ['alta', 'media', 'bassa'].indexOf(b.priorita) || perData(a, b));
+  const ultimaRev = rev[rev.length - 1];
+  const perAmbito = raggruppa(attivi, o => o.ambito || 'Senza ambito');
+  return [
+    h('div', { class: 'dati' }, dato('Obiettivi attivi', attivi.length, `${ob.filter(o => o.stato === 'raggiunto').length} raggiunti`), dato('Cose da fare aperte', aperte.length, `${aperte.filter(x => x.stato !== 'fatta' && giorniDa(x.data) > 0).length} in ritardo`, aperte.some(x => giorniDa(x.data) > 0) ? 'allerta' : ''),
+      dato('Ultima revisione', ultimaRev ? fmtData(ultimaRev.data) : 'mai', ultimaRev && ultimaRev.voto ? `voto ${ultimaRev.voto} su 5` : '')),
+    attivi.length ? pannello('Obiettivi', [...perAmbito].map(([amb, l]) => [h('h3', {}, amb), h('ul', { class: 'elenco' }, l.map(o => h('li', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('organizzazione', 'obiettivo', o) },
+      h('div', { class: 'tra' }, h('strong', {}, o.titolo), h('span', { class: 'attenuato num' }, `${fmtNum(o.avanzamento || 0, 0)}%` + (o.scadenza ? `, entro il ${fmtData(o.scadenza)}` : ''))),
+      h('span', { class: 'rip-pista' }, h('span', { class: 'rip-barra ok', style: `width:${Math.max(2, Math.min(100, o.avanzamento || 0))}%` })),
+      o.misura ? h('div', { class: 'elenco-nota' }, o.misura) : null)))])) : null,
+    pannello('Cose da fare', aperte.length ? h('ul', { class: 'elenco' }, aperte.slice(0, 15).map(x => { const g = -giorniDa(x.data); return h('li', {}, h('div', { class: 'tra' }, h('span', {}, h('strong', {}, x.titolo), h('span', { class: 'attenuato' }, [x.ambito, x.priorita ? 'priorità ' + x.priorita : ''].filter(Boolean).map(s => ' ' + s).join(','))),
+      stato(g < 0 ? 'ritardo' : 'vuota', g < 0 ? `In ritardo dal ${fmtData(x.data)}` : g === 0 ? 'Oggi' : fmtData(x.data))),
+      h('div', { class: 'azioni' }, btn('Fatta', () => metti({ ...x, stato: 'fatta', fatta_il: oggi() }), 'piccolo'), btn('Modifica', () => apriModulo('organizzazione', 'attivita', x), 'piccolo'))); })) : h('p', { class: 'attenuato' }, 'Niente in sospeso.'),
+      h('div', { class: 'azioni' }, btn('Aggiungi', () => apriModulo('organizzazione', 'attivita', null, { stato: 'da fare', priorita: 'media' }), 'piccolo'))),
+    pannello('Revisione della settimana', ultimaRev ? [h('p', { class: 'attenuato piccolo' }, `Settimana del ${fmtData(ultimaRev.data)}`), ultimaRev.focus ? h('div', { class: 'testo-lungo' }, h('strong', {}, 'Focus: '), ultimaRev.focus) : null] : h('p', { class: 'attenuato' }, 'Dieci minuti a settimana: cosa è andato, cosa no, le tre cose su cui concentrarti. È l\'abitudine che tiene vivo tutto il resto.'),
+      h('div', { class: 'azioni' }, btn('Scrivi la revisione', () => apriModulo('organizzazione', 'revisione', null, { data: lunedi(oggi()) }), 'piccolo'))),
+  ];
+}
+
+/* --- Sport: attività e sedute da scheda --- */
+function cruscottoSport() {
+  const at = voci('sport', 'attivita').sort(perData), al = voci('sport', 'allenamento');
+  if (!at.length && !al.length && !voci('sport', 'massimale').length) return pannello('', vuoto('Cartella vuota. Registra le attività (palestra, corsa, padel…) oppure manda a Claude le schede di allenamento: le sedute le ricava lui.', btn('Aggiungi un\'attività', () => apriModulo('sport', 'attivita', null, { data: oggi() }), 'primario')));
+  const tutte = [...at, ...al].sort(perData);
+  const sett = []; if (tutte.length) { let l = lunedi(tutte[0].data); const fine = lunedi(oggi()); while (l <= fine) { sett.push(l); l = isoData(...((d) => [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()])(new Date(tempo(l) + 7 * MS_G))); } }
+  const ultime = sett.slice(-12);
+  const serie = [{ nome: 'Sedute', classe: 'g-barra1', valori: ultime.map(s => tutte.filter(v => lunedi(v.data) === s).length) }];
+  const perDisc = [...raggruppa(at.filter(v => giorniDa(v.data) < 90), v => v.disciplina)].map(([nome, l]) => ({ nome, valore: l.length })).sort((a, b) => b.valore - a.valore);
+  return [
+    h('div', { class: 'dati' }, dato('Sedute nelle ultime 4 settimane', tutte.filter(v => giorniDa(v.data) < 28).length, 'obiettivo: almeno 3 a settimana'), at.length ? dato('Minuti nelle ultime 4 settimane', fmtNum(somma(at.filter(v => giorniDa(v.data) < 28).map(v => v.minuti)), 0)) : null),
+    ultime.length > 1 ? pannello('Sedute per settimana', grafico('Sedute per settimana', w => graficoBarre(w, { categorie: ultime.map(s => fmtData(s).replace(/ \d{4}$/, '')), serie, alto: 160 }))) : null,
+    perDisc.length ? pannello('Attività negli ultimi 90 giorni', barreOrizzontali(perDisc, v => fmtNum(v, 0))) : null,
+    at.length ? pannello('Ultime attività', tabella('sport', 'attivita', at, { limite: 8, filtro: false })) : null,
+    pannelloAllenamenti(),
+  ];
+}
+
+/* --- Mindfulness: costanza della pratica e stress misurato dal Garmin --- */
+function cruscottoMindfulness() {
+  const pr = voci('mindfulness', 'pratica').sort(perData), stress = mediaRecente('Stress medio', 14), stressPrima = (() => { const l = serieMetrica('Stress medio', 'sensore').filter(v => giorniDa(v.data) >= 14 && giorniDa(v.data) < 42); return l.length >= 7 ? somma(l.map(v => v.valore)) / l.length : null; })();
+  if (!pr.length && !stress) return pannello('', vuoto('Cartella vuota. Registra ogni pratica, anche di 5 minuti: conta la costanza, non la durata. Lo stress misurato dal Garmin compare qui da solo.', btn('Aggiungi una pratica', () => apriModulo('mindfulness', 'pratica', null, { data: oggi() }), 'primario')));
+  const giorni30 = new Set(pr.filter(v => giorniDa(v.data) < 30).map(v => v.data)).size;
+  let serie = 0; { let d = oggi(); const giorni = new Set(pr.map(v => v.data)); if (!giorni.has(d)) d = isoData(...((x) => [x.getUTCFullYear(), x.getUTCMonth() + 1, x.getUTCDate()])(new Date(tempo(d) - MS_G))); while (giorni.has(d)) { serie++; d = isoData(...((x) => [x.getUTCFullYear(), x.getUTCMonth() + 1, x.getUTCDate()])(new Date(tempo(d) - MS_G))); } }
+  return [
+    h('div', { class: 'dati' }, dato('Giorni di pratica negli ultimi 30', giorni30), dato('Giorni consecutivi', serie), pr.length ? dato('Minuti negli ultimi 30 giorni', fmtNum(somma(pr.filter(v => giorniDa(v.data) < 30).map(v => v.minuti)), 0)) : null,
+      stress ? dato('Stress medio Garmin, 14 giorni', fmtNum(stress.media, 0), stressPrima ? `prima ${fmtNum(stressPrima, 0)}; più basso è meglio` : 'su 100; più basso è meglio') : null),
+    pannelloSerie('Stress misurato', voci('salute', 'sensore').filter(v => v.metrica === 'Stress medio' || v.metrica === 'Body Battery massima'), 'Lo stress arriva dal Garmin una volta attivato lo scaricamento.'),
+    pr.length ? pannello('Ultime pratiche', tabella('mindfulness', 'pratica', pr, { limite: 10, filtro: false })) : null,
+  ];
+}
+
+/* --- Lettura --- */
+function cruscottoLettura() {
+  const li = voci('lettura', 'libro'), se = voci('lettura', 'sessione');
+  if (!li.length && !se.length) return pannello('', vuoto('Cartella vuota. Aggiungi il libro che stai leggendo e quelli in lista. Per ogni libro finito tieni le idee da applicare: è la parte che vale di più.', btn('Aggiungi un libro', () => apriModulo('lettura', 'libro', null, { stato: 'in lettura', data: oggi() }), 'primario')));
+  const anno = oggi().slice(0, 4), letti = li.filter(v => v.stato === 'letto').sort((a, b) => (b.fine || '').localeCompare(a.fine || ''));
+  const inLettura = li.filter(v => v.stato === 'in lettura'), lista = li.filter(v => v.stato === 'da leggere');
+  const carta = v => h('li', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('lettura', 'libro', v) }, h('div', { class: 'tra' }, h('strong', {}, v.titolo), h('span', { class: 'attenuato' }, [v.autore, v.voto ? `voto ${v.voto} su 5` : '', v.fine ? fmtData(v.fine) : ''].filter(Boolean).join(', '))), v.idee ? h('div', { class: 'elenco-nota testo-lungo' }, v.idee) : null);
+  return [
+    h('div', { class: 'dati' }, dato(`Libri letti nel ${anno}`, letti.filter(v => (v.fine || '').startsWith(anno)).length), dato('In lettura', inLettura.length), dato('In lista', lista.length),
+      se.length ? dato('Minuti di lettura negli ultimi 30 giorni', fmtNum(somma(se.filter(v => giorniDa(v.data) < 30).map(v => v.minuti)), 0)) : null),
+    inLettura.length ? pannello('In lettura', h('ul', { class: 'elenco' }, inLettura.map(carta))) : null,
+    letti.length ? pannello('Letti, con le idee da tenere', h('ul', { class: 'elenco' }, letti.slice(0, 20).map(carta))) : null,
+    lista.length ? pannello('Da leggere', h('ul', { class: 'elenco' }, lista.map(carta))) : null,
+  ];
+}
+
+/* --- Patrimonio --- */
+function cruscottoPatrimonio() {
+  const beni = voci('patrimonio', 'bene'), debiti = voci('patrimonio', 'debito'), fin = totaleFinanze(voci('finanze', 'saldo'));
+  if (!beni.length && !debiti.length) return pannello('', vuoto('Cartella vuota. Inserisci i beni con il loro valore stimato e i debiti con il residuo: il patrimonio netto si calcola da solo, insieme alle disponibilità della cartella Finanze.', btn('Aggiungi un bene', () => apriModulo('patrimonio', 'bene'), 'primario'), btn('Aggiungi un debito', () => apriModulo('patrimonio', 'debito'))));
+  const tb = somma(beni.map(v => v.valore)), td = somma(debiti.map(v => Math.abs(v.valore)));
+  const perTipo = [...raggruppa(beni, v => v.categoria || 'Altro')].map(([nome, l]) => ({ nome, valore: somma(l.map(v => v.valore)) }));
+  if (fin) perTipo.push({ nome: 'Disponibilità finanziarie', valore: fin });
+  return [
+    h('div', { class: 'dati' }, dato('Patrimonio netto', fmtEuro(tb + fin - td), 'beni e disponibilità meno debiti'), dato('Beni', fmtEuro(tb), `${beni.length} voci`), dato('Debiti', fmtEuro(td), debiti.length ? `rate mensili ${fmtEuro(somma(debiti.map(v => v.rata)))}` : '')),
+    pannello('Composizione', barreOrizzontali(perTipo.sort((a, b) => b.valore - a.valore), fmtEuro)),
+    beni.length ? pannello('Beni', tabella('patrimonio', 'bene', beni, { filtro: false })) : null,
+    debiti.length ? pannello('Debiti', tabella('patrimonio', 'debito', debiti, { filtro: false })) : null,
+  ];
+}
+
+/* --- Viaggi ed esperienze --- */
+function cruscottoViaggi() {
+  const vg = voci('viaggi', 'viaggio').sort(perData), es = voci('viaggi', 'esperienza').sort(perData);
+  if (!vg.length && !es.length) return pannello('', vuoto('Cartella vuota. Registra i viaggi fatti e quelli in programma, con chi eri e cosa vuoi ricordare.', btn('Aggiungi un viaggio', () => apriModulo('viaggi', 'viaggio'), 'primario'), btn('Aggiungi un\'esperienza', () => apriModulo('viaggi', 'esperienza'))));
+  const giorni = somma(vg.map(v => (v.fine && v.fine >= v.data ? (tempo(v.fine) - tempo(v.data)) / MS_G + 1 : 1)));
+  const tutti = [...vg, ...es].sort(perData), anni = [...new Set(tutti.map(v => v.data.slice(0, 4)))].sort();
+  const serie = [{ nome: 'Viaggi', classe: 'g-barra1', valori: anni.map(a => vg.filter(v => v.data.startsWith(a)).length) }, { nome: 'Esperienze', classe: 'g-barra2', valori: anni.map(a => es.filter(v => v.data.startsWith(a)).length) }];
+  const carta = (v, tipo) => h('li', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('viaggi', tipo, v) }, h('div', { class: 'tra' }, h('strong', {}, v.titolo), h('span', { class: 'attenuato' }, fmtData(v.data) + (v.fine ? ' – ' + fmtData(v.fine) : ''))),
+    h('div', { class: 'elenco-nota' }, [v.luogo, v.paese, v.con ? 'con ' + v.con : '', v.voto ? `voto ${v.voto} su 5` : '', v.valore ? fmtEuro(v.valore) : ''].filter(Boolean).join(', ')), v.nota ? h('div', { class: 'elenco-nota testo-lungo' }, v.nota) : null);
+  const futuri = vg.filter(v => v.data > oggi());
+  return [
+    h('div', { class: 'dati' }, dato('Viaggi', vg.length, `${giorni} giorni in viaggio`), dato('Paesi', new Set(vg.map(v => v.paese).filter(Boolean)).size), dato('Esperienze', es.length), dato('Spesa registrata', fmtEuro(somma(tutti.map(v => v.valore))))),
+    futuri.length ? pannello('In programma', h('ul', { class: 'elenco' }, futuri.map(v => carta(v, 'viaggio')))) : null,
+    anni.length > 1 ? pannello('Per anno', legenda(serie), grafico('Viaggi ed esperienze per anno', w => graficoBarre(w, { categorie: anni, serie, alto: 170 }))) : null,
+    pannello('Diario', h('ul', { class: 'elenco' }, tutti.filter(v => v.data <= oggi()).reverse().slice(0, 40).map(v => carta(v, v.tipo)))),
+  ];
+}
+
+/* --- Cartelle personalizzate --- */
+function cruscottoLibero(a) {
+  const l = voci(a.id, 'voce').sort(perData);
+  if (!l.length) return pannello('', vuoto('Cartella vuota. Ogni voce ha titolo, data, categoria, un valore numerico facoltativo e note.', btn('Aggiungi una voce', () => apriModulo(a.id, 'voce'), 'primario')));
+  const num = l.filter(v => typeof v.valore === 'number');
+  const perCat = [...raggruppa(l, v => v.categoria || 'Senza categoria')].map(([nome, x]) => ({ nome, valore: x.length })).sort((p, q) => q.valore - p.valore);
+  return [
+    h('div', { class: 'dati' }, dato('Voci', l.length, `ultima il ${fmtData(l[l.length - 1].data)}`), num.length ? dato('Somma dei valori', fmtNum(somma(num.map(v => v.valore)))) : null),
+    num.length > 1 ? pannello('Valori nel tempo', grafico('Valori nel tempo', w => graficoLinea(w, { punti: num.map(v => ({ data: v.data, y: v.valore, righe: [v.titolo] })), unita: num[num.length - 1].unita }))) : null,
+    perCat.length > 1 ? pannello('Voci per categoria', barreOrizzontali(perCat, v => fmtNum(v, 0))) : null,
+    pannello('Ultime voci', tabella(a.id, 'voce', l, { limite: 10, filtro: false })),
+  ];
+}
+
+/* --- Progetti: schede da portare in una chat e riportare indietro aggiornate --- */
+function schedaProgetto(v) {
+  return [`<!-- archivio-vita:progetto id=${v.id} versione=${v.versione || 1} esportato=${adesso()} -->`, `# ${v.titolo}`, '', `Stato: ${v.stato || 'attivo'}`, `Obiettivo: ${(v.obiettivo || '').replace(/\s*\n\s*/g, ' ')}`, '',
+    '<!-- istruzioni:inizio -->', '> Per l\'assistente: questo file è la base di lavoro del progetto, conservata nell\'archivio personale del proprietario.',
+    '> Parti da qui invece che da zero. A fine sessione restituisci questo stesso file completo e aggiornato (decisioni prese, stato, dati nuovi, prossimi passi),',
+    '> lasciando intatte la prima riga e le righe Stato e Obiettivo, così può essere ricaricato nell\'archivio come nuova versione.', '<!-- istruzioni:fine -->', '', v.contenuto || ''].join('\n');
+}
+function leggiScheda(testo) {
+  const out = {}; let t = testo.replace(/^﻿/, '');
+  const m = t.match(/<!--\s*archivio-vita:progetto\s+id=(\S+)\s+versione=(\d+)[^>]*-->/);
+  if (m) { out.id = m[1]; out.daVersione = +m[2]; t = t.replace(m[0], ''); }
+  t = t.replace(/<!--\s*istruzioni:inizio\s*-->[\s\S]*?<!--\s*istruzioni:fine\s*-->/, '');
+  const righe = t.replace(/^\s+/, '').split(/\r?\n/);
+  if (/^#\s+/.test(righe[0] || '')) out.titolo = righe.shift().replace(/^#\s+/, '').trim();
+  while (righe.length && (righe[0].trim() === '' || /^(Stato|Obiettivo):/.test(righe[0]))) {
+    const r = righe.shift(), k = r.match(/^(Stato|Obiettivo):\s*(.*)$/);
+    if (k) out[k[1].toLowerCase()] = k[2].trim();
+  }
+  out.contenuto = righe.join('\n').trim();
+  return out;
+}
+function aggiornaContenuto(v, nuovo, origine, campi = {}) {
+  if ((v.contenuto || '') !== nuovo && (v.contenuto || '').trim()) {
+    v.versioni = [...(v.versioni || []), { n: v.versione || 1, quando: v.agg, contenuto: v.contenuto }].slice(-40);
+  }
+  if ((v.contenuto || '') !== nuovo) v.versione = (v.versione || 1) + ((v.contenuto || '').trim() ? 1 : 0);
+  Object.assign(v, campi, { contenuto: nuovo });
+  annota('Scheda di progetto aggiornata', origine, { aggiunti: 0, aggiornati: 1, saltati: 0, errori: [] });
+  metti(v);
+}
+async function caricaScheda(file, v) {
+  const sch = leggiScheda(await leggiFile(file));
+  if (!sch.contenuto) { avviso(`"${file.name}" è vuoto: scheda non caricata.`, 'errore'); return; }
+  if (!v && sch.id) v = voce(sch.id);
+  if (v && sch.id && sch.id !== v.id && !confirm('Questo file appartiene a un altro progetto. Caricarlo comunque qui?')) return;
+  const campi = {}; if (sch.titolo) campi.titolo = sch.titolo; if (sch.stato) campi.stato = sch.stato; if (sch.obiettivo) campi.obiettivo = sch.obiettivo;
+  if (!v) { v = metti({ area: 'progetti', tipo: 'progetto', persona: personaPredefinita(), titolo: sch.titolo || file.name.replace(/\.[^.]+$/, ''), stato: sch.stato || 'attivo', obiettivo: sch.obiettivo || '', contenuto: '', versione: 1 }, false); }
+  else if (sch.daVersione && sch.daVersione < (v.versione || 1) && !confirm(`Il file parte dalla versione ${sch.daVersione}, ma in archivio c'è già la ${v.versione}. Caricandolo, la versione attuale finisce nella cronologia. Procedere?`)) return;
+  aggiornaContenuto(v, sch.contenuto, file.name, campi);
+  avviso(`Scheda caricata: "${v.titolo}" è ora alla versione ${v.versione}.`);
+  location.hash = '#/a/progetti/p/' + v.id;
+}
+const scegliFile = (accept, fn, multiplo) => { const i = h('input', { type: 'file', accept, multiple: !!multiplo, onchange: () => { if (i.files.length) fn(multiplo ? [...i.files] : i.files[0]); } }); i.click(); };
+function cruscottoProgetti() {
+  const l = voci('progetti', 'progetto').sort((a, b) => (b.agg || '').localeCompare(a.agg || ''));
+  const azioni = h('div', { class: 'azioni' }, btn('Nuovo progetto', () => apriModulo('progetti', 'progetto', null, { stato: 'attivo' }), 'primario'), btn('Carica una scheda (.md)', () => scegliFile('.md,.txt,text/markdown,text/plain', f => caricaScheda(f, null))));
+  return [
+    h('p', { class: 'sotto largo-testo' }, 'Ogni progetto è una scheda di testo che conserva ragionamenti, decisioni e stato. La scarichi, la alleghi a una chat con un assistente, e ricarichi qui la versione aggiornata: la base resta tua e cresce a ogni giro.'),
+    azioni,
+    l.length ? h('div', { class: 'griglia' }, l.map(v => h('a', { class: 'scheda', href: '#/a/progetti/p/' + v.id }, h('h3', {}, v.titolo), h('p', {}, v.obiettivo || ''), h('p', { class: 'attenuato piccolo' }, `${v.stato || ''}, versione ${v.versione || 1}, aggiornato il ${fmtData((v.agg || '').slice(0, 10))}`)))) : vuoto('Nessun progetto. Creane uno e incolla dentro il riassunto di una chat, oppure carica una scheda già pronta.'),
+  ];
+}
+function vistaProgetto(id) {
+  const v = voce(id); if (!v) return vuoto('Progetto non trovato.');
+  const area_ = h('textarea', { class: 'scheda-testo', rows: 22, spellcheck: 'false', 'aria-label': 'Contenuto della scheda' }, v.contenuto || '');
+  const doc = S.A.allegati.filter(a => !a.canc && a.rif === id);
+  return h('div', {},
+    h('p', { class: 'briciole' }, h('a', { href: '#/a/progetti' }, 'Progetti'), ' / ', v.titolo),
+    h('div', { class: 'testa' }, h('div', {}, h('h1', {}, v.titolo), h('p', { class: 'sotto' }, `${v.stato || ''}, versione ${v.versione || 1}, aggiornato il ${fmtQuando(v.agg)}`)),
+      h('div', { class: 'azioni' }, btn('Scarica la scheda', () => scarica(nomeFile(v.titolo) + '.md', schedaProgetto(v), 'text/markdown'), 'primario'), btn('Carica la versione aggiornata', () => scegliFile('.md,.txt,text/markdown,text/plain', f => caricaScheda(f, v))), btn('Titolo e stato', () => apriModulo('progetti', 'progetto', v)))),
+    v.obiettivo ? h('p', { class: 'largo-testo' }, h('strong', {}, 'Obiettivo: '), v.obiettivo) : null,
+    pannello('Contenuto', area_, h('div', { class: 'azioni' }, btn('Salva il testo', () => { if (area_.value === (v.contenuto || '')) { avviso('Nessuna modifica da salvare.'); return; } aggiornaContenuto(v, area_.value, 'modifica a mano'); avviso(`Salvato come versione ${v.versione}.`); }, 'primario'), btn('Copia negli appunti', () => navigator.clipboard.writeText(schedaProgetto(v)).then(() => avviso('Scheda copiata.'), () => avviso('Copia non riuscita: usa Scarica la scheda.', 'errore'))))),
+    pannello('Cronologia', (v.versioni || []).length ? h('ul', { class: 'elenco' }, [...v.versioni].reverse().map(x => h('li', {}, h('div', { class: 'tra' }, h('span', {}, h('strong', {}, `Versione ${x.n}`), h('span', { class: 'attenuato' }, ` del ${fmtQuando(x.quando)}, ${fmtNum(x.contenuto.length, 0)} caratteri`)),
+      h('span', { class: 'azioni' }, btn('Vedi', () => apriModale(`Versione ${x.n}`, h('pre', { class: 'testo-lungo' }, x.contenuto), true), 'piccolo'), btn('Ripristina', () => { if (confirm(`Riportare il contenuto alla versione ${x.n}? Quella attuale resta in cronologia.`)) aggiornaContenuto(v, x.contenuto, `ripristino versione ${x.n}`); }, 'piccolo')))))) : h('p', { class: 'attenuato' }, 'Le versioni precedenti compaiono qui a ogni aggiornamento. Se ne conservano 40.')),
+    pannello('File del progetto', doc.length ? elencoDocumenti(doc) : h('p', { class: 'attenuato' }, 'Nessun file collegato.'), h('div', { class: 'azioni' }, btn('Aggiungi file', () => scegliFile('', fs => caricaDocumenti(fs, { rif: id, area: 'progetti', stato: 'elaborato' }), true), 'piccolo'))));
+}
+
+/* --- Scadenze --- */
+function creaIcs(lista) {
+  const righe = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Archivio di vita//IT'];
+  const freq = { mensile: 'FREQ=MONTHLY', trimestrale: 'FREQ=MONTHLY;INTERVAL=3', semestrale: 'FREQ=MONTHLY;INTERVAL=6', annuale: 'FREQ=YEARLY' };
+  const pulisci = t => String(t || '').replace(/([,;\\])/g, '\\$1').replace(/\r?\n/g, '\\n');
+  for (const x of lista) {
+    const d = x.data.replace(/-/g, ''), fine = isoData(...((dt) => [dt.getUTCFullYear(), dt.getUTCMonth() + 1, dt.getUTCDate()])(new Date(tempo(x.data) + MS_G))).replace(/-/g, '');
+    righe.push('BEGIN:VEVENT', `UID:${x.id}@archivio-vita`, `DTSTAMP:${adesso().replace(/[-:]/g, '').slice(0, 15)}Z`, `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${fine}`, `SUMMARY:${pulisci(x.titolo)}`);
+    if (x.nota) righe.push(`DESCRIPTION:${pulisci(x.nota)}`);
+    if (freq[x.ripeti]) righe.push('RRULE:' + freq[x.ripeti]);
+    righe.push('BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:Promemoria', 'TRIGGER:PT9H', 'END:VALARM', 'END:VEVENT');
+  }
+  righe.push('END:VCALENDAR');
+  return righe.join('\r\n');
+}
+function vistaScadenze() {
+  const l = voci('sistema', 'scadenza').sort(perData), aperte = l.filter(x => x.stato !== 'fatta'), fatte = l.filter(x => x.stato === 'fatta').reverse();
+  const fatta = x => { const pros = prossimaData(x.data, x.ripeti); if (pros) { let d = pros; while (d <= oggi()) d = prossimaData(d, x.ripeti); metti({ ...x, data: d }); avviso(`Fatta. Prossima il ${fmtData(d)}.`); } else metti({ ...x, stato: 'fatta', fatta_il: oggi() }); };
+  return h('div', {},
+    h('div', { class: 'testa' }, h('h1', {}, 'Scadenze'), h('div', { class: 'azioni' }, btn('Aggiungi', () => apriModulo('sistema', 'scadenza', null, { stato: 'da fare', ripeti: 'mai' }), 'primario'), aperte.length ? btn('Porta nel calendario (.ics)', () => scarica('scadenze.ics', creaIcs(aperte), 'text/calendar')) : null)),
+    pannello('Da fare', aperte.length ? h('ul', { class: 'elenco' }, aperte.map(x => { const g = -giorniDa(x.data); return h('li', {}, h('div', { class: 'tra' }, h('span', {}, h('strong', {}, x.titolo), x.zona ? h('span', { class: 'attenuato' }, ' ' + x.zona) : null), stato(g < 0 ? 'ritardo' : 'vuota', g < 0 ? `Scaduta il ${fmtData(x.data)}` : g === 0 ? 'Oggi' : `${fmtData(x.data)}, tra ${g} giorni`)),
+      x.nota ? h('div', { class: 'elenco-nota testo-lungo' }, x.nota) : null, h('div', { class: 'azioni' }, btn('Fatta', () => fatta(x), 'piccolo'), btn('Modifica', () => apriModulo('sistema', 'scadenza', x), 'piccolo'), x.ripeti && x.ripeti !== 'mai' ? h('span', { class: 'attenuato piccolo' }, 'si ripete: ' + x.ripeti) : null)); })) : h('p', { class: 'attenuato' }, 'Nessuna scadenza aperta.')),
+    fatte.length ? pannello('Fatte', tabella('sistema', 'scadenza', fatte, { limite: 30, filtro: false })) : null);
+}
+
+/* --- Documenti: gli originali, cifrati --- */
+const APRIBILI = /^(application\/pdf|image\/(png|jpeg|gif|webp)|text\/plain)$/;
+async function apriAllegato(a, forzaScarica) {
+  try {
+    const bytes = await contenutoAllegato(a);
+    if (!forzaScarica && APRIBILI.test(a.mime)) {
+      /* Solo PDF, immagini e testo semplice si aprono nella pagina; tutto il resto si scarica, così un file non può eseguire codice qui dentro. */
+      const url = URL.createObjectURL(new Blob([bytes], { type: a.mime }));
+      const vista = a.mime === 'text/plain' ? h('pre', { class: 'testo-lungo' }, decod.decode(bytes)) : a.mime === 'application/pdf' ? h('iframe', { class: 'visore', src: url, title: a.nome }) : h('img', { class: 'visore-img', src: url, alt: a.nome });
+      apriModale(a.nome, h('div', {}, h('div', { class: 'azioni' }, h('a', { class: 'btn', href: url, target: '_blank', rel: 'noopener' }, 'Apri in una nuova scheda'), btn('Scarica', () => scarica(a.nome, new Blob([bytes], { type: a.mime })))), vista), true);
+    } else scarica(a.nome, new Blob([bytes], { type: 'application/octet-stream' }));
+  } catch (e) { avviso(e.message, 'errore'); }
+}
+const MAX_DOC = 20 * 1048576;
+async function caricaDocumenti(files, extra = {}) {
+  const esito = { aggiunti: 0, aggiornati: 0, saltati: 0, errori: [] }, nomi = [];
+  for (const f of files) {
+    if (f.size > MAX_DOC) { esito.errori.push(`"${f.name}" supera i 20 MB: non caricato.`); continue; }
+    if (f.size === 0) { esito.errori.push(`"${f.name}" è vuoto: non caricato.`); continue; }
+    try { await aggiungiAllegato(f, extra); esito.aggiunti++; nomi.push(f.name); } catch (e) { esito.errori.push(`"${f.name}" non caricato: ${e.message}`); }
+  }
+  annota('Caricamento documenti', nomi.join(', ').slice(0, 200) || 'nessun file', esito);
+  salva();
+  if (esito.errori.length) apriModale('Esito del caricamento', ricevuta(esito)); else avviso(`Documenti caricati e cifrati: ${esito.aggiunti}.`);
+}
+function modificaDocumento(a) {
+  const pp = persone();
+  const form = h('form', { class: 'modulo', onsubmit: e => { e.preventDefault(); const el = form.elements; Object.assign(a, { nome: el.nome.value.trim() || a.nome, area: el.area.value, data: el.data.value, stato: el.stato.value, nota: el.nota.value.trim(), persona: el.persona ? el.persona.value : a.persona, agg: adesso() }); salva(); chiudiModale(); } },
+    h('label', { class: 'campo intero' }, h('span', {}, 'Nome'), h('input', { name: 'nome', value: a.nome })),
+    h('label', { class: 'campo' }, h('span', {}, 'Cartella'), h('select', { name: 'area' }, h('option', { value: '' }, 'Nessuna'), aree().map(x => h('option', { value: x.id, selected: x.id === a.area }, x.nome)))),
+    h('label', { class: 'campo' }, h('span', {}, 'Data del documento'), h('input', { name: 'data', type: 'date', value: a.data || '' })),
+    h('label', { class: 'campo' }, h('span', {}, 'Stato'), h('select', { name: 'stato' }, ['da elaborare', 'elaborato'].map(x => h('option', { value: x, selected: x === a.stato }, x)))),
+    pp.length > 1 ? h('label', { class: 'campo' }, h('span', {}, 'Persona'), h('select', { name: 'persona' }, pp.map(p => h('option', { value: p.id, selected: p.id === a.persona }, p.nome)))) : null,
+    h('label', { class: 'campo intero' }, h('span', {}, 'Nota'), h('textarea', { name: 'nota', rows: 3 }, a.nota || '')),
+    h('div', { class: 'azioni intero' }, h('button', { class: 'btn primario', type: 'submit' }, 'Salva'), btn('Elimina', () => { if (confirm(`Eliminare "${a.nome}"? Il file viene rimosso anche dal cloud alla prossima sincronizzazione.`)) { blobTogli(a.id); togli('allegati', a.id); chiudiModale(); } }, 'pericolo')));
+  apriModale('Documento', form);
+}
+function elencoDocumenti(l) {
+  return h('div', { class: 'scorri' }, h('table', {}, h('thead', {}, h('tr', {}, h('th', {}, 'Nome'), h('th', { class: 'solo-largo' }, 'Cartella'), h('th', {}, 'Data'), h('th', {}, 'Stato'), h('th', { class: 'solo-largo destra' }, 'Dimensione'))),
+    h('tbody', {}, [...l].sort((a, b) => (b.data || '').localeCompare(a.data || '')).map(a => h('tr', {}, h('td', {}, h('div', { class: 'testo-lungo' }, a.nome), a.nota ? h('div', { class: 'attenuato piccolo' }, a.nota) : null,
+        h('div', { class: 'azioni stretta' }, btn('Apri', () => apriAllegato(a), 'piccolo'), btn('Scarica', () => apriAllegato(a, true), 'piccolo'), btn('Modifica', () => modificaDocumento(a), 'piccolo'))),
+      h('td', { class: 'solo-largo' }, (area(a.area) || {}).nome || ''), h('td', { class: 'nonspezza' }, fmtData(a.data)),
+      h('td', {}, stato(a.stato === 'elaborato' ? 'ok' : 'vuota', a.stato === 'elaborato' ? 'Elaborato' : 'Da elaborare')), h('td', { class: 'num destra solo-largo' }, fmtDim(a.dim)))))));
+}
+function vistaDocumenti() {
+  const l = allegati();
+  const selArea = h('select', { 'aria-label': 'Cartella di destinazione' }, h('option', { value: '' }, 'Nessuna cartella'), aree().map(x => h('option', { value: x.id }, x.nome)));
+  const prendi = fs => caricaDocumenti(fs, { area: selArea.value });
+  const zona = h('div', { class: 'zona-carica', ondragover: e => { e.preventDefault(); zona.classList.add('sopra'); }, ondragleave: () => zona.classList.remove('sopra'), ondrop: e => { e.preventDefault(); zona.classList.remove('sopra'); if (e.dataTransfer.files.length) prendi([...e.dataTransfer.files]); } },
+    h('p', {}, h('strong', {}, 'Trascina qui i file'), ' oppure sceglili dal dispositivo. Vengono cifrati prima di essere salvati.'),
+    h('div', { class: 'azioni' }, selArea, btn('Scegli i file', () => scegliFile('', prendi, true), 'primario')));
+  return h('div', {},
+    h('div', { class: 'testa' }, h('div', {}, h('h1', {}, 'Documenti'), h('p', { class: 'sotto largo-testo' }, 'Carica qui referti e documenti, anche dal telefono. Claude li legge e ne inserisce i valori nelle cartelle alla verifica del lunedì, o subito se glielo chiedi.'))),
+    zona,
+    l.length ? pannello(`${l.length} documenti, ${fmtDim(somma(l.map(a => a.dim)))}`, elencoDocumenti(l)) : null);
+}
+
+/* ===== 8b. Indice di salute e consigli in ordine di priorità =====
+   L'indice è costruito da Claude con regole dichiarate qui sotto, non è una valutazione medica.
+   Ogni componente va da 0 a 100; l'indice è la media pesata dei componenti di cui ci sono dati.
+   Cambiare una regola significa cambiare l'indice di tutto lo storico: annotarlo in CLAUDE.md del repository dei dati. */
+const limita = (x, a = 0, b = 100) => Math.max(a, Math.min(b, x));
+const plurale = (n, uno, molti) => `${fmtNum(n, 1)} ${Math.abs(n - 1) < 1e-9 ? uno : molti}`;
+const PESI_SALUTE = { esami: 25, sonno: 20, recupero: 20, attivita: 20, corpo: 15 };
+const PARAMETRI_CHIAVE = new Set(['Creatinina', 'eGFR (filtrato glomerulare stimato)', 'Colesterolo LDL', 'Colesterolo HDL', 'Trigliceridi', 'Glucosio a digiuno',
+  'Emoglobina glicata', 'Proteina C-reattiva (PCR)', 'ALT (GPT)', 'AST (GOT)', 'Gamma-GT', 'Emoglobina', 'Vitamina D 25-OH', 'Ferritina', 'TSH', 'Calprotectina fecale']);
+
+function serieMetrica(metrica, tipo) {
+  return voci('salute', tipo).filter(v => v.metrica === metrica && typeof v.valore === 'number').sort(perData);
+}
+function mediaRecente(metrica, giorni, tipo = 'sensore') {
+  const l = serieMetrica(metrica, tipo).filter(v => giorniDa(v.data) < giorni);
+  return l.length ? { media: somma(l.map(v => v.valore)) / l.length, n: l.length } : null;
+}
+const ultimoValore = (metrica, tipo = 'corpo') => { const l = serieMetrica(metrica, tipo); return l.length ? l[l.length - 1] : null; };
+
+function componentiSalute() {
+  const c = {};
+  /* Esami: quota dei parametri nell'intervallo all'ultima misura; i parametri chiave pesano tre volte. */
+  const mis = voci('salute', 'misura').sort(perData);
+  if (mis.length) {
+    const ultimi = [...raggruppa(mis, v => v.parametro).values()].map(l => l[l.length - 1]);
+    let tot = 0, ok = 0; const fuori = [];
+    for (const v of ultimi) { const w = PARAMETRI_CHIAVE.has(v.parametro) ? 3 : 1; tot += w; if (fuoriIntervallo(v)) fuori.push(v.parametro); else ok += w; }
+    const ultimo = mis[mis.length - 1].data;
+    c.esami = { nome: 'Esami del sangue', punti: (ok / tot) * 100, eta: giorniDa(ultimo),
+      testo: `${plurale(ultimi.length - fuori.length, 'parametro', 'parametri')} su ${ultimi.length} nell'intervallo all'ultima misura` + (fuori.length ? `; fuori: ${fuori.slice(0, 4).join(', ')}${fuori.length > 4 ? ` e altri ${fuori.length - 4}` : ''}` : '') + `. Ultimo prelievo ${fa(giorniDa(ultimo))}.` };
+  }
+  /* Sonno: media del punteggio del sonno Garmin degli ultimi 14 giorni (almeno 5 notti). */
+  const so = mediaRecente('Punteggio del sonno', 14), ore = mediaRecente('Sonno totale', 14);
+  if (so && so.n >= 5) c.sonno = { nome: 'Sonno', punti: so.media, eta: 0, testo: `Punteggio medio ${fmtNum(so.media, 0)} su ${so.n} notti` + (ore ? `, ${fmtNum(ore.media, 1)} ore in media.` : '.') };
+  /* Recupero: frequenza a riposo (100 fino a 45 bpm, 3 punti in meno per ogni battito in più) e, con almeno 4 settimane di dati,
+     variabilità cardiaca degli ultimi 7 giorni rispetto alla propria media (3 punti in meno per ogni punto percentuale sotto). */
+  const fc = mediaRecente('Frequenza cardiaca a riposo', 14);
+  if (fc && fc.n >= 5) {
+    const parti = [limita(100 - (fc.media - 45) * 3)]; let testo = `Frequenza a riposo ${fmtNum(fc.media, 0)} bpm`;
+    const hrv = serieMetrica('Variabilità cardiaca notturna (HRV)', 'sensore');
+    if (hrv.length && giorniDa(hrv[0].data) >= 28) {
+      const rec = hrv.filter(v => giorniDa(v.data) < 7), base = hrv.filter(v => giorniDa(v.data) >= 7 && giorniDa(v.data) < 60);
+      if (rec.length >= 3 && base.length >= 14) {
+        const r = somma(rec.map(v => v.valore)) / rec.length, b = somma(base.map(v => v.valore)) / base.length;
+        parti.push(limita(100 - Math.max(0, (1 - r / b) * 100) * 3));
+        testo += `, variabilità cardiaca ${fmtNum(r, 0)} ms contro una media personale di ${fmtNum(b, 0)}`;
+      }
+    } else testo += '; la variabilità cardiaca entra nel calcolo dopo 4 settimane di dati';
+    c.recupero = { nome: 'Recupero', punti: somma(parti) / parti.length, eta: 0, testo: testo + '.' };
+  }
+  /* Attività: passi medi degli ultimi 14 giorni (100 da 10.000 in su) e sedute a settimana (100 da 3 in su),
+     contando sia le sedute da scheda sia le altre attività sportive (cartella Sport). */
+  const pa = mediaRecente('Passi', 14), al = [...voci('sport', 'allenamento'), ...voci('sport', 'attivita')].sort(perData);
+  const partiA = [], testiA = [];
+  if (pa && pa.n >= 5) { partiA.push(limita(pa.media / 100)); testiA.push(`${fmtNum(pa.media, 0)} passi al giorno`); }
+  if (al.length) {
+    const ultima = al[al.length - 1].data, da = isoData(...((d) => [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()])(new Date(tempo(ultima) - 27 * MS_G)));
+    const fin = al.filter(v => v.data >= da), settimane = new Set(fin.map(v => lunedi(v.data))).size || 1;
+    const spw = fin.length / settimane;
+    partiA.push(limita(spw / 3 * 100)); testiA.push(`${plurale(spw, 'seduta', 'sedute')} a settimana ` + (settimane === 1 ? 'nell\'ultima settimana registrata' : `nelle ultime ${settimane} settimane registrate`));
+  }
+  if (partiA.length) c.attivita = { nome: 'Attività', punti: somma(partiA) / partiA.length, eta: al.length ? giorniDa(al[al.length - 1].data) : 0, testo: testiA.join(', ') + '.' };
+  /* Corpo: rapporto vita/altezza (100 fino a 0,50, 6 punti in meno per ogni centesimo in più) e massa grassa (100 fino al 15%, 5 punti in meno per ogni punto in più). */
+  const vita = ultimoValore('Circonferenza vita'), alt = ultimoValore('Altezza'), mg = ultimoValore('Massa grassa');
+  const partiC = [], testiC = []; let etaC = 0;
+  if (vita && alt) { const r = vita.valore / alt.valore; partiC.push(limita(100 - Math.max(0, r - 0.5) * 600)); testiC.push(`vita/altezza ${fmtNum(r, 2)}`); etaC = Math.max(etaC, giorniDa(vita.data)); }
+  if (mg) { partiC.push(limita(100 - Math.max(0, mg.valore - 15) * 5)); testiC.push(`massa grassa ${fmtNum(mg.valore, 1)}%`); etaC = Math.max(etaC, giorniDa(mg.data)); }
+  if (partiC.length) c.corpo = { nome: 'Composizione corporea', punti: somma(partiC) / partiC.length, eta: etaC, testo: testiC.join(', ') + `. Misure di ${fa(etaC)}.` };
+  return c;
+}
+function indiceSalute() {
+  const c = componentiSalute(), chiavi = Object.keys(PESI_SALUTE).filter(k => c[k]);
+  if (!chiavi.length) return null;
+  const peso = somma(chiavi.map(k => PESI_SALUTE[k]));
+  const valore = somma(chiavi.map(k => c[k].punti * PESI_SALUTE[k])) / peso;
+  const vecchi = chiavi.filter(k => (k === 'esami' && c[k].eta > 365) || (k === 'corpo' && c[k].eta > 180) || (k === 'attivita' && c[k].eta > 21));
+  const mancano = Object.keys(PESI_SALUTE).filter(k => !c[k]);
+  const affidabilita = mancano.length === 0 && !vecchi.length ? 'alta' : mancano.length <= 1 && vecchi.length <= 1 ? 'media' : 'bassa';
+  return { valore, componenti: c, mancano, vecchi, affidabilita };
+}
+const fascia = v => (v >= 80 ? { tipo: 'ok', testo: 'Buono' } : v >= 60 ? { tipo: 'vuota', testo: 'Discreto' } : { tipo: 'ritardo', testo: 'Da migliorare' });
+function anello(valore, dim = 132, nome = 'Indice di salute') {
+  const r = dim / 2 - 9, circ = 2 * Math.PI * r, f = fascia(valore);
+  return s('svg', { class: 'anello ' + f.tipo, width: dim, height: dim, viewBox: `0 0 ${dim} ${dim}`, role: 'img', 'aria-label': `${nome} ${Math.round(valore)} su 100, ${f.testo.toLowerCase()}` },
+    s('circle', { class: 'anello-fondo', cx: dim / 2, cy: dim / 2, r }),
+    s('circle', { class: 'anello-valore', cx: dim / 2, cy: dim / 2, r, 'stroke-dasharray': `${(circ * valore) / 100} ${circ}`, transform: `rotate(-90 ${dim / 2} ${dim / 2})` }),
+    s('text', { class: 'anello-numero', x: dim / 2, y: dim / 2 + 2, 'text-anchor': 'middle', 'dominant-baseline': 'middle' }, String(Math.round(valore))),
+    s('text', { class: 'anello-unita', x: dim / 2, y: dim / 2 + 26, 'text-anchor': 'middle' }, 'su 100'));
+}
+const NOMI_MANCANTI = { esami: 'esami del sangue', sonno: 'sonno', recupero: 'recupero', attivita: 'attività', corpo: 'misure del corpo' };
+/* Pannello comune agli indici (corpo, finanze): anello, giudizio, affidabilità e componenti con il loro peso. */
+function pannelloIndiceComune(titolo, nomeIndice, ind, pesi, nomiMancanti, nota) {
+  const f = fascia(ind.valore);
+  return h('section', { class: 'pannello indice' },
+    h('h2', {}, titolo),
+    h('div', { class: 'indice-testa' }, anello(ind.valore, 132, nomeIndice),
+      h('div', {}, h('p', { class: 'indice-giudizio' }, stato(f.tipo, f.testo)),
+        h('p', { class: 'piccolo' }, `Affidabilità ${ind.affidabilita}` + (ind.mancano.length ? `: mancano ${ind.mancano.map(k => nomiMancanti[k]).join(', ')}` : '') + (ind.vecchi.length ? `${ind.mancano.length ? ';' : ':'} dati vecchi per ${ind.vecchi.map(k => nomiMancanti[k]).join(', ')}` : '') + '.'),
+        h('p', { class: 'attenuato piccolo' }, nota))),
+    h('div', { class: 'componenti' }, Object.keys(pesi).filter(k => ind.componenti[k]).map(k => {
+      const x = ind.componenti[k];
+      return h('div', { class: 'componente' },
+        h('div', { class: 'tra' }, h('strong', {}, x.nome), h('span', { class: 'num' }, `${Math.round(x.punti)}`, h('span', { class: 'attenuato' }, `, peso ${pesi[k]}%`))),
+        h('span', { class: 'rip-pista' }, h('span', { class: 'rip-barra ' + fascia(x.punti).tipo, style: `width:${Math.max(2, x.punti)}%` })),
+        h('div', { class: 'elenco-nota' }, x.testo));
+    })));
+}
+function pannelloIndice() {
+  const ind = indiceSalute(); if (!ind) return null;
+  return pannelloIndiceComune('Situazione del corpo', 'Indice di salute', ind, PESI_SALUTE, NOMI_MANCANTI, 'Indice costruito da Claude sui tuoi dati, con regole fisse e visibili. Non è una valutazione medica.');
+}
+
+/* --- Indice finanziario: stesse regole di trasparenza dell'indice di salute ---
+   Risparmio: quota delle entrate non spesa negli ultimi 3 mesi completi (100 dal 20% in su, 0 a zero o sotto).
+   Riserva: mesi di spesa coperti dalla liquidità (conti correnti, risparmio, contanti) (100 da 6 mesi in su).
+   Debiti: rate mensili rispetto alle entrate medie (100 fino al 10%, 0 dal 50% in su).
+   Tetti di spesa: quota delle categorie con tetto rispettate nell'ultimo mese completo.
+   I giroconti tra conti propri non contano. */
+const PESI_FINANZE = { risparmio: 35, riserva: 35, debiti: 15, budget: 15 };
+const NOMI_MANCANTI_FIN = { risparmio: 'movimenti', riserva: 'saldi o movimenti', debiti: 'entrate', budget: 'tetti di spesa' };
+const LIQUIDI = new Set(['Conto corrente', 'Risparmio', 'Contanti']);
+const movimentiReali = () => voci('finanze', 'movimento').filter(v => v.categoria !== GIROCONTO && typeof v.valore === 'number');
+function mesiCompleti(quanti) {
+  const o = oggi(); let y = +o.slice(0, 4), m = +o.slice(5, 7); const out = [];
+  for (let i = 0; i < quanti; i++) { if (--m < 1) { m = 12; y--; } out.unshift(`${y}-${String(m).padStart(2, '0')}`); }
+  return out;
+}
+function liquidita() {
+  const ultimi = new Map();
+  for (const v of voci('finanze', 'saldo').sort(perData)) ultimi.set((v.persona || '') + '|' + v.conto, v);
+  const l = [...ultimi.values()].filter(v => LIQUIDI.has(v.categoria));
+  return l.length ? { valore: somma(l.map(v => v.valore)), data: l.reduce((m, v) => (v.data > m ? v.data : m), '') } : null;
+}
+function componentiFinanze() {
+  const c = {}, mov = movimentiReali();
+  const mesi = mesiCompleti(3).filter(k => mov.some(v => v.data.startsWith(k)));
+  let entrateMedie = 0, usciteMedie = 0;
+  if (mesi.length) {
+    const nelPeriodo = mov.filter(v => mesi.some(k => v.data.startsWith(k)));
+    const E = somma(nelPeriodo.filter(v => v.valore > 0).map(v => v.valore)), U = -somma(nelPeriodo.filter(v => v.valore < 0).map(v => v.valore));
+    entrateMedie = E / mesi.length; usciteMedie = U / mesi.length;
+    if (E > 0) { const r = (E - U) / E; c.risparmio = { nome: 'Risparmio', punti: limita(r / 0.2 * 100), eta: 0, testo: `Risparmiato il ${fmtNum(r * 100, 0)}% delle entrate (${fmtEuro(E - U)} su ${fmtEuro(E)}) negli ultimi ${mesi.length === 1 ? 'mese completo' : mesi.length + ' mesi completi'}.` }; }
+  }
+  const liq = liquidita();
+  if (liq && usciteMedie > 0) {
+    const m = liq.valore / usciteMedie;
+    c.riserva = { nome: 'Riserva', punti: limita(m / 6 * 100), eta: giorniDa(liq.data), testo: `La liquidità (${fmtEuro(liq.valore)}) copre ${fmtNum(m, 1)} mesi di spesa media (${fmtEuro(usciteMedie)} al mese).` };
+  }
+  const deb = voci('patrimonio', 'debito'), rate = somma(deb.map(v => v.rata));
+  if (entrateMedie > 0) {
+    const q = rate / entrateMedie;
+    c.debiti = { nome: 'Debiti', punti: limita(100 - Math.max(0, q - 0.1) / 0.4 * 100), eta: 0, testo: rate ? `Le rate (${fmtEuro(rate)} al mese) valgono il ${fmtNum(q * 100, 0)}% delle entrate medie.` : 'Nessuna rata registrata.' };
+  }
+  const ultimo = mesiCompleti(1)[0], fine = ultimo + '-31';
+  const tetti = new Map(); for (const b of voci('finanze', 'budget').filter(b => b.data <= fine).sort(perData)) tetti.set(b.categoria, b);
+  if (tetti.size && mov.some(v => v.data.startsWith(ultimo))) {
+    const sforati = [...tetti.values()].filter(b => -somma(mov.filter(v => v.data.startsWith(ultimo) && v.categoria === b.categoria && v.valore < 0).map(v => v.valore)) > b.valore).map(b => b.categoria);
+    c.budget = { nome: 'Tetti di spesa', punti: (tetti.size - sforati.length) / tetti.size * 100, eta: 0, testo: `${tetti.size - sforati.length} categorie su ${tetti.size} nel tetto a ${fmtMese(ultimo)}` + (sforati.length ? `; sforate: ${sforati.join(', ')}.` : '.') };
+  }
+  return c;
+}
+function indiceFinanze() {
+  const c = componentiFinanze(), chiavi = Object.keys(PESI_FINANZE).filter(k => c[k]);
+  if (!chiavi.length) return null;
+  const valore = somma(chiavi.map(k => c[k].punti * PESI_FINANZE[k])) / somma(chiavi.map(k => PESI_FINANZE[k]));
+  const vecchi = chiavi.filter(k => k === 'riserva' && c[k].eta > 45);
+  const mancano = Object.keys(PESI_FINANZE).filter(k => !c[k]);
+  const affidabilita = mancano.length === 0 && !vecchi.length ? 'alta' : mancano.length <= 1 && vecchi.length <= 1 ? 'media' : 'bassa';
+  return { valore, componenti: c, mancano, vecchi, affidabilita };
+}
+function pannelloIndiceFinanze() {
+  const ind = indiceFinanze(); if (!ind) return null;
+  return pannelloIndiceComune('Salute finanziaria', 'Indice finanziario', ind, PESI_FINANZE, NOMI_MANCANTI_FIN, 'Indice costruito da Claude sui tuoi movimenti e saldi, con regole fisse e visibili. Non è una consulenza finanziaria.');
+}
+
+/* --- Consigli: per ogni cartella, in ordine di priorità (1 = il più importante) --- */
+const consigliAperti = idArea => voci(idArea, 'consiglio').filter(v => v.stato !== 'fatto' && v.stato !== 'scartato').sort((a, b) => (a.priorita || 99) - (b.priorita || 99));
+function voceConsiglio(idArea, v, conArea) {
+  return h('li', { class: 'consiglio cliccabile', tabindex: 0, onclick: () => apriModulo(idArea, 'consiglio', v), onkeydown: e => { if (e.key === 'Enter') apriModulo(idArea, 'consiglio', v); } },
+    h('span', { class: 'consiglio-num num', 'aria-label': 'Priorità ' + (v.priorita || '') }, v.priorita || ''),
+    h('div', {}, h('div', { class: 'tra' }, h('strong', {}, v.titolo), h('span', { class: 'attenuato piccolo' }, [conArea ? (area(idArea) || {}).nome : '', v.stato === 'in corso' ? 'in corso' : ''].filter(Boolean).join(', '))),
+      v.azione ? h('div', { class: 'elenco-nota testo-lungo' }, v.azione) : null,
+      v.perche ? h('div', { class: 'attenuato piccolo testo-lungo' }, 'Perché: ' + v.perche) : null));
+}
+function pannelloConsigli(idArea) {
+  const l = consigliAperti(idArea), fatti = voci(idArea, 'consiglio').filter(v => v.stato === 'fatto').length;
+  if (!l.length && !fatti) return null;
+  return pannello('Consigli in ordine di priorità', l.length ? h('ol', { class: 'elenco consigli' }, l.map(v => voceConsiglio(idArea, v))) : h('p', { class: 'attenuato' }, 'Nessun consiglio aperto.'),
+    fatti ? h('p', { class: 'attenuato piccolo' }, h('a', { href: `#/a/${idArea}/consiglio` }, fatti === 1 ? '1 consiglio già seguito' : `${fatti} consigli già seguiti`)) : null);
+}
+function consigliPrincipali() {
+  const l = aree().flatMap(a => consigliAperti(a.id).slice(0, 2).map(v => [a.id, v]));
+  if (!l.length) return null;
+  return pannello('Consigli principali', h('ol', { class: 'elenco consigli' }, l.slice(0, 6).map(([a, v]) => voceConsiglio(a, v, true))),
+    h('p', { class: 'attenuato piccolo' }, 'I primi due di ogni cartella. L\'elenco completo è in ciascuna cartella.'));
+}
+
+/* ===== 9. Impostazioni: persone, cartelle, repository dei dati, Garmin, sicurezza ===== */
+function toccaImpostazioni() { S.A.impostazioni.agg = adesso(); }
+function modificaPersona(p) {
+  const nuova = !p; p = p || { nome: '', nascita: '', ruolo: 'familiare' };
+  const form = h('form', { class: 'modulo', onsubmit: e => {
+    e.preventDefault(); const el = form.elements; if (!el.nome.value.trim()) return;
+    Object.assign(p, { nome: el.nome.value.trim(), nascita: el.nascita.value, ruolo: el.ruolo.value, agg: adesso() });
+    if (nuova) { p.id = uid(); p.creato = adesso(); S.A.persone.push(p); }
+    salva(); chiudiModale();
+  } },
+    h('label', { class: 'campo' }, h('span', {}, 'Nome *'), h('input', { name: 'nome', value: p.nome, required: true })),
+    h('label', { class: 'campo' }, h('span', {}, 'Data di nascita'), h('input', { name: 'nascita', type: 'date', value: p.nascita || '' })),
+    h('label', { class: 'campo' }, h('span', {}, 'Ruolo'), h('select', { name: 'ruolo' }, ['titolare', 'coniuge', 'figlio o figlia', 'familiare'].map(r => h('option', { value: r, selected: r === p.ruolo }, r)))),
+    h('div', { class: 'azioni intero' }, h('button', { class: 'btn primario', type: 'submit' }, 'Salva'),
+      !nuova && persone().length > 1 ? btn('Rimuovi', () => { const n = S.A.voci.filter(v => !v.canc && v.persona === p.id).length; if (confirm(n ? `${p.nome} ha ${n} voci in archivio: restano salvate ma senza persona visibile. Rimuovere?` : `Rimuovere ${p.nome}?`)) { if (S.persona === p.id) S.persona = ''; togli('persone', p.id); chiudiModale(); } }, 'pericolo') : null));
+  apriModale(nuova ? 'Nuova persona' : 'Persona', form);
+}
+function apriImportaDati(file, dati) {
+  const pp = persone();
+  const nelFile = dati.persone || [];
+  const somiglia = (a, b) => { const x = a.toLowerCase().split(/\s+/), y = b.toLowerCase().split(/\s+/); return x.some(t => y.includes(t)); };
+  const sel = nelFile.map(p => h('select', { 'data-id': p.id }, pp.map(q => h('option', { value: q.id, selected: q.id === p.id || somiglia(q.nome, p.nome) }, 'È ' + q.nome)), h('option', { value: '', selected: !pp.some(q => q.id === p.id || somiglia(q.nome, p.nome)) }, 'Nuova persona')));
+  const corpo = h('div', {},
+    h('p', {}, `File "${file.name}": ${(dati.voci || []).length} voci, ${(dati.allegati || []).length} documenti.`),
+    nelFile.length ? h('div', { class: 'modulo' }, nelFile.map((p, i) => h('label', { class: 'campo' }, h('span', {}, `A chi appartengono i dati di "${p.nome}"?`), sel[i]))) : null,
+    h('p', { class: 'attenuato piccolo' }, 'I dati si aggiungono a quelli presenti. Se una voce esiste già, resta la versione più recente.'),
+    h('div', { class: 'azioni' }, btn('Importa', async () => {
+      const mappa = {}; sel.forEach(x => { mappa[x.dataset.id] = x.value; });
+      corpo.replaceChildren(h('p', {}, 'Importo e cifro i dati…'));
+      try { corpo.replaceChildren(ricevuta(await importaChiaro(dati, mappa, file.name))); } catch (e) { corpo.replaceChildren(h('p', { class: 'errore' }, 'Importazione interrotta: ' + e.message)); }
+    }, 'primario')));
+  apriModale('Importa file dati', corpo);
+}
+async function scegliImportaDati(file) {
+  let dati;
+  try { dati = JSON.parse(await leggiFile(file)); } catch (e) { avviso(`"${file.name}" non è un file JSON leggibile: niente è stato importato.`, 'errore'); return; }
+  if (dati.formato === 'archivio-vita-copia' || dati.formato === 'archivio-vita') { avviso('Questa è una copia cifrata della versione precedente della pagina: per aprirla usa decifra.py, poi importa il file in chiaro che produce.', 'errore'); return; }
+  if (!dati.schema || !String(dati.schema).startsWith('archivio-vita/')) { avviso(`"${file.name}" non è nel formato dell'archivio (manca il campo schema): niente è stato importato.`, 'errore'); return; }
+  apriImportaDati(file, dati);
+}
+
+function collegaRepository(g) { S.disp.github = g; return salvaSubito(); }
+const linkGh = (g, percorso, testo) => h('a', { href: `https://github.com/${encodeURIComponent(g.proprietario)}/${encodeURIComponent(g.repo)}/${percorso}`, target: '_blank', rel: 'noopener' }, testo);
+function pannelloGarmin() {
+  const g = gh();
+  if (!g) return pannello('Scaricamento automatico Garmin', h('p', { class: 'attenuato' }, 'Si attiva dopo aver collegato il repository dei dati.'));
+  const st = S.est.stato, sg = statoGarmin();
+  return pannello('Scaricamento automatico Garmin',
+    sg ? h('p', {}, stato(sg.tipo, sg.testo)) : null, sg && sg.nota ? h('p', { class: 'attenuato piccolo' }, sg.nota) : null,
+    st && st.ultimo_avvio ? h('p', { class: 'attenuato piccolo' }, `Ultimo tentativo: ${fmtQuando(st.ultimo_avvio)}` + (st.metriche && st.metriche.length ? `. Metriche ricevute: ${st.metriche.join(', ')}.` : '')) : null,
+    h('details', { open: !st || st.esito === 'non configurato' }, h('summary', {}, 'Come si attiva (una volta sola)'), h('ol', { class: 'largo-testo' },
+      h('li', {}, 'Apri ', linkGh(g, 'settings/secrets/actions', 'i secrets del repository dei dati'), '.'),
+      h('li', {}, 'Premi "New repository secret": nome GARMIN_EMAIL, valore l\'email con cui entri in Garmin Connect.'),
+      h('li', {}, 'Ripeti con nome GARMIN_PASSWORD e la password di Garmin Connect.'),
+      h('li', {}, 'Apri ', linkGh(g, 'actions/workflows/garmin.yml', 'l\'automazione Garmin'), ', premi "Run workflow" e conferma: il primo scaricamento recupera gli ultimi 30 giorni.')),
+      h('p', { class: 'attenuato piccolo' }, 'Le credenziali restano nella cassaforte di GitHub: non le vede la pagina, non le vede Claude e non compaiono nel repository. Da lì in poi lo scaricamento parte da solo ogni notte.')),
+    h('p', { class: 'piccolo' }, linkGh(g, 'actions', 'Vedi le esecuzioni su GitHub')));
+}
+function vistaImpostazioni() {
+  const g = gh() || {}, pp = persone();
+  const el = (name, etich, val, extra = {}) => h('label', { class: 'campo' }, h('span', {}, etich), h('input', { name, value: val || '', autocomplete: 'off', spellcheck: 'false', ...extra }));
+  const formGh = h('form', { class: 'modulo', onsubmit: async e => {
+    e.preventDefault(); const f = formGh.elements;
+    const nuovo = { proprietario: f.proprietario.value.trim(), repo: f.repo.value.trim(), ramo: f.ramo.value.trim(), token: f.token.value.trim() };
+    if (!nuovo.proprietario || !nuovo.repo || !nuovo.token) { avviso('Servono utente, repository e token.', 'errore'); return; }
+    await collegaRepository(nuovo);
+    await sincronizza(true); disegna();
+  } },
+    el('proprietario', 'Utente GitHub', g.proprietario), el('repo', 'Repository privato dei dati', g.repo, { placeholder: 'es. archivio-dati' }),
+    el('token', 'Token di accesso', g.token, { type: 'password' }), el('ramo', 'Ramo (lascia vuoto)', g.ramo),
+    h('div', { class: 'azioni intero' }, h('button', { class: 'btn primario', type: 'submit' }, ghPronto() ? 'Salva e sincronizza' : 'Collega e sincronizza'),
+      ghPronto() ? btn('Scollega', async () => { if (confirm('Scollegare questo dispositivo? I dati restano nel repository e qui, ma smettono di sincronizzarsi.')) { S.disp.github = null; await salvaSubito(); disegna(); } }) : null));
+  const inclDoc = h('input', { type: 'checkbox', checked: true });
+  const formFrase = h('form', { class: 'modulo', onsubmit: async e => {
+    e.preventDefault(); const f = formFrase.elements;
+    if (f.nuova.value !== f.ripeti.value) { avviso('Le due frasi non coincidono.', 'errore'); return; }
+    if (normFrase(f.nuova.value).length < 4) { avviso('Frase troppo corta.', 'errore'); return; }
+    S.testata.slot = [await creaSlot('frase', f.nuova.value, S.chiaveGrezza)];
+    S.testata.promemoria = f.promemoria.value.trim(); S.testata.slot_agg = adesso();
+    await salvaSubito(); formFrase.reset(); avviso('Frase segreta cambiata su questo dispositivo.');
+  } },
+    el('nuova', 'Nuova frase segreta', '', { type: 'password', required: true, autocomplete: 'new-password' }), el('ripeti', 'Ripeti la frase', '', { type: 'password', required: true, autocomplete: 'new-password' }),
+    h('label', { class: 'campo intero' }, h('span', {}, 'Promemoria mostrato allo sblocco (visibile a chiunque apra la pagina)'), h('input', { name: 'promemoria', value: S.testata.promemoria || '' })),
+    h('div', { class: 'azioni intero' }, h('button', { class: 'btn', type: 'submit' }, 'Cambia frase segreta')));
+  const nomeArea = h('input', { placeholder: 'es. Formazione, Casa, Auto', 'aria-label': 'Nome della nuova cartella' });
+  const stSync = !ghPronto() ? stato('ritardo', 'Non collegato: i dati sono solo su questo dispositivo') : S.sync.stato === 'errore' ? stato('ritardo', S.sync.errore) : stato('ok', S.sync.ultimo ? 'Ultima sincronizzazione ' + fmtQuando(S.sync.ultimo) : 'Collegato');
+  return h('div', {},
+    h('div', { class: 'testa' }, h('h1', {}, 'Impostazioni')),
+    pannello('Persone', h('ul', { class: 'elenco' }, pp.map(p => h('li', { class: 'tra' }, h('span', {}, h('strong', {}, p.nome), h('span', { class: 'attenuato' }, ` ${p.ruolo || ''}` + (p.nascita ? `, ${fmtData(p.nascita)}` : ''))), btn('Modifica', () => modificaPersona(p), 'piccolo')))),
+      h('div', { class: 'azioni' }, btn('Aggiungi una persona', () => modificaPersona(null))), h('p', { class: 'attenuato piccolo' }, 'Ogni voce appartiene a una persona. Con più persone compare in alto il selettore per vedere una sola persona o tutta la famiglia.')),
+    pannello('Cartelle personalizzate', S.A.aree.filter(a => !a.canc).length ? h('ul', { class: 'elenco' }, S.A.aree.filter(a => !a.canc).map(a => h('li', { class: 'tra' }, h('strong', {}, a.nome), btn('Elimina', () => { const n = voci(a.id, null, true).length; if (confirm(n ? `La cartella contiene ${n} voci, che non saranno più visibili. Eliminare?` : 'Eliminare la cartella?')) togli('aree', a.id); }, 'piccolo')))) : null,
+      h('div', { class: 'azioni' }, nomeArea, btn('Crea cartella', () => { const n = nomeArea.value.trim(); if (!n) return; S.A.aree.push({ id: 'x-' + uid().slice(0, 8), nome: n, creato: adesso(), agg: adesso() }); salva(); })),
+      h('p', { class: 'attenuato piccolo' }, 'Le cartelle già previste (finanze, patrimonio, organizzazione, salute, sport, mindfulness, lettura, viaggi, progetti) hanno cruscotti dedicati. Una cartella personalizzata raccoglie voci libere con data, categoria e valore.')),
+    pannello('Repository dei dati', h('p', {}, stSync), formGh,
+      h('details', {}, h('summary', {}, 'Come si crea il token'), h('ol', { class: 'largo-testo' },
+        h('li', {}, 'Su GitHub: foto del profilo, Settings, Developer settings, Personal access tokens, Fine-grained tokens, Generate new token.'),
+        h('li', {}, 'Repository access: "Only select repositories" e scegli il repository dei dati.'),
+        h('li', {}, 'Permissions: Repository permissions, Contents, "Read and write". Scadenza: la più lunga disponibile.'),
+        h('li', {}, 'Copia il token e incollalo qui. Quando scade, la pagina lo segnala: se ne crea uno nuovo e lo si incolla di nuovo.')),
+        h('p', { class: 'attenuato piccolo' }, 'Il token resta solo su questo dispositivo, cifrato con la tua frase.'))),
+    pannelloGarmin(),
+    pannello('Esportazione',
+      h('div', { class: 'azioni' }, btn('Esporta tutto (.json)', async () => scarica(`archivio-${oggi()}.json`, JSON.stringify(await esportaChiaro(inclDoc.checked), null, 1), 'application/json')), h('label', { class: 'spunta' }, inclDoc, 'includi i documenti')),
+      h('p', { class: 'attenuato piccolo' }, 'Formato aperto e leggibile, descritto nel LEGGIMI: serve per spostare i dati in qualunque sistema futuro. Il file non è protetto: conservalo con cura.'),
+      h('div', { class: 'azioni' }, btn('Importa un file dati (.json)', () => scegliFile('.json,application/json', scegliImportaDati))),
+      h('p', { class: 'attenuato piccolo' }, 'Per caricare dati preparati altrove nello stesso formato. Al termine vedi quante voci sono entrate e quali no.')),
+    pannello('Sicurezza di questo dispositivo', formFrase,
+      h('label', { class: 'campo stretto' }, h('span', {}, 'Blocco automatico dopo minuti di inattività'), h('input', { type: 'number', min: 1, max: 240, value: S.A.impostazioni.blocco_min || 15, onchange: e => { S.A.impostazioni.blocco_min = Math.max(1, +e.target.value || 15); toccaImpostazioni(); salva(false); } }))),
+    pannello('Questo dispositivo', h('p', { class: 'attenuato piccolo' }, 'Rimuove l\'archivio solo da questo browser. Il repository dei dati non viene toccato.'),
+      h('div', { class: 'azioni' }, btn('Rimuovi l\'archivio da questo dispositivo', async () => { if (!confirm(ghPronto() && !S.sporco ? 'Rimuovere l\'archivio da questo dispositivo?' : 'ATTENZIONE: ci sono dati che esistono solo qui e andranno persi. Rimuovere comunque?')) return; await kvTogli('busta'); await kvTogli('sporco'); for (const k of await blobChiavi()) await blobTogli(k); blocca(); }, 'pericolo'))));
+}
+
+/* ===== 10. Schermata di sblocco e avvio ===== */
+let _modoBlocco = '';
+async function dopoSblocco() {
+  _modoBlocco = '';
+  S.ultimaAttivita = Date.now();
+  disegna();
+  if (ghPronto()) sincronizza(false);
+}
+async function schermataBlocco() {
+  const busta = await kvLeggi('busta');
+  const modo = _modoBlocco || (busta ? 'apri' : 'benvenuto');
+  const vai = m => { _modoBlocco = m; schermataBlocco().then(el => $('#app').replaceChildren(el)); };
+  const err = h('div', { class: 'errore', role: 'alert' });
+  const attesa = (form, si) => { const b = form.querySelector('button[type=submit]'); b.disabled = si; if (si) { b.dataset.t = b.textContent; b.textContent = 'Un momento…'; } else if (b.dataset.t) b.textContent = b.dataset.t; };
+  const campo = (name, etich, extra = {}) => h('label', { class: 'campo intero' }, h('span', {}, etich), h('input', { name, autocomplete: 'off', spellcheck: 'false', ...extra }));
+  const cornice = (...kids) => h('div', { class: 'blocco' }, h('div', { class: 'blocco-scheda' }, h('div', { class: 'marchio grande' }, 'Archivio'), kids));
+  const invio = (form, fn) => async e => { e.preventDefault(); err.textContent = ''; attesa(form, true); try { await fn(form.elements); } catch (ex) { err.textContent = ex.message === 'Failed to fetch' ? 'Impossibile raggiungere GitHub: controlla la connessione.' : ex.message; attesa(form, false); } };
+  const campiFrase = () => {
+    const forza = h('div', { class: 'forza intero' });
+    return [
+      campo('frase', 'Frase segreta per aprire la pagina su questo dispositivo', { type: 'password', required: true, autocomplete: 'new-password', oninput: e => { const f = forzaFrase(e.target.value); forza.textContent = f ? f.testo : ''; forza.className = 'forza intero ' + (f ? f.livello : ''); } }), forza,
+      campo('ripeti', 'Ripeti la frase segreta', { type: 'password', required: true, autocomplete: 'new-password' }),
+      campo('promemoria', 'Promemoria (facoltativo, visibile a chiunque apra la pagina)', { placeholder: 'Una domanda che solo tu sai collegare alla frase' }),
+    ];
+  };
+  const controllaFrase = el => {
+    if (el.frase.value !== el.ripeti.value) throw new Error('Le due frasi non coincidono.');
+    if (normFrase(el.frase.value).length < 4) throw new Error('La frase segreta deve avere almeno 4 caratteri.');
+  };
+
+  if (modo === 'apri') {
+    const form = h('form', { class: 'modulo' },
+      busta.promemoria ? h('p', { class: 'promemoria intero' }, 'Promemoria: ' + busta.promemoria) : null,
+      campo('segreto', 'Frase segreta', { type: 'password', required: true, autocomplete: 'current-password' }), err,
+      h('div', { class: 'azioni intero' }, h('button', { class: 'btn primario', type: 'submit' }, 'Sblocca')));
+    form.onsubmit = invio(form, async el => { await sblocca(busta, el.segreto.value, 'frase'); await dopoSblocco(); });
+    setTimeout(() => { const i = form.elements.segreto; if (i) i.focus(); });
+    return cornice(h('p', { class: 'sotto' }, 'Su questo dispositivo i dati sono cifrati. Si aprono solo con la tua frase.'), form,
+      h('p', { class: 'collegamenti' }, btn('Ho dimenticato la frase', () => vai('dimenticata'), 'piatto'), btn('Collega un altro archivio', () => vai('collega'), 'piatto')));
+  }
+  if (modo === 'dimenticata') {
+    const nonInviate = !!(await kvLeggi('sporco'));
+    return cornice(h('h2', {}, 'Frase dimenticata'),
+      h('p', {}, 'La frase protegge solo la copia su questo dispositivo. L\'archivio vero è nel tuo repository dei dati: ricollega il dispositivo con il token di GitHub e scegli una frase nuova.'),
+      nonInviate ? h('p', { class: 'errore' }, 'Attenzione: su questo dispositivo ci sono modifiche non ancora inviate al repository. Ricollegandolo andranno perse.') : null,
+      h('div', { class: 'azioni' }, btn('Ricollega il dispositivo', () => vai('collega'), 'primario'), btn('Indietro', () => vai('apri'), 'piatto')));
+  }
+  if (modo === 'benvenuto') {
+    return cornice(h('p', { class: 'sotto' }, 'Il tuo archivio personale: salute, finanze, patrimonio, viaggi e progetti. I dati vivono nel tuo repository privato su GitHub; su questo dispositivo restano cifrati con una frase che conosci solo tu.'),
+      h('div', { class: 'azioni colonna' }, btn('Collega il mio archivio', () => vai('collega'), 'primario')),
+      h('p', { class: 'collegamenti' }, btn('Prova senza repository', () => vai('nuovo'), 'piatto')));
+  }
+  if (modo === 'nuovo') {
+    const form = h('form', { class: 'modulo' }, campo('nome', 'Il tuo nome', { required: true }), campo('nascita', 'Data di nascita (facoltativa)', { type: 'date' }), campiFrase(), err,
+      h('div', { class: 'azioni intero' }, h('button', { class: 'btn primario', type: 'submit' }, 'Crea l\'archivio'), btn('Indietro', () => vai(busta ? 'apri' : 'benvenuto'), 'piatto')));
+    form.onsubmit = invio(form, async el => {
+      controllaFrase(el);
+      if (busta && !confirm('Su questo dispositivo c\'è già un archivio: verrà sostituito qui. Continuare?')) { attesa(form, false); return; }
+      await creaArchivio(el.frase.value, el.promemoria.value.trim(), el.nome.value.trim(), el.nascita.value);
+      await dopoSblocco();
+    });
+    return cornice(h('h2', {}, 'Archivio solo su questo dispositivo'), h('p', { class: 'sotto' }, 'Utile per provare. Puoi collegare il repository in qualunque momento da Impostazioni: i dati inseriti qui si uniscono a quelli già presenti.'), form);
+  }
+  /* modo collega: primo avvio, dispositivo nuovo o frase dimenticata */
+  const form = h('form', { class: 'modulo' },
+    campo('proprietario', 'Utente GitHub', { required: true, autocapitalize: 'none' }), campo('repo', 'Repository privato dei dati', { required: true, value: 'archivio-dati', autocapitalize: 'none' }),
+    campo('token', 'Token di accesso', { type: 'password', required: true }), campiFrase(),
+    campo('nome', 'Il tuo nome (serve solo se il repository è ancora vuoto)'), err,
+    h('div', { class: 'azioni intero' }, h('button', { class: 'btn primario', type: 'submit' }, 'Collega e apri'), btn('Indietro', () => vai(busta ? 'apri' : 'benvenuto'), 'piatto')));
+  form.onsubmit = invio(form, async el => {
+    controllaFrase(el);
+    const g = { proprietario: el.proprietario.value.trim(), repo: el.repo.value.trim(), ramo: '', token: el.token.value.trim() };
+    await ghControllaRepo(g);
+    const remoto = await ghLeggiArchivio(g);
+    if (!remoto && !el.nome.value.trim()) throw new Error('Il repository è vuoto: scrivi il tuo nome per creare l\'archivio.');
+    if (busta && !confirm('L\'archivio già presente su questo dispositivo verrà sostituito da quello del repository. Continuare?')) { attesa(form, false); return; }
+    if (remoto) { await preparaLocale(el.frase.value, el.promemoria.value.trim()); S.A = remoto.A; }
+    else await creaArchivio(el.frase.value, el.promemoria.value.trim(), el.nome.value.trim(), '');
+    S.disp.github = g; S.sbloccato = true;
+    const p = persone(); S.persona = p.length === 1 ? p[0].id : '';
+    ricostruisciEsterni();
+    await persisti();
+    await dopoSblocco();
+  });
+  return cornice(h('h2', {}, 'Collega il tuo archivio'),
+    h('p', { class: 'sotto' }, 'Servono il tuo utente GitHub, il nome del repository dei dati e un token di accesso. La guida per il token è nel LEGGIMI.'), form);
+}
+
+['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => { S.ultimaAttivita = Date.now(); }, { passive: true }));
+setInterval(() => { if (S.sbloccato && Date.now() - S.ultimaAttivita > (S.A.impostazioni.blocco_min || 15) * 60000) { salvaSubito().finally(blocca); } }, 20000);
+window.addEventListener('online', programmaSync);
+document.addEventListener('visibilitychange', () => {
+  if (!S.sbloccato) return;
+  if (document.hidden) salvaSubito().catch(() => {});
+  else if (ghPronto()) programmaSync();
+});
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if (!window.isSecureContext || !crypto.subtle) document.getElementById('app').textContent = 'Questa pagina va aperta da un indirizzo https (o da localhost): senza, il browser non permette la cifratura.';
+else disegna();
+
+</script>
+</body>
+</html>
