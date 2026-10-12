@@ -87,7 +87,7 @@ Date `AAAA-MM-GG`, numeri come numeri JSON. Nell'esportazione i documenti posson
 Regole in `src/08b-punteggio.js`, visibili nella pagina. Cambiare una regola cambia l'indice di tutto lo storico.
 
 - **Indice di salute**: esami 25%, sonno 20%, recupero 20%, attività 20% (passi e sedute delle cartelle Sport), composizione corporea 15%.
-- **Indice finanziario**: risparmio 35% (100 dal 20% delle entrate in su, ultimi 3 mesi completi), riserva 35% (100 da 6 mesi di spesa coperti dalla liquidità), debiti 15% (100 con rate fino al 10% delle entrate, 0 dal 50%), tetti di spesa 15% (categorie rispettate nell'ultimo mese completo). I giroconti sono esclusi.
+- **Indice finanziario**: risparmio 35% (100 dal 20% delle entrate in su, ultimi 3 mesi completi), riserva 35% (100 da 6 mesi di spesa coperti dalla liquidità), debiti 15% (rate mensili pagate o dichiarate, la più alta; 100 fino al 10% delle entrate, 0 dal 50%), tetti di spesa 15% (categorie rispettate nell'ultimo mese completo). I giroconti sono esclusi.
 
 I dati Garmin non stanno in `archivio.json`: sono in `garmin/AAAA.csv` (`data;tipo;metrica;valore;unita`) e la pagina li mostra come voci `sensore` o `corpo` di sola lettura.
 

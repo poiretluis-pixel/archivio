@@ -113,7 +113,7 @@ function pannelloIndice() {
 /* --- Indice finanziario: stesse regole di trasparenza dell'indice di salute ---
    Risparmio: quota delle entrate non spesa negli ultimi 3 mesi completi (100 dal 20% in su, 0 a zero o sotto).
    Riserva: mesi di spesa coperti dalla liquidità (conti correnti, risparmio, contanti) (100 da 6 mesi in su).
-   Debiti: rate mensili rispetto alle entrate medie (100 fino al 10%, 0 dal 50% in su).
+   Debiti: rate mensili (pagate o dichiarate, la più alta) rispetto alle entrate medie (100 fino al 10%, 0 dal 50% in su).
    Tetti di spesa: quota delle categorie con tetto rispettate nell'ultimo mese completo.
    I giroconti tra conti propri non contano. */
 const PESI_FINANZE = { risparmio: 35, riserva: 35, debiti: 15, budget: 15 };
@@ -146,7 +146,10 @@ function componentiFinanze() {
     const m = liq.valore / usciteMedie;
     c.riserva = { nome: 'Riserva', punti: limita(m / 6 * 100), eta: giorniDa(liq.data), testo: `La liquidità (${fmtEuro(liq.valore)}) copre ${fmtNum(m, 1)} mesi di spesa media (${fmtEuro(usciteMedie)} al mese).` };
   }
-  const deb = voci('patrimonio', 'debito'), rate = somma(deb.map(v => v.rata));
+  /* Rate: la più alta tra quelle pagate davvero (movimenti "Rate e finanziamenti") e quelle dichiarate nei debiti. */
+  const deb = voci('patrimonio', 'debito'), rateDebiti = somma(deb.map(v => v.rata));
+  const rateMov = mesi.length ? -somma(mov.filter(v => v.categoria === 'Rate e finanziamenti' && v.valore < 0 && mesi.some(k => v.data.startsWith(k))).map(v => v.valore)) / mesi.length : 0;
+  const rate = Math.max(rateDebiti, rateMov);
   if (entrateMedie > 0) {
     const q = rate / entrateMedie;
     c.debiti = { nome: 'Debiti', punti: limita(100 - Math.max(0, q - 0.1) / 0.4 * 100), eta: 0, testo: rate ? `Le rate (${fmtEuro(rate)} al mese) valgono il ${fmtNum(q * 100, 0)}% delle entrate medie.` : 'Nessuna rata registrata.' };

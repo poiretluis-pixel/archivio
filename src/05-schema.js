@@ -5,8 +5,8 @@ const c = (k, etichetta, tipo = 'testo', extra = {}) => ({ k, etichetta, tipo, .
 const CAT_ESAMI = ['Rene', 'Lipidi', 'Glicemia', 'Fegato', 'Infiammazione', 'Ematologia', 'Ferro e vitamine', 'Tiroide e ormoni', 'Proteine', 'Elettroliti', 'Intestino', 'Urine', 'Sierologie', 'Allergologia', 'Altro'];
 const RIPETI = { mai: 0, mensile: 1, trimestrale: 3, semestrale: 6, annuale: 12 };
 /* Categorie dei movimenti. "Giroconto" (spostamenti tra conti propri) non conta né come entrata né come uscita. */
-const CAT_USCITE = ['Casa', 'Spesa alimentare', 'Ristoranti e bar', 'Auto e trasporti', 'Salute', 'Figli', 'Istruzione', 'Sport e benessere', 'Abbigliamento', 'Viaggi e svago', 'Abbonamenti', 'Assicurazioni', 'Tasse e imposte', 'Regali e donazioni', 'Commissioni bancarie', 'Altre uscite'];
-const CAT_ENTRATE = ['Compensi e stipendio', 'Utili e dividendi', 'Rimborsi', 'Affitti', 'Altre entrate'];
+const CAT_USCITE = ['Casa', 'Spesa alimentare', 'Ristoranti e bar', 'Auto e trasporti', 'Salute', 'Figli', 'Istruzione', 'Sport e benessere', 'Abbigliamento', 'Viaggi e svago', 'Abbonamenti', 'Assicurazioni', 'Tasse e imposte', 'Rate e finanziamenti', 'Lavori e ristrutturazioni', 'Regali e donazioni', 'Contanti prelevati', 'Commissioni bancarie', 'Altre uscite'];
+const CAT_ENTRATE = ['Compensi e stipendio', 'Utili e dividendi', 'Contributi famiglia', 'Rimborsi', 'Affitti', 'Altre entrate'];
 const GIROCONTO = 'Giroconto';
 const AMBITI = ['Lavoro', 'Famiglia', 'Personale', 'Salute', 'Finanze'];
 
