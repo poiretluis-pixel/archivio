@@ -252,8 +252,8 @@ function vistaPer(r) {
     if (r[2]) return vistaTipo(r[1], r[2]);
     return vistaArea(a);
   }
-  if (r[0] === 'task' || r[0] === 'da-fare') return vistaLavoro('attivita');
-  if (r[0] === 'mail') return vistaLavoro('mail');
+  if (r[0] === 'task' || r[0] === 'da-fare') return vistaLavoro('attivita', r[1]);
+  if (r[0] === 'mail') return vistaLavoro('mail', r[1]);
   if (r[0] === 'scadenze') return vistaScadenze();
   if (r[0] === 'rapporti') return vistaRapporti(r[1]);
   if (r[0] === 'documenti') return vistaDocumenti();

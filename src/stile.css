@@ -212,3 +212,24 @@ i.g-barra1{background:var(--serie)} i.g-barra2{background:var(--serie2)}
 li.lavoro .azioni{flex-wrap:wrap}
 .scadenza-rapida{display:inline-flex;align-items:center;gap:.35rem}
 .scadenza-rapida input{font:inherit;font-size:.85rem;padding:.15rem .35rem;border:1px solid var(--linea);border-radius:6px;background:var(--carta);color:var(--inchiostro)}
+/* Etichette di chi riguarda task e mail */
+:root{--e-blu-f:#dce8fb;--e-blu-t:#1a4d9e;--e-giallo-f:#fbefc4;--e-giallo-t:#7a5800;--e-rosso-f:#fbe1e0;--e-rosso-t:#a8282a;--e-viola-f:#ebe3fa;--e-viola-t:#5b3a9e;--e-verde-f:#dcf1e1;--e-verde-t:#1f6b35;--e-grigio-f:var(--linea2);--e-grigio-t:var(--inchiostro2)}
+@media (prefers-color-scheme:dark){:root{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c}}
+.etichetta{display:inline-block;font-size:.76rem;font-weight:600;border-radius:99px;padding:0 .55rem;line-height:1.45rem;white-space:nowrap;vertical-align:.08em}
+.e-blu{background:var(--e-blu-f);color:var(--e-blu-t)}
+.e-giallo{background:var(--e-giallo-f);color:var(--e-giallo-t)}
+.e-rosso{background:var(--e-rosso-f);color:var(--e-rosso-t)}
+.e-viola{background:var(--e-viola-f);color:var(--e-viola-t)}
+.e-verde{background:var(--e-verde-f);color:var(--e-verde-t)}
+.e-grigio{background:var(--e-grigio-f);color:var(--e-grigio-t)}
+.titolo-lavoro{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem}
+.filtro{font:inherit;font-size:.84rem;border:1px solid transparent;background:none;border-radius:99px;padding:.15rem .3rem;cursor:pointer;color:var(--inchiostro2)}
+.filtro.scelto{border-color:var(--marca);background:var(--marca-tenue)}
+.filtro:hover{border-color:var(--linea)}
+/* Schede Oggi, Coda, Archivio */
+.schede{display:flex;gap:.3rem;border-bottom:1px solid var(--linea);margin:.5rem 0 1rem;overflow-x:auto}
+.schede a{display:inline-flex;align-items:center;gap:.45rem;padding:.6rem .9rem;color:var(--inchiostro2);text-decoration:none;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;font-weight:500}
+.schede a:hover{color:var(--inchiostro)}
+.schede a.attiva{color:var(--marca);border-bottom-color:var(--marca);font-weight:600}
+.schede .conta{background:var(--linea2);color:var(--inchiostro2)}
+.schede a.attiva .conta{background:var(--marca);color:var(--marca-su)}

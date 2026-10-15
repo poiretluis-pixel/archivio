@@ -31,6 +31,9 @@ function pulsanteCalendario(x) {
     ? btn('Togli dal calendario', () => { metti({ ...x, calendario: false }); avviso('Esce dal calendario TASK al prossimo aggiornamento.'); }, 'piccolo')
     : btn('Aggiungi al calendario', () => { metti({ ...x, calendario: true }); avviso('Entra nel calendario TASK al prossimo aggiornamento.'); }, 'piccolo');
 }
+/* Etichette colorate per chi riguarda il task o la mail: Pioltello blu, Porta Romana giallo, Personale rosso. */
+const COLORI_ETICHETTA = { '3MEDical Pioltello': 'blu', '3MEDical Porta Romana': 'giallo', 'Personale': 'rosso', '3MEDical': 'viola', 'Psiche e Soma': 'verde' };
+const etichettaColore = nome => (nome ? h('span', { class: 'etichetta e-' + (COLORI_ETICHETTA[nome] || 'grigio') }, nome) : null);
 const linkGmail = x => (typeof x.link === 'string' && /^https:\/\/mail\.google\.com\//.test(x.link) ? x.link : '');
 
 function spostaLavoro(x, lista) { metti({ ...x, lista, lista_dal: oggi() }); avviso(`Spostata in ${lista}.`); }
@@ -47,9 +50,9 @@ function rigaLavoro(x) {
   const link = linkGmail(x);
   return h('li', { class: 'lavoro', 'data-tipo': x.tipo },
     h('div', { class: 'tra' },
-      h('strong', {}, x.titolo),
+      h('span', { class: 'titolo-lavoro' }, etichettaColore(dove), h('strong', {}, x.titolo)),
       x.priorita === 'alta' ? stato('ritardo', 'Priorità alta') : null),
-    h('div', { class: 'elenco-nota' }, [dove, mail && x.mittente ? 'da ' + x.mittente : '', quando, mail && x.stato === 'in attesa di altri' ? 'in attesa di altri' : ''].filter(Boolean).join(', ')),
+    h('div', { class: 'elenco-nota' }, [mail && x.mittente ? 'da ' + x.mittente : '', quando, mail && x.stato === 'in attesa di altri' ? 'in attesa di altri' : ''].filter(Boolean).join(', ')),
     x.azione || x.nota ? h('div', { class: 'elenco-nota testo-lungo' }, x.azione || x.nota) : null,
     h('div', { class: 'azioni' },
       btn(mail ? 'Gestita' : 'Fatta', () => chiudiLavoro(x), 'piccolo primario'),
@@ -64,7 +67,9 @@ function rigaLavoro(x) {
 
 /* Due pagine: Task (cose da fare) e Gestione mail. Stesse liste, stesso comportamento. */
 const fonteDi = x => (x.tipo === 'mail' ? x.casella : (x.casella || x.ambito));
-function vistaLavoro(tipo) {
+const SCHEDE_LAVORO = { oggi: 'Oggi', coda: 'Coda', archivio: 'Archivio', tutti: 'Tutti' };
+function vistaLavoro(tipo, scheda) {
+  const base = tipo === 'mail' ? '#/mail/' : '#/task/', sc = SCHEDE_LAVORO[scheda] ? scheda : 'oggi';
   const mail = tipo === 'mail', chiave = 'filtro_' + tipo, filtro = S[chiave] || '';
   const tutte = lavoriAperti().filter(x => x.tipo === tipo);
   const l = tutte.filter(x => !filtro || fonteDi(x) === filtro);
@@ -82,6 +87,8 @@ function vistaLavoro(tipo) {
     h('div', { class: 'dati' }, dato('Per oggi', perLista('Oggi').length, alte ? `${alte} con priorità alta` : ''), dato('In coda', perLista('Coda').length),
       mail ? dato('In attesa di altri', tutte.filter(x => x.stato === 'in attesa di altri').length) : dato('In ritardo', tutte.filter(x => giorniDaSe(x.data) > 0).length, '', tutte.some(x => giorniDaSe(x.data) > 0) ? 'allerta' : '')),
     fonti.length > 1 ? h('div', { class: 'azioni filtri' }, h('span', { class: 'attenuato piccolo' }, 'Mostra:'),
-      ['', ...fonti].map(f => btn(f || 'Tutto', () => { S[chiave] = f; disegna(); }, 'piccolo' + (f === filtro ? ' primario' : '')))) : null,
-    LISTE_LAVORO.map(n => { const x = perLista(n); return pannello(`${n} (${x.length})`, x.length ? h('ul', { class: 'elenco' }, x.map(rigaLavoro)) : h('p', { class: 'attenuato' }, testi[n])); }));
+      ['', ...fonti].map(f => h('button', { type: 'button', class: 'filtro' + (f === filtro ? ' scelto' : ''), 'aria-pressed': f === filtro ? 'true' : 'false', onclick: () => { S[chiave] = f; disegna(); } }, f ? etichettaColore(f) : 'Tutto'))) : null,
+    h('nav', { class: 'schede', 'aria-label': 'Liste' }, Object.entries(SCHEDE_LAVORO).map(([k, n]) => h('a', { href: base + k, class: k === sc ? 'attiva' : '', 'aria-current': k === sc ? 'page' : null },
+      n, h('span', { class: 'conta' }, k === 'tutti' ? l.length : perLista(n).length)))),
+    (sc === 'tutti' ? LISTE_LAVORO : [SCHEDE_LAVORO[sc]]).map(n => { const x = perLista(n); return pannello(sc === 'tutti' ? `${n} (${x.length})` : '', x.length ? h('ul', { class: 'elenco' }, x.map(rigaLavoro)) : h('p', { class: 'attenuato' }, testi[n])); }));
 }
