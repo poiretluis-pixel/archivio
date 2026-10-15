@@ -204,3 +204,9 @@ i.g-barra1{background:var(--serie)} i.g-barra2{background:var(--serie2)}
 }
 @media (prefers-reduced-motion:no-preference){.btn,.menu a,.scheda{transition:border-color .12s,background-color .12s}}
 @media print{.barra,.menu,.azioni,.btn{display:none!important}#vista{border:0}}
+/* Da fare: etichette del tipo di voce e filtri per casella */
+.etichetta-tipo{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.02em;border-radius:4px;padding:0 .4rem;line-height:1.3rem;vertical-align:.1em}
+.e-mail{background:var(--attenzione-tenue);color:var(--attenzione)}
+.e-cosa{background:var(--marca-tenue);color:var(--marca)}
+.filtri{flex-wrap:wrap;align-items:center;margin:0 0 1rem}
+li.lavoro .azioni{flex-wrap:wrap}

@@ -19,8 +19,13 @@ function vistaCasa() {
   const daFare = [];
   const sc = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta').sort(perData);
   for (const x of sc) { const g = -giorniDa(x.data); if (g <= 30) daFare.push({ tipo: g < 0 ? 'ritardo' : 'vuota', testo: x.titolo, nota: g < 0 ? `Scaduta il ${fmtData(x.data)}` : g === 0 ? 'Scade oggi' : `Entro il ${fmtData(x.data)}`, href: '#/scadenze' }); }
-  const att = voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta' && -giorniDa(x.data) <= 7).sort(perData);
-  for (const x of att) { const g = -giorniDa(x.data); daFare.push({ tipo: g < 0 ? 'ritardo' : 'vuota', testo: x.titolo, nota: (x.ambito ? x.ambito + ', ' : '') + (g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`), href: '#/a/organizzazione' }); }
+  const lav = lavoriAperti().filter(x => listaDi(x) === 'Oggi').sort(perPrioritaLavoro);
+  for (const x of lav.slice(0, 6)) {
+    const mail = x.tipo === 'mail', g = mail ? 0 : -giorniDa(x.data);
+    daFare.push({ tipo: x.priorita === 'alta' || g < 0 ? 'ritardo' : 'vuota', testo: (mail ? 'Mail: ' : '') + x.titolo,
+      nota: [mail ? x.casella : (x.casella || x.ambito), mail ? (x.mittente ? 'da ' + x.mittente : '') : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`].filter(Boolean).join(', '), href: '#/da-fare' });
+  }
+  if (lav.length > 6) daFare.push({ tipo: 'vuota', testo: `Altre ${lav.length - 6} cose per oggi`, nota: 'Tutte nella pagina Da fare.', href: '#/da-fare' });
   const daElab = allegati().filter(a => a.stato === 'da elaborare').length;
   if (daElab) daFare.push({ tipo: 'vuota', testo: daElab === 1 ? '1 documento in attesa che Claude ne inserisca i valori' : `${daElab} documenti in attesa che Claude ne inserisca i valori`, nota: 'Sono al sicuro. Li elabora alla verifica del lunedì, oppure subito se glielo chiedi in chat.', href: '#/documenti' });
   if (!ghPronto()) daFare.push({ tipo: 'ritardo', testo: 'I dati sono solo su questo dispositivo', nota: 'Collega il repository dei dati in Impostazioni.', href: '#/impostazioni' });
@@ -270,7 +275,7 @@ function cruscottoOrganizzazione() {
     pannello('Cose da fare', aperte.length ? h('ul', { class: 'elenco' }, aperte.slice(0, 15).map(x => { const g = -giorniDa(x.data); return h('li', {}, h('div', { class: 'tra' }, h('span', {}, h('strong', {}, x.titolo), h('span', { class: 'attenuato' }, [x.ambito, x.priorita ? 'priorità ' + x.priorita : ''].filter(Boolean).map(s => ' ' + s).join(','))),
       stato(g < 0 ? 'ritardo' : 'vuota', g < 0 ? `In ritardo dal ${fmtData(x.data)}` : g === 0 ? 'Oggi' : fmtData(x.data))),
       h('div', { class: 'azioni' }, btn('Fatta', () => metti({ ...x, stato: 'fatta', fatta_il: oggi() }), 'piccolo'), btn('Modifica', () => apriModulo('organizzazione', 'attivita', x), 'piccolo'))); })) : h('p', { class: 'attenuato' }, 'Niente in sospeso.'),
-      h('div', { class: 'azioni' }, btn('Aggiungi', () => apriModulo('organizzazione', 'attivita', null, { stato: 'da fare', priorita: 'media' }), 'piccolo'))),
+      h('div', { class: 'azioni' }, btn('Aggiungi', () => apriModulo('organizzazione', 'attivita', null, { stato: 'da fare', priorita: 'media' }), 'piccolo'), h('a', { class: 'btn piccolo', href: '#/da-fare' }, 'Oggi, domani, archivio e mail'))),
     pannello('Revisione della settimana', ultimaRev ? [h('p', { class: 'attenuato piccolo' }, `Settimana del ${fmtData(ultimaRev.data)}`), ultimaRev.focus ? h('div', { class: 'testo-lungo' }, h('strong', {}, 'Focus: '), ultimaRev.focus) : null] : h('p', { class: 'attenuato' }, 'Dieci minuti a settimana: cosa è andato, cosa no, le tre cose su cui concentrarti. È l\'abitudine che tiene vivo tutto il resto.'),
       h('div', { class: 'azioni' }, btn('Scrivi la revisione', () => apriModulo('organizzazione', 'revisione', null, { data: lunedi(oggi()) }), 'piccolo'))),
   ];

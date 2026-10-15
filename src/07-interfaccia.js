@@ -60,6 +60,7 @@ function apriModulo(idArea, idTipo, esistente, predefiniti = {}) {
     const { out, errori } = leggiModulo(form, def);
     if (errori.length) { err.textContent = errori.join(' '); return; }
     const extra = {}; for (const k of Object.keys(v)) if (!def.campi.some(f => f.k === k)) extra[k] = v[k];
+    if (out.lista && (out.lista !== v.lista || !v.lista_dal)) extra.lista_dal = oggi();
     metti({ ...extra, ...out, area: idArea, tipo: idTipo, persona: pp.length > 1 ? form.elements.persona.value : v.persona });
     chiudiModale(); avviso('Salvato.');
   } },
@@ -218,6 +219,7 @@ function menu(rotta) {
   const scadute = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta' && x.data <= oggi()).length;
   return h('nav', { class: 'menu', 'aria-label': 'Cartelle' },
     v('#/', 'Quadro generale', 'casa'),
+    v('#/da-fare', 'Da fare', 'da-fare', quantiOggi()),
     h('div', { class: 'menu-gruppo' }, 'Cartelle'),
     aree().map(a => v('#/a/' + a.id, a.nome, 'a/' + a.id)),
     h('div', { class: 'menu-gruppo' }, 'Archivio'),
@@ -248,6 +250,7 @@ function vistaPer(r) {
     if (r[2]) return vistaTipo(r[1], r[2]);
     return vistaArea(a);
   }
+  if (r[0] === 'da-fare') return vistaLavoro();
   if (r[0] === 'scadenze') return vistaScadenze();
   if (r[0] === 'rapporti') return vistaRapporti(r[1]);
   if (r[0] === 'documenti') return vistaDocumenti();

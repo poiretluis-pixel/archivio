@@ -61,7 +61,8 @@ Date `AAAA-MM-GG`, numeri come numeri JSON. Nell'esportazione i documenti posson
 | `patrimonio` | `bene` | `titolo`, `categoria`, `valore`, `data`, `costo`, `acquisto`, `nota` |
 | `patrimonio` | `debito` | `titolo`, `categoria`, `valore` (residuo), `data`, `rata`, `scadenza`, `nota` |
 | `organizzazione` | `obiettivo` | `titolo`, `ambito` (Lavoro, Famiglia, Personale, Salute, Finanze), `data`, `scadenza`, `misura`, `avanzamento` (%), `stato`, `nota` |
-| `organizzazione` | `attivita` | `titolo`, `ambito`, `data` (entro il), `priorita`, `stato` (da fare, in corso, fatta), `nota` |
+| `organizzazione` | `attivita` | `titolo`, `ambito`, `data` (entro il), `lista` (Oggi, Domani, Archivio), `lista_dal`, `casella`, `priorita`, `stato` (da fare, in corso, fatta), `nota` |
+| `organizzazione` | `mail` | `titolo` (oggetto), `mittente`, `casella` (Personale, 3MEDical Pioltello, 3MEDical Porta Romana), `data` (ricevuta il), `azione`, `lista`, `lista_dal`, `priorita`, `stato` (da gestire, in attesa di altri, gestita), `link` (solo indirizzi mail.google.com), `nota` |
 | `organizzazione` | `revisione` | `data` (lunedì), `voto`, `bene`, `male`, `focus`, `famiglia` |
 | `salute` | `misura` | `data`, `parametro`, `categoria`, `valore` oppure `testo`, `unita`, `rif_min`, `rif_max`, `rif_testo`, `fuori`, `laboratorio`, `doc`, `nota` |
 | `salute` | `visita` | `data`, `specialista`, `struttura`, `motivo`, `conclusioni`, `indicazioni`, `doc` |
@@ -81,6 +82,10 @@ Date `AAAA-MM-GG`, numeri come numeri JSON. Nell'esportazione i documenti posson
 | ogni area | `consiglio` | `titolo`, `data`, `priorita` (1 = il più importante), `azione`, `perche`, `stato`, `origine` |
 | `sistema` | `scadenza` | `titolo`, `data`, `zona`, `ripeti`, `stato`, `nota` |
 | cartella personalizzata | `voce` | `titolo`, `data`, `categoria`, `valore`, `unita`, `nota` |
+
+### Da fare
+
+La pagina **Da fare** riunisce cose da fare e mail da gestire in tre liste, come Google Task: Oggi, Domani, Archivio, ordinate per priorità e poi per data. `lista_dal` è il giorno in cui la voce è stata messa nella lista: una voce in Domani passa da sola in Oggi il giorno dopo. Senza `lista` decide la data. Le mail le carica Claude da Gmail.
 
 ### Indici
 

@@ -11,6 +11,10 @@ const CAT_ENTRATE = ['Compensi e stipendio', 'Utili e dividendi', 'Contributi fa
 const GIROCONTO = 'Giroconto';
 const CAT_NEUTRE = new Set([GIROCONTO, 'Investimenti e partecipazioni', 'Prestiti ricevuti']);
 const AMBITI = ['Lavoro', 'Famiglia', 'Personale', 'Salute', 'Finanze'];
+/* Liste di lavoro, come in Google Task: Oggi, Domani, Archivio. Valgono per le cose da fare e per le mail da gestire. */
+const LISTE_LAVORO = ['Oggi', 'Domani', 'Archivio'];
+const PRIORITA = ['alta', 'media', 'bassa'];
+const CASELLE = ['Personale', '3MEDical Pioltello', '3MEDical Porta Romana'];
 
 const AREE_BASE = [
   { id: 'finanze', nome: 'Finanze', tipi: {
@@ -34,9 +38,15 @@ const AREE_BASE = [
     obiettivo: { nome: 'Obiettivo', plur: 'Obiettivi', titolo: v => v.titolo, colonne: ['titolo', 'ambito', 'avanzamento', 'scadenza', 'stato'], campi: [
       c('titolo', 'Obiettivo', 'testo', { obbl: true }), c('ambito', 'Ambito', 'scelta', { opzioni: AMBITI }), c('data', 'Fissato il', 'data', { obbl: true }), c('scadenza', 'Da raggiungere entro', 'data'),
       c('misura', 'Come si misura (es. 10 kg in meno, 20.000 € di riserva)', 'lungo'), c('avanzamento', 'Avanzamento in %', 'numero'), c('stato', 'Stato', 'scelta', { opzioni: ['attivo', 'raggiunto', 'in pausa', 'abbandonato'] }), c('nota', 'Nota', 'lungo')] },
-    attivita: { nome: 'Cosa da fare', plur: 'Cose da fare', titolo: v => v.titolo, colonne: ['data', 'titolo', 'ambito', 'priorita', 'stato'], campi: [
+    attivita: { nome: 'Cosa da fare', plur: 'Cose da fare', titolo: v => v.titolo, colonne: ['data', 'titolo', 'ambito', 'lista', 'priorita', 'stato'], campi: [
       c('titolo', 'Cosa', 'testo', { obbl: true }), c('ambito', 'Ambito', 'scelta', { opzioni: AMBITI }), c('data', 'Entro il', 'data', { obbl: true }),
-      c('priorita', 'Priorità', 'scelta', { opzioni: ['alta', 'media', 'bassa'] }), c('stato', 'Stato', 'scelta', { opzioni: ['da fare', 'in corso', 'fatta'] }), c('nota', 'Nota', 'lungo')] },
+      c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }), c('casella', 'Riguarda', 'scelta', { opzioni: CASELLE }),
+      c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da fare', 'in corso', 'fatta'] }), c('nota', 'Nota', 'lungo')] },
+    mail: { nome: 'Mail da gestire', plur: 'Mail da gestire', titolo: v => v.titolo, colonne: ['data', 'titolo', 'mittente', 'casella', 'lista', 'stato'], campi: [
+      c('titolo', 'Oggetto', 'testo', { obbl: true }), c('mittente', 'Da chi', 'testo', { suggerisci: true }), c('casella', 'Casella', 'scelta', { opzioni: CASELLE }),
+      c('data', 'Ricevuta il', 'data', { obbl: true }), c('azione', 'Cosa fare', 'lungo'), c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }),
+      c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da gestire', 'in attesa di altri', 'gestita'] }),
+      c('link', 'Collegamento a Gmail'), c('nota', 'Nota', 'lungo')] },
     revisione: { nome: 'Revisione della settimana', plur: 'Revisioni settimanali', titolo: v => 'Settimana del ' + fmtData(v.data), colonne: ['data', 'voto', 'focus'], campi: [
       c('data', 'Lunedì della settimana', 'data', { obbl: true }), c('voto', 'Come è andata, da 1 a 5', 'numero'), c('bene', 'Cosa è andato bene', 'lungo'), c('male', 'Cosa non è andato', 'lungo'),
       c('focus', 'Le tre cose della prossima settimana', 'lungo'), c('famiglia', 'Tempo per la famiglia: cosa ho fatto', 'lungo')] },

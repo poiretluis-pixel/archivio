@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0d5c57">
 <title>Archivio</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d5c57'/%3E%3Cpath d='M18 46V22a4 4 0 0 1 4-4h8l4 5h8a4 4 0 0 1 4 4v19a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4z' fill='%23fff'/%3E%3C/svg%3E">
-<!-- Versione costruita il 2026-10-12. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
+<!-- Versione costruita il 2026-10-15. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
 <style>
 :root{
   --fondo:#e9eeec; --carta:#ffffff; --inchiostro:#12211f; --inchiostro2:#465955; --tenue:#6f807c; --linea:#d5dedb; --linea2:#e6ecea;
@@ -216,6 +216,12 @@ i.g-barra1{background:var(--serie)} i.g-barra2{background:var(--serie2)}
 }
 @media (prefers-reduced-motion:no-preference){.btn,.menu a,.scheda{transition:border-color .12s,background-color .12s}}
 @media print{.barra,.menu,.azioni,.btn{display:none!important}#vista{border:0}}
+/* Da fare: etichette del tipo di voce e filtri per casella */
+.etichetta-tipo{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.02em;border-radius:4px;padding:0 .4rem;line-height:1.3rem;vertical-align:.1em}
+.e-mail{background:var(--attenzione-tenue);color:var(--attenzione)}
+.e-cosa{background:var(--marca-tenue);color:var(--marca)}
+.filtri{flex-wrap:wrap;align-items:center;margin:0 0 1rem}
+li.lavoro .azioni{flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -856,6 +862,10 @@ const CAT_ENTRATE = ['Compensi e stipendio', 'Utili e dividendi', 'Contributi fa
 const GIROCONTO = 'Giroconto';
 const CAT_NEUTRE = new Set([GIROCONTO, 'Investimenti e partecipazioni', 'Prestiti ricevuti']);
 const AMBITI = ['Lavoro', 'Famiglia', 'Personale', 'Salute', 'Finanze'];
+/* Liste di lavoro, come in Google Task: Oggi, Domani, Archivio. Valgono per le cose da fare e per le mail da gestire. */
+const LISTE_LAVORO = ['Oggi', 'Domani', 'Archivio'];
+const PRIORITA = ['alta', 'media', 'bassa'];
+const CASELLE = ['Personale', '3MEDical Pioltello', '3MEDical Porta Romana'];
 
 const AREE_BASE = [
   { id: 'finanze', nome: 'Finanze', tipi: {
@@ -879,9 +889,15 @@ const AREE_BASE = [
     obiettivo: { nome: 'Obiettivo', plur: 'Obiettivi', titolo: v => v.titolo, colonne: ['titolo', 'ambito', 'avanzamento', 'scadenza', 'stato'], campi: [
       c('titolo', 'Obiettivo', 'testo', { obbl: true }), c('ambito', 'Ambito', 'scelta', { opzioni: AMBITI }), c('data', 'Fissato il', 'data', { obbl: true }), c('scadenza', 'Da raggiungere entro', 'data'),
       c('misura', 'Come si misura (es. 10 kg in meno, 20.000 € di riserva)', 'lungo'), c('avanzamento', 'Avanzamento in %', 'numero'), c('stato', 'Stato', 'scelta', { opzioni: ['attivo', 'raggiunto', 'in pausa', 'abbandonato'] }), c('nota', 'Nota', 'lungo')] },
-    attivita: { nome: 'Cosa da fare', plur: 'Cose da fare', titolo: v => v.titolo, colonne: ['data', 'titolo', 'ambito', 'priorita', 'stato'], campi: [
+    attivita: { nome: 'Cosa da fare', plur: 'Cose da fare', titolo: v => v.titolo, colonne: ['data', 'titolo', 'ambito', 'lista', 'priorita', 'stato'], campi: [
       c('titolo', 'Cosa', 'testo', { obbl: true }), c('ambito', 'Ambito', 'scelta', { opzioni: AMBITI }), c('data', 'Entro il', 'data', { obbl: true }),
-      c('priorita', 'Priorità', 'scelta', { opzioni: ['alta', 'media', 'bassa'] }), c('stato', 'Stato', 'scelta', { opzioni: ['da fare', 'in corso', 'fatta'] }), c('nota', 'Nota', 'lungo')] },
+      c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }), c('casella', 'Riguarda', 'scelta', { opzioni: CASELLE }),
+      c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da fare', 'in corso', 'fatta'] }), c('nota', 'Nota', 'lungo')] },
+    mail: { nome: 'Mail da gestire', plur: 'Mail da gestire', titolo: v => v.titolo, colonne: ['data', 'titolo', 'mittente', 'casella', 'lista', 'stato'], campi: [
+      c('titolo', 'Oggetto', 'testo', { obbl: true }), c('mittente', 'Da chi', 'testo', { suggerisci: true }), c('casella', 'Casella', 'scelta', { opzioni: CASELLE }),
+      c('data', 'Ricevuta il', 'data', { obbl: true }), c('azione', 'Cosa fare', 'lungo'), c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }),
+      c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da gestire', 'in attesa di altri', 'gestita'] }),
+      c('link', 'Collegamento a Gmail'), c('nota', 'Nota', 'lungo')] },
     revisione: { nome: 'Revisione della settimana', plur: 'Revisioni settimanali', titolo: v => 'Settimana del ' + fmtData(v.data), colonne: ['data', 'voto', 'focus'], campi: [
       c('data', 'Lunedì della settimana', 'data', { obbl: true }), c('voto', 'Come è andata, da 1 a 5', 'numero'), c('bene', 'Cosa è andato bene', 'lungo'), c('male', 'Cosa non è andato', 'lungo'),
       c('focus', 'Le tre cose della prossima settimana', 'lungo'), c('famiglia', 'Tempo per la famiglia: cosa ho fatto', 'lungo')] },
@@ -1182,6 +1198,7 @@ function apriModulo(idArea, idTipo, esistente, predefiniti = {}) {
     const { out, errori } = leggiModulo(form, def);
     if (errori.length) { err.textContent = errori.join(' '); return; }
     const extra = {}; for (const k of Object.keys(v)) if (!def.campi.some(f => f.k === k)) extra[k] = v[k];
+    if (out.lista && (out.lista !== v.lista || !v.lista_dal)) extra.lista_dal = oggi();
     metti({ ...extra, ...out, area: idArea, tipo: idTipo, persona: pp.length > 1 ? form.elements.persona.value : v.persona });
     chiudiModale(); avviso('Salvato.');
   } },
@@ -1340,6 +1357,7 @@ function menu(rotta) {
   const scadute = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta' && x.data <= oggi()).length;
   return h('nav', { class: 'menu', 'aria-label': 'Cartelle' },
     v('#/', 'Quadro generale', 'casa'),
+    v('#/da-fare', 'Da fare', 'da-fare', quantiOggi()),
     h('div', { class: 'menu-gruppo' }, 'Cartelle'),
     aree().map(a => v('#/a/' + a.id, a.nome, 'a/' + a.id)),
     h('div', { class: 'menu-gruppo' }, 'Archivio'),
@@ -1370,6 +1388,7 @@ function vistaPer(r) {
     if (r[2]) return vistaTipo(r[1], r[2]);
     return vistaArea(a);
   }
+  if (r[0] === 'da-fare') return vistaLavoro();
   if (r[0] === 'scadenze') return vistaScadenze();
   if (r[0] === 'rapporti') return vistaRapporti(r[1]);
   if (r[0] === 'documenti') return vistaDocumenti();
@@ -1399,8 +1418,13 @@ function vistaCasa() {
   const daFare = [];
   const sc = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta').sort(perData);
   for (const x of sc) { const g = -giorniDa(x.data); if (g <= 30) daFare.push({ tipo: g < 0 ? 'ritardo' : 'vuota', testo: x.titolo, nota: g < 0 ? `Scaduta il ${fmtData(x.data)}` : g === 0 ? 'Scade oggi' : `Entro il ${fmtData(x.data)}`, href: '#/scadenze' }); }
-  const att = voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta' && -giorniDa(x.data) <= 7).sort(perData);
-  for (const x of att) { const g = -giorniDa(x.data); daFare.push({ tipo: g < 0 ? 'ritardo' : 'vuota', testo: x.titolo, nota: (x.ambito ? x.ambito + ', ' : '') + (g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`), href: '#/a/organizzazione' }); }
+  const lav = lavoriAperti().filter(x => listaDi(x) === 'Oggi').sort(perPrioritaLavoro);
+  for (const x of lav.slice(0, 6)) {
+    const mail = x.tipo === 'mail', g = mail ? 0 : -giorniDa(x.data);
+    daFare.push({ tipo: x.priorita === 'alta' || g < 0 ? 'ritardo' : 'vuota', testo: (mail ? 'Mail: ' : '') + x.titolo,
+      nota: [mail ? x.casella : (x.casella || x.ambito), mail ? (x.mittente ? 'da ' + x.mittente : '') : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`].filter(Boolean).join(', '), href: '#/da-fare' });
+  }
+  if (lav.length > 6) daFare.push({ tipo: 'vuota', testo: `Altre ${lav.length - 6} cose per oggi`, nota: 'Tutte nella pagina Da fare.', href: '#/da-fare' });
   const daElab = allegati().filter(a => a.stato === 'da elaborare').length;
   if (daElab) daFare.push({ tipo: 'vuota', testo: daElab === 1 ? '1 documento in attesa che Claude ne inserisca i valori' : `${daElab} documenti in attesa che Claude ne inserisca i valori`, nota: 'Sono al sicuro. Li elabora alla verifica del lunedì, oppure subito se glielo chiedi in chat.', href: '#/documenti' });
   if (!ghPronto()) daFare.push({ tipo: 'ritardo', testo: 'I dati sono solo su questo dispositivo', nota: 'Collega il repository dei dati in Impostazioni.', href: '#/impostazioni' });
@@ -1650,7 +1674,7 @@ function cruscottoOrganizzazione() {
     pannello('Cose da fare', aperte.length ? h('ul', { class: 'elenco' }, aperte.slice(0, 15).map(x => { const g = -giorniDa(x.data); return h('li', {}, h('div', { class: 'tra' }, h('span', {}, h('strong', {}, x.titolo), h('span', { class: 'attenuato' }, [x.ambito, x.priorita ? 'priorità ' + x.priorita : ''].filter(Boolean).map(s => ' ' + s).join(','))),
       stato(g < 0 ? 'ritardo' : 'vuota', g < 0 ? `In ritardo dal ${fmtData(x.data)}` : g === 0 ? 'Oggi' : fmtData(x.data))),
       h('div', { class: 'azioni' }, btn('Fatta', () => metti({ ...x, stato: 'fatta', fatta_il: oggi() }), 'piccolo'), btn('Modifica', () => apriModulo('organizzazione', 'attivita', x), 'piccolo'))); })) : h('p', { class: 'attenuato' }, 'Niente in sospeso.'),
-      h('div', { class: 'azioni' }, btn('Aggiungi', () => apriModulo('organizzazione', 'attivita', null, { stato: 'da fare', priorita: 'media' }), 'piccolo'))),
+      h('div', { class: 'azioni' }, btn('Aggiungi', () => apriModulo('organizzazione', 'attivita', null, { stato: 'da fare', priorita: 'media' }), 'piccolo'), h('a', { class: 'btn piccolo', href: '#/da-fare' }, 'Oggi, domani, archivio e mail'))),
     pannello('Revisione della settimana', ultimaRev ? [h('p', { class: 'attenuato piccolo' }, `Settimana del ${fmtData(ultimaRev.data)}`), ultimaRev.focus ? h('div', { class: 'testo-lungo' }, h('strong', {}, 'Focus: '), ultimaRev.focus) : null] : h('p', { class: 'attenuato' }, 'Dieci minuti a settimana: cosa è andato, cosa no, le tre cose su cui concentrarti. È l\'abitudine che tiene vivo tutto il resto.'),
       h('div', { class: 'azioni' }, btn('Scrivi la revisione', () => apriModulo('organizzazione', 'revisione', null, { data: lunedi(oggi()) }), 'piccolo'))),
   ];
@@ -2098,6 +2122,71 @@ function consigliPrincipali() {
   if (!l.length) return null;
   return pannello('Consigli principali', h('ol', { class: 'elenco consigli' }, l.slice(0, 6).map(([a, v]) => voceConsiglio(a, v, true))),
     h('p', { class: 'attenuato piccolo' }, 'I primi due di ogni cartella. L\'elenco completo è in ciascuna cartella.'));
+}
+
+/* ===== 8c. Da fare: cose da fare e mail da gestire in una vista sola, divise in Oggi, Domani e Archivio =====
+   Le cose da fare sono le voci organizzazione/attivita, le mail sono organizzazione/mail (le carica Claude da Gmail).
+   Una voce messa in "Domani" passa da sola in "Oggi" il giorno dopo; senza lista, decide la data. */
+const domani = () => { const d = new Date(tempo(oggi()) + MS_G); return isoData(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()); };
+function listaDi(x) {
+  if (x.lista === 'Domani' && x.lista_dal && x.lista_dal < oggi()) return 'Oggi';
+  if (LISTE_LAVORO.includes(x.lista)) return x.lista;
+  if (!x.data || x.data <= oggi()) return 'Oggi';
+  return x.data === domani() && x.tipo === 'attivita' ? 'Domani' : x.tipo === 'mail' ? 'Oggi' : 'Archivio';
+}
+const apertaLavoro = x => (x.tipo === 'mail' ? x.stato !== 'gestita' : x.stato !== 'fatta');
+function lavoriAperti() {
+  return [...voci('organizzazione', 'attivita'), ...voci('organizzazione', 'mail')].filter(apertaLavoro);
+}
+const ordinePriorita = x => (PRIORITA.includes(x.priorita) ? PRIORITA.indexOf(x.priorita) : 1);
+function perPrioritaLavoro(a, b) {
+  return ordinePriorita(a) - ordinePriorita(b) || perData(a, b);
+}
+const quantiOggi = () => lavoriAperti().filter(x => listaDi(x) === 'Oggi').length;
+const linkGmail = x => (typeof x.link === 'string' && /^https:\/\/mail\.google\.com\//.test(x.link) ? x.link : '');
+
+function spostaLavoro(x, lista) { metti({ ...x, lista, lista_dal: oggi() }); avviso(`Spostata in ${lista}.`); }
+function chiudiLavoro(x) {
+  metti(x.tipo === 'mail' ? { ...x, stato: 'gestita', gestita_il: oggi() } : { ...x, stato: 'fatta', fatta_il: oggi() });
+  avviso(x.tipo === 'mail' ? 'Mail segnata come gestita.' : 'Fatta.');
+}
+
+function rigaLavoro(x) {
+  const l = listaDi(x), mail = x.tipo === 'mail';
+  const dove = mail ? x.casella : (x.casella || x.ambito);
+  const g = mail ? null : -giorniDa(x.data);
+  const quando = mail ? `ricevuta il ${fmtData(x.data)}` : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`;
+  const link = linkGmail(x);
+  return h('li', { class: 'lavoro', 'data-tipo': x.tipo },
+    h('div', { class: 'tra' },
+      h('span', {}, h('span', { class: 'etichetta-tipo ' + (mail ? 'e-mail' : 'e-cosa') }, mail ? 'Mail' : 'Da fare'), ' ', h('strong', {}, x.titolo)),
+      x.priorita === 'alta' ? stato('ritardo', 'Priorità alta') : null),
+    h('div', { class: 'elenco-nota' }, [dove, mail && x.mittente ? 'da ' + x.mittente : '', quando, mail && x.stato === 'in attesa di altri' ? 'in attesa di altri' : ''].filter(Boolean).join(', ')),
+    x.azione || x.nota ? h('div', { class: 'elenco-nota testo-lungo' }, x.azione || x.nota) : null,
+    h('div', { class: 'azioni' },
+      btn(mail ? 'Gestita' : 'Fatta', () => chiudiLavoro(x), 'piccolo primario'),
+      LISTE_LAVORO.filter(n => n !== l).map(n => btn('In ' + n.toLowerCase(), () => spostaLavoro(x, n), 'piccolo')),
+      link ? h('a', { class: 'btn piccolo', href: link, target: '_blank', rel: 'noopener noreferrer' }, 'Apri in Gmail') : null,
+      btn('Modifica', () => apriModulo('organizzazione', x.tipo, x), 'piccolo')));
+}
+
+function vistaLavoro() {
+  const filtro = S.filtroLavoro || '';
+  const tutte = lavoriAperti();
+  const l = tutte.filter(x => !filtro || (x.tipo === 'mail' ? x.casella : (x.casella || x.ambito)) === filtro);
+  const fonti = [...new Set(tutte.map(x => (x.tipo === 'mail' ? x.casella : (x.casella || x.ambito))).filter(Boolean))].sort();
+  const perLista = n => l.filter(x => listaDi(x) === n).sort(perPrioritaLavoro);
+  const nuova = () => apriModulo('organizzazione', 'attivita', null, { stato: 'da fare', priorita: 'media', ambito: 'Lavoro', lista: 'Oggi', lista_dal: oggi(), data: oggi() });
+  const testi = { Oggi: 'Niente per oggi.', Domani: 'Niente per domani.', Archivio: 'Archivio vuoto.' };
+  const nMail = tutte.filter(x => x.tipo === 'mail').length;
+  return h('div', {},
+    h('div', { class: 'testa' },
+      h('div', {}, h('h1', {}, 'Da fare'), h('p', { class: 'sotto largo-testo' }, 'Cose da fare e mail delle tre caselle in un posto solo. Le mail le porta qui Claude da Gmail; quello che sposti in Domani torna da solo in Oggi il giorno dopo.')),
+      h('div', { class: 'azioni' }, btn('Aggiungi una cosa da fare', nuova, 'primario'))),
+    h('div', { class: 'dati' }, dato('Per oggi', perLista('Oggi').length, `${l.filter(x => listaDi(x) === 'Oggi' && x.priorita === 'alta').length} con priorità alta`), dato('Per domani', perLista('Domani').length), dato('Mail da gestire', nMail, 'tutte le caselle')),
+    fonti.length > 1 ? h('div', { class: 'azioni filtri' }, h('span', { class: 'attenuato piccolo' }, 'Mostra:'),
+      ['', ...fonti].map(f => btn(f || 'Tutto', () => { S.filtroLavoro = f; disegna(); }, 'piccolo' + (f === filtro ? ' primario' : '')))) : null,
+    LISTE_LAVORO.map(n => { const x = perLista(n); return pannello(`${n} (${x.length})`, x.length ? h('ul', { class: 'elenco' }, x.map(rigaLavoro)) : h('p', { class: 'attenuato' }, testi[n])); }));
 }
 
 /* ===== 9. Impostazioni: persone, cartelle, repository dei dati, Garmin, sicurezza ===== */
