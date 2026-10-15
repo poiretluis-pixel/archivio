@@ -5,7 +5,7 @@ const domani = () => { const d = new Date(tempo(oggi()) + MS_G); return isoData(
 function listaDi(x) {
   if (x.lista === 'Domani' && x.lista_dal && x.lista_dal < oggi()) return 'Oggi';
   if (LISTE_LAVORO.includes(x.lista)) return x.lista;
-  if (!x.data || x.data <= oggi()) return 'Oggi';
+  if (!x.data || x.data <= oggi()) return x.tipo === 'attivita' && !x.data ? 'Archivio' : 'Oggi';
   return x.data === domani() && x.tipo === 'attivita' ? 'Domani' : x.tipo === 'mail' ? 'Oggi' : 'Archivio';
 }
 const apertaLavoro = x => (x.tipo === 'mail' ? x.stato !== 'gestita' : x.stato !== 'fatta');
@@ -28,8 +28,8 @@ function chiudiLavoro(x) {
 function rigaLavoro(x) {
   const l = listaDi(x), mail = x.tipo === 'mail';
   const dove = mail ? x.casella : (x.casella || x.ambito);
-  const g = mail ? null : -giorniDa(x.data);
-  const quando = mail ? `ricevuta il ${fmtData(x.data)}` : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`;
+  const g = mail ? null : -giorniDaSe(x.data);
+  const quando = mail ? `ricevuta il ${fmtData(x.data)}` : !x.data ? '' : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`;
   const link = linkGmail(x);
   return h('li', { class: 'lavoro', 'data-tipo': x.tipo },
     h('div', { class: 'tra' },
@@ -62,7 +62,7 @@ function vistaLavoro(tipo) {
         : 'Le tue cose da fare, come in Google Task. Quello che sposti in Domani torna da solo in Oggi il giorno dopo.')),
       h('div', { class: 'azioni' }, btn(mail ? 'Aggiungi una mail' : 'Aggiungi un task', nuova, 'primario'))),
     h('div', { class: 'dati' }, dato('Per oggi', perLista('Oggi').length, alte ? `${alte} con priorità alta` : ''), dato('Per domani', perLista('Domani').length),
-      mail ? dato('In attesa di altri', tutte.filter(x => x.stato === 'in attesa di altri').length) : dato('In ritardo', tutte.filter(x => giorniDa(x.data) > 0).length, '', tutte.some(x => giorniDa(x.data) > 0) ? 'allerta' : '')),
+      mail ? dato('In attesa di altri', tutte.filter(x => x.stato === 'in attesa di altri').length) : dato('In ritardo', tutte.filter(x => giorniDaSe(x.data) > 0).length, '', tutte.some(x => giorniDaSe(x.data) > 0) ? 'allerta' : '')),
     fonti.length > 1 ? h('div', { class: 'azioni filtri' }, h('span', { class: 'attenuato piccolo' }, 'Mostra:'),
       ['', ...fonti].map(f => btn(f || 'Tutto', () => { S[chiave] = f; disegna(); }, 'piccolo' + (f === filtro ? ' primario' : '')))) : null,
     LISTE_LAVORO.map(n => { const x = perLista(n); return pannello(`${n} (${x.length})`, x.length ? h('ul', { class: 'elenco' }, x.map(rigaLavoro)) : h('p', { class: 'attenuato' }, testi[n])); }));

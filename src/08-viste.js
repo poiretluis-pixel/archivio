@@ -21,9 +21,9 @@ function vistaCasa() {
   for (const x of sc) { const g = -giorniDa(x.data); if (g <= 30) daFare.push({ tipo: g < 0 ? 'ritardo' : 'vuota', testo: x.titolo, nota: g < 0 ? `Scaduta il ${fmtData(x.data)}` : g === 0 ? 'Scade oggi' : `Entro il ${fmtData(x.data)}`, href: '#/scadenze' }); }
   const lav = lavoriAperti().filter(x => listaDi(x) === 'Oggi').sort(perPrioritaLavoro);
   for (const x of lav.slice(0, 6)) {
-    const mail = x.tipo === 'mail', g = mail ? 0 : -giorniDa(x.data);
+    const mail = x.tipo === 'mail', g = mail || !x.data ? 0 : -giorniDaSe(x.data);
     daFare.push({ tipo: x.priorita === 'alta' || g < 0 ? 'ritardo' : 'vuota', testo: (mail ? 'Mail: ' : '') + x.titolo,
-      nota: [mail ? x.casella : (x.casella || x.ambito), mail ? (x.mittente ? 'da ' + x.mittente : '') : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`].filter(Boolean).join(', '), href: mail ? '#/mail' : '#/task' });
+      nota: [mail ? x.casella : (x.casella || x.ambito), mail ? (x.mittente ? 'da ' + x.mittente : '') : !x.data ? '' : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`].filter(Boolean).join(', '), href: mail ? '#/mail' : '#/task' });
   }
   if (lav.length > 6) daFare.push({ tipo: 'vuota', testo: `Altre ${lav.length - 6} cose per oggi`, nota: 'Tutte nelle pagine Task e Gestione mail.', href: '#/task' });
   const daElab = allegati().filter(a => a.stato === 'da elaborare').length;
@@ -266,14 +266,14 @@ function cruscottoOrganizzazione() {
   const ultimaRev = rev[rev.length - 1];
   const perAmbito = raggruppa(attivi, o => o.ambito || 'Senza ambito');
   return [
-    h('div', { class: 'dati' }, dato('Obiettivi attivi', attivi.length, `${ob.filter(o => o.stato === 'raggiunto').length} raggiunti`), dato('Cose da fare aperte', aperte.length, `${aperte.filter(x => x.stato !== 'fatta' && giorniDa(x.data) > 0).length} in ritardo`, aperte.some(x => giorniDa(x.data) > 0) ? 'allerta' : ''),
+    h('div', { class: 'dati' }, dato('Obiettivi attivi', attivi.length, `${ob.filter(o => o.stato === 'raggiunto').length} raggiunti`), dato('Cose da fare aperte', aperte.length, `${aperte.filter(x => x.stato !== 'fatta' && giorniDaSe(x.data) > 0).length} in ritardo`, aperte.some(x => giorniDaSe(x.data) > 0) ? 'allerta' : ''),
       dato('Ultima revisione', ultimaRev ? fmtData(ultimaRev.data) : 'mai', ultimaRev && ultimaRev.voto ? `voto ${ultimaRev.voto} su 5` : '')),
     attivi.length ? pannello('Obiettivi', [...perAmbito].map(([amb, l]) => [h('h3', {}, amb), h('ul', { class: 'elenco' }, l.map(o => h('li', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('organizzazione', 'obiettivo', o) },
       h('div', { class: 'tra' }, h('strong', {}, o.titolo), h('span', { class: 'attenuato num' }, `${fmtNum(o.avanzamento || 0, 0)}%` + (o.scadenza ? `, entro il ${fmtData(o.scadenza)}` : ''))),
       h('span', { class: 'rip-pista' }, h('span', { class: 'rip-barra ok', style: `width:${Math.max(2, Math.min(100, o.avanzamento || 0))}%` })),
       o.misura ? h('div', { class: 'elenco-nota' }, o.misura) : null)))])) : null,
-    pannello('Cose da fare', aperte.length ? h('ul', { class: 'elenco' }, aperte.slice(0, 15).map(x => { const g = -giorniDa(x.data); return h('li', {}, h('div', { class: 'tra' }, h('span', {}, h('strong', {}, x.titolo), h('span', { class: 'attenuato' }, [x.ambito, x.priorita ? 'priorità ' + x.priorita : ''].filter(Boolean).map(s => ' ' + s).join(','))),
-      stato(g < 0 ? 'ritardo' : 'vuota', g < 0 ? `In ritardo dal ${fmtData(x.data)}` : g === 0 ? 'Oggi' : fmtData(x.data))),
+    pannello('Cose da fare', aperte.length ? h('ul', { class: 'elenco' }, aperte.slice(0, 15).map(x => { const g = -giorniDaSe(x.data); return h('li', {}, h('div', { class: 'tra' }, h('span', {}, h('strong', {}, x.titolo), h('span', { class: 'attenuato' }, [x.ambito, x.priorita ? 'priorità ' + x.priorita : ''].filter(Boolean).map(s => ' ' + s).join(','))),
+      x.data ? stato(g < 0 ? 'ritardo' : 'vuota', g < 0 ? `In ritardo dal ${fmtData(x.data)}` : g === 0 ? 'Oggi' : fmtData(x.data)) : null),
       h('div', { class: 'azioni' }, btn('Fatta', () => metti({ ...x, stato: 'fatta', fatta_il: oggi() }), 'piccolo'), btn('Modifica', () => apriModulo('organizzazione', 'attivita', x), 'piccolo'))); })) : h('p', { class: 'attenuato' }, 'Niente in sospeso.'),
       h('div', { class: 'azioni' }, btn('Aggiungi', () => apriModulo('organizzazione', 'attivita', null, { stato: 'da fare', priorita: 'media' }), 'piccolo'), h('a', { class: 'btn piccolo', href: '#/task' }, 'Apri Task'))),
     pannello('Revisione della settimana', ultimaRev ? [h('p', { class: 'attenuato piccolo' }, `Settimana del ${fmtData(ultimaRev.data)}`), ultimaRev.focus ? h('div', { class: 'testo-lungo' }, h('strong', {}, 'Focus: '), ultimaRev.focus) : null] : h('p', { class: 'attenuato' }, 'Dieci minuti a settimana: cosa è andato, cosa no, le tre cose su cui concentrarti. È l\'abitudine che tiene vivo tutto il resto.'),

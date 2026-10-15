@@ -219,9 +219,10 @@ function menu(rotta) {
   const scadute = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta' && x.data <= oggi()).length;
   return h('nav', { class: 'menu', 'aria-label': 'Cartelle' },
     v('#/', 'Quadro generale', 'casa'),
+    h('div', { class: 'menu-gruppo' }, 'Lavoro'),
     v('#/task', 'Task', 'task', quantiOggi('attivita')),
     v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
-    h('div', { class: 'menu-gruppo' }, 'Cartelle'),
+    h('div', { class: 'menu-gruppo' }, 'Personale'),
     aree().map(a => v('#/a/' + a.id, a.nome, 'a/' + a.id)),
     h('div', { class: 'menu-gruppo' }, 'Archivio'),
     v('#/rapporti', 'Rapporti', 'rapporti'), v('#/scadenze', 'Scadenze', 'scadenze', scadute), v('#/documenti', 'Documenti', 'documenti', allegati().filter(a => a.stato === 'da elaborare').length), v('#/impostazioni', 'Impostazioni', 'impostazioni'));

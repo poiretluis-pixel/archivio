@@ -30,6 +30,7 @@ const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.g
 const MS_G = 86400000;
 const tempo = iso => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
 const giorniDa = iso => Math.floor((tempo(oggi()) - tempo(iso.slice(0, 10))) / MS_G);
+const giorniDaSe = iso => (iso ? giorniDa(iso) : NaN); /* per le date facoltative: senza data nessun ritardo */
 
 const _fd = new Intl.DateTimeFormat('it-IT', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 const _fm = new Intl.DateTimeFormat('it-IT', { month: 'short', year: '2-digit', timeZone: 'UTC' });
