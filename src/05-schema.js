@@ -14,6 +14,8 @@ const AMBITI = ['Lavoro', 'Famiglia', 'Personale', 'Salute', 'Finanze'];
 /* Liste di lavoro, come in Google Task: Oggi, Coda, Archivio. Valgono per i task e per le mail da gestire. Il vecchio valore Domani vale come Coda. */
 const LISTE_LAVORO = ['Oggi', 'Coda', 'Archivio'];
 const PRIORITA = ['alta', 'media', 'bassa'];
+/* Task ricorrenti: quando si segna fatto, la scadenza passa alla prossima e il task torna in Coda. */
+const RIPETI_TASK = ['ogni giorno', 'nei giorni lavorativi', 'ogni settimana', 'ogni 2 settimane', 'ogni mese', 'ogni 3 mesi', 'ogni 6 mesi', 'ogni anno'];
 const CASELLE = ['Personale', '3MEDical Pioltello', '3MEDical Porta Romana'];
 const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personale'];
 
@@ -41,6 +43,7 @@ const AREE_BASE = [
       c('misura', 'Come si misura (es. 10 kg in meno, 20.000 € di riserva)', 'lungo'), c('avanzamento', 'Avanzamento in %', 'numero'), c('stato', 'Stato', 'scelta', { opzioni: ['attivo', 'raggiunto', 'in pausa', 'abbandonato'] }), c('nota', 'Nota', 'lungo')] },
     attivita: { nome: 'Cosa da fare', plur: 'Cose da fare', titolo: v => v.titolo, colonne: ['data', 'titolo', 'ambito', 'lista', 'priorita', 'stato'], campi: [
       c('titolo', 'Cosa', 'testo', { obbl: true }), c('ambito', 'Ambito', 'scelta', { opzioni: AMBITI }), c('data', 'Entro il (facoltativo)', 'data'),
+      c('ripeti', 'Si ripete (serve la scadenza)', 'scelta', { opzioni: RIPETI_TASK }),
       c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }), c('casella', 'Riguarda', 'scelta', { opzioni: RIGUARDA }),
       c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da fare', 'in corso', 'fatta'] }), c('nota', 'Nota', 'lungo')] },
     mail: { nome: 'Mail da gestire', plur: 'Mail da gestire', titolo: v => v.titolo, colonne: ['data', 'titolo', 'mittente', 'casella', 'lista', 'stato'], campi: [

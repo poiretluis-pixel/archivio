@@ -61,7 +61,7 @@ Date `AAAA-MM-GG`, numeri come numeri JSON. Nell'esportazione i documenti posson
 | `patrimonio` | `bene` | `titolo`, `categoria`, `valore`, `data`, `costo`, `acquisto`, `nota` |
 | `patrimonio` | `debito` | `titolo`, `categoria`, `valore` (residuo), `data`, `rata`, `scadenza`, `nota` |
 | `organizzazione` | `obiettivo` | `titolo`, `ambito` (Lavoro, Famiglia, Personale, Salute, Finanze), `data`, `scadenza`, `misura`, `avanzamento` (%), `stato`, `nota` |
-| `organizzazione` | `attivita` | `titolo`, `ambito`, `data` (scadenza, facoltativa), `lista` (Oggi, Coda, Archivio), `lista_dal`, `casella`, `priorita`, `stato` (da fare, in corso, fatta), `nota` |
+| `organizzazione` | `attivita` | `titolo`, `ambito`, `data` (scadenza, facoltativa), `ripeti` (ogni giorno, nei giorni lavorativi, ogni settimana, ogni 2 settimane, ogni mese, ogni 3 mesi, ogni 6 mesi, ogni anno), `fatta_ultima`, `lista` (Oggi, Coda, Archivio), `lista_dal`, `casella`, `priorita`, `stato` (da fare, in corso, fatta), `nota` |
 | `organizzazione` | `mail` | `titolo` (oggetto), `mittente`, `casella` (Personale, 3MEDical Pioltello, 3MEDical Porta Romana), `data` (ricevuta il), `azione`, `lista`, `lista_dal`, `priorita`, `stato` (da gestire, in attesa di altri, gestita), `link` (solo indirizzi mail.google.com), `nota` |
 | `organizzazione` | `revisione` | `data` (lunedì), `voto`, `bene`, `male`, `focus`, `famiglia` |
 | `salute` | `misura` | `data`, `parametro`, `categoria`, `valore` oppure `testo`, `unita`, `rif_min`, `rif_max`, `rif_testo`, `fuori`, `laboratorio`, `doc`, `nota` |
@@ -85,7 +85,7 @@ Date `AAAA-MM-GG`, numeri come numeri JSON. Nell'esportazione i documenti posson
 
 ### Task e Gestione mail
 
-Le pagine **Task** (cose da fare) e **Gestione mail** hanno le stesse tre liste, come Google Task: Oggi, Coda, Archivio, ordinate per priorità e poi per data. `lista_dal` è il giorno in cui la voce è stata messa nella lista. Un task in Coda o in Archivio passa da solo in Oggi quando arriva la scadenza, salvo che sia stato spostato dopo; le mail restano dove sono. Il vecchio valore `Domani` vale come `Coda`. La scadenza si mette dal calendario sulla riga del task. Il pulsante "Aggiungi al calendario" mette `calendario: true` ("Togli dal calendario" lo mette a `false`); gli eventi nel calendario Google dedicato li crea, sposta e toglie Claude all'aggiornamento (`evento_id`, `evento_data`, `evento_titolo`). La pagina non chiama Google e mostra lo stato. Le mail le carica Claude da Gmail.
+Le pagine **Task** (cose da fare) e **Gestione mail** hanno le stesse tre liste, come Google Task: Oggi, Coda, Archivio, ordinate per priorità e poi per data. `lista_dal` è il giorno in cui la voce è stata messa nella lista. Un task in Coda o in Archivio passa da solo in Oggi quando arriva la scadenza, salvo che sia stato spostato dopo; le mail restano dove sono. Il vecchio valore `Domani` vale come `Coda`. Un task con `ripeti` segnato come fatto non si chiude: la scadenza passa alla prossima ripetizione dopo oggi, torna in Coda e `fatta_ultima` registra il giorno. La scadenza si mette dal calendario sulla riga del task. Il pulsante "Aggiungi al calendario" mette `calendario: true` ("Togli dal calendario" lo mette a `false`); gli eventi nel calendario Google dedicato li crea, sposta e toglie Claude all'aggiornamento (`evento_id`, `evento_data`, `evento_titolo`). La pagina non chiama Google e mostra lo stato. Le mail le carica Claude da Gmail.
 
 ### Indici
 

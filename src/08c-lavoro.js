@@ -36,8 +36,26 @@ const COLORI_ETICHETTA = { '3MEDical Pioltello': 'blu', '3MEDical Porta Romana':
 const etichettaColore = nome => (nome ? h('span', { class: 'etichetta e-' + (COLORI_ETICHETTA[nome] || 'grigio') }, nome) : null);
 const linkGmail = x => (typeof x.link === 'string' && /^https:\/\/mail\.google\.com\//.test(x.link) ? x.link : '');
 
+/* Prossima scadenza di un task ricorrente: sempre dopo oggi, anche se è stato fatto in ritardo. */
+const piuGiorni = (iso, n) => { const d = new Date(tempo(iso) + n * MS_G); return isoData(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()); };
+function passoRipeti(iso, ripeti) {
+  if (ripeti === 'ogni giorno') return piuGiorni(iso, 1);
+  if (ripeti === 'nei giorni lavorativi') { let d = piuGiorni(iso, 1); while ([0, 6].includes(new Date(tempo(d)).getUTCDay())) d = piuGiorni(d, 1); return d; }
+  if (ripeti === 'ogni settimana') return piuGiorni(iso, 7);
+  if (ripeti === 'ogni 2 settimane') return piuGiorni(iso, 14);
+  const mesi = { 'ogni mese': 'mensile', 'ogni 3 mesi': 'trimestrale', 'ogni 6 mesi': 'semestrale', 'ogni anno': 'annuale' }[ripeti];
+  return mesi ? prossimaData(iso, mesi) : null;
+}
+function prossimaRipetizione(x) {
+  if (!RIPETI_TASK.includes(x.ripeti)) return null;
+  let d = passoRipeti(x.data || oggi(), x.ripeti);
+  for (let i = 0; d && d <= oggi() && i < 5000; i++) d = passoRipeti(d, x.ripeti);
+  return d;
+}
 function spostaLavoro(x, lista) { metti({ ...x, lista, lista_dal: oggi() }); avviso(`Spostata in ${lista}.`); }
 function chiudiLavoro(x) {
+  const pros = x.tipo === 'attivita' ? prossimaRipetizione(x) : null;
+  if (pros) { metti({ ...x, data: pros, lista: 'Coda', lista_dal: oggi(), fatta_ultima: oggi() }); avviso(`Fatta. Torna il ${fmtData(pros)}.`); return; }
   metti(x.tipo === 'mail' ? { ...x, stato: 'gestita', gestita_il: oggi() } : { ...x, stato: 'fatta', fatta_il: oggi() });
   avviso(x.tipo === 'mail' ? 'Mail segnata come gestita.' : 'Fatta.');
 }
@@ -52,7 +70,7 @@ function rigaLavoro(x) {
     h('div', { class: 'tra' },
       h('span', { class: 'titolo-lavoro' }, etichettaColore(dove), h('strong', {}, x.titolo)),
       x.priorita === 'alta' ? stato('ritardo', 'Priorità alta') : null),
-    h('div', { class: 'elenco-nota' }, [mail && x.mittente ? 'da ' + x.mittente : '', quando, mail && x.stato === 'in attesa di altri' ? 'in attesa di altri' : ''].filter(Boolean).join(', ')),
+    h('div', { class: 'elenco-nota' }, [mail && x.mittente ? 'da ' + x.mittente : '', quando, !mail && RIPETI_TASK.includes(x.ripeti) ? '↻ si ripete ' + x.ripeti : '', mail && x.stato === 'in attesa di altri' ? 'in attesa di altri' : ''].filter(Boolean).join(', ')),
     x.azione || x.nota ? h('div', { class: 'elenco-nota testo-lungo' }, x.azione || x.nota) : null,
     h('div', { class: 'azioni' },
       btn(mail ? 'Gestita' : 'Fatta', () => chiudiLavoro(x), 'piccolo primario'),
