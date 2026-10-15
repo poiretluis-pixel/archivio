@@ -219,7 +219,8 @@ function menu(rotta) {
   const scadute = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta' && x.data <= oggi()).length;
   return h('nav', { class: 'menu', 'aria-label': 'Cartelle' },
     v('#/', 'Quadro generale', 'casa'),
-    v('#/da-fare', 'Da fare', 'da-fare', quantiOggi()),
+    v('#/task', 'Task', 'task', quantiOggi('attivita')),
+    v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
     h('div', { class: 'menu-gruppo' }, 'Cartelle'),
     aree().map(a => v('#/a/' + a.id, a.nome, 'a/' + a.id)),
     h('div', { class: 'menu-gruppo' }, 'Archivio'),
@@ -250,7 +251,8 @@ function vistaPer(r) {
     if (r[2]) return vistaTipo(r[1], r[2]);
     return vistaArea(a);
   }
-  if (r[0] === 'da-fare') return vistaLavoro();
+  if (r[0] === 'task' || r[0] === 'da-fare') return vistaLavoro('attivita');
+  if (r[0] === 'mail') return vistaLavoro('mail');
   if (r[0] === 'scadenze') return vistaScadenze();
   if (r[0] === 'rapporti') return vistaRapporti(r[1]);
   if (r[0] === 'documenti') return vistaDocumenti();

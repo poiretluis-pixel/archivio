@@ -83,9 +83,9 @@ Date `AAAA-MM-GG`, numeri come numeri JSON. Nell'esportazione i documenti posson
 | `sistema` | `scadenza` | `titolo`, `data`, `zona`, `ripeti`, `stato`, `nota` |
 | cartella personalizzata | `voce` | `titolo`, `data`, `categoria`, `valore`, `unita`, `nota` |
 
-### Da fare
+### Task e Gestione mail
 
-La pagina **Da fare** riunisce cose da fare e mail da gestire in tre liste, come Google Task: Oggi, Domani, Archivio, ordinate per priorità e poi per data. `lista_dal` è il giorno in cui la voce è stata messa nella lista: una voce in Domani passa da sola in Oggi il giorno dopo. Senza `lista` decide la data. Le mail le carica Claude da Gmail.
+Le pagine **Task** (cose da fare) e **Gestione mail** hanno le stesse tre liste, come Google Task: Oggi, Domani, Archivio, ordinate per priorità e poi per data. `lista_dal` è il giorno in cui la voce è stata messa nella lista: una voce in Domani passa da sola in Oggi il giorno dopo. Senza `lista` decide la data. Le mail le carica Claude da Gmail.
 
 ### Indici
 
