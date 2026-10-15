@@ -222,6 +222,7 @@ function menu(rotta) {
     h('div', { class: 'menu-gruppo' }, 'Lavoro'),
     v('#/task', 'Task', 'task', quantiOggi('attivita')),
     v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
+    v('#/siti', 'Siti e gestionali', 'siti'),
     h('div', { class: 'menu-gruppo' }, 'Personale'),
     aree().map(a => v('#/a/' + a.id, a.nome, 'a/' + a.id)),
     h('div', { class: 'menu-gruppo' }, 'Archivio'),
@@ -254,6 +255,7 @@ function vistaPer(r) {
   }
   if (r[0] === 'task' || r[0] === 'da-fare') return vistaLavoro('attivita', r[1]);
   if (r[0] === 'mail') return vistaLavoro('mail', r[1]);
+  if (r[0] === 'siti') return vistaSiti();
   if (r[0] === 'scadenze') return vistaScadenze();
   if (r[0] === 'rapporti') return vistaRapporti(r[1]);
   if (r[0] === 'documenti') return vistaDocumenti();

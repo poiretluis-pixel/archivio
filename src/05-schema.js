@@ -17,6 +17,7 @@ const PRIORITA = ['alta', 'media', 'bassa'];
 /* Task ricorrenti: quando si segna fatto, la scadenza passa alla prossima e il task torna in Coda. */
 const RIPETI_TASK = ['ogni giorno', 'nei giorni lavorativi', 'ogni settimana', 'ogni 2 settimane', 'ogni mese', 'ogni 3 mesi', 'ogni 6 mesi', 'ogni anno'];
 const CASELLE = ['Personale', '3MEDical Pioltello', '3MEDical Porta Romana'];
+const CAT_SITI = ['Gestionali', 'Banche e pagamenti', 'Personale e paghe', 'Google e comunicazione', 'Sito e social', 'Altro'];
 const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personale'];
 
 const AREE_BASE = [
@@ -51,6 +52,9 @@ const AREE_BASE = [
       c('data', 'Ricevuta il', 'data', { obbl: true }), c('azione', 'Cosa fare', 'lungo'), c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }),
       c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da gestire', 'in attesa di altri', 'gestita'] }),
       c('link', 'Collegamento a Gmail'), c('nota', 'Nota', 'lungo')] },
+    sito: { nome: 'Sito o gestionale', plur: 'Siti e gestionali', titolo: v => v.titolo, colonne: ['titolo', 'categoria', 'casella', 'link'], campi: [
+      c('titolo', 'Nome', 'testo', { obbl: true }), c('link', 'Indirizzo (https://…)', 'testo', { obbl: true }), c('categoria', 'Tipo', 'scelta', { opzioni: CAT_SITI }),
+      c('casella', 'Riguarda', 'scelta', { opzioni: RIGUARDA }), c('nota', 'Nota (mai password)', 'lungo')] },
     revisione: { nome: 'Revisione della settimana', plur: 'Revisioni settimanali', titolo: v => 'Settimana del ' + fmtData(v.data), colonne: ['data', 'voto', 'focus'], campi: [
       c('data', 'Lunedì della settimana', 'data', { obbl: true }), c('voto', 'Come è andata, da 1 a 5', 'numero'), c('bene', 'Cosa è andato bene', 'lungo'), c('male', 'Cosa non è andato', 'lungo'),
       c('focus', 'Le tre cose della prossima settimana', 'lungo'), c('famiglia', 'Tempo per la famiglia: cosa ho fatto', 'lungo')] },

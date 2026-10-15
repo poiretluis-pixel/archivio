@@ -63,6 +63,7 @@ Date `AAAA-MM-GG`, numeri come numeri JSON. Nell'esportazione i documenti posson
 | `organizzazione` | `obiettivo` | `titolo`, `ambito` (Lavoro, Famiglia, Personale, Salute, Finanze), `data`, `scadenza`, `misura`, `avanzamento` (%), `stato`, `nota` |
 | `organizzazione` | `attivita` | `titolo`, `ambito`, `data` (scadenza, facoltativa), `ripeti` (ogni giorno, nei giorni lavorativi, ogni settimana, ogni 2 settimane, ogni mese, ogni 3 mesi, ogni 6 mesi, ogni anno), `fatta_ultima`, `lista` (Oggi, Coda, Archivio), `lista_dal`, `casella`, `priorita`, `stato` (da fare, in corso, fatta), `nota` |
 | `organizzazione` | `mail` | `titolo` (oggetto), `mittente`, `casella` (Personale, 3MEDical Pioltello, 3MEDical Porta Romana), `data` (ricevuta il), `azione`, `lista`, `lista_dal`, `priorita`, `stato` (da gestire, in attesa di altri, gestita), `link` (solo indirizzi mail.google.com), `nota` |
+| `organizzazione` | `sito` | `titolo`, `link` (solo https), `categoria` (Gestionali, Banche e pagamenti, Personale e paghe, Google e comunicazione, Sito e social, Altro), `casella` (riguarda), `nota` (mai password). Pagina **Siti e gestionali** sotto Lavoro |
 | `organizzazione` | `revisione` | `data` (lunedì), `voto`, `bene`, `male`, `focus`, `famiglia` |
 | `salute` | `misura` | `data`, `parametro`, `categoria`, `valore` oppure `testo`, `unita`, `rif_min`, `rif_max`, `rif_testo`, `fuori`, `laboratorio`, `doc`, `nota` |
 | `salute` | `visita` | `data`, `specialista`, `struttura`, `motivo`, `conclusioni`, `indicazioni`, `doc` |

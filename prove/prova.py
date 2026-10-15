@@ -67,6 +67,9 @@ def voci_nuove(T, oggi):
     add(area="organizzazione", tipo="attivita", data=oggi.isoformat(), titolo="Chiamare il fornitore", ambito="Lavoro", lista="Domani", lista_dal=ieri, priorita="media", stato="da fare")
     v.append({"id": "n-senza-data", "persona": "mario", "creato": T, "agg": T, "area": "organizzazione", "tipo": "attivita", "titolo": "Task senza scadenza", "casella": "Psiche e Soma", "lista": "Archivio", "lista_dal": ieri, "priorita": "media", "stato": "da fare"})
     add(area="organizzazione", tipo="attivita", data=oggi.isoformat(), titolo="Report settimanale", casella="3MEDical Pioltello", ripeti="ogni settimana", lista="Coda", lista_dal=oggi.isoformat(), priorita="media", stato="da fare")
+    add(area="organizzazione", tipo="sito", titolo="Gestionale di prova", link="https://gestionale.example.com/accesso", categoria="Gestionali", casella="3MEDical Pioltello")
+    add(area="organizzazione", tipo="sito", titolo="Banca di prova", link="https://banca.example.com", categoria="Banche e pagamenti", casella="Personale", nota="Accesso con l'app")
+    add(area="organizzazione", tipo="sito", titolo="Sito sbagliato", link="javascript:alert(1)", categoria="Altro")
     add(area="organizzazione", tipo="attivita", titolo="Idea da riprendere", ambito="Lavoro", lista="Archivio", lista_dal=ieri, priorita="bassa", stato="da fare")
     add(area="organizzazione", tipo="mail", data=ieri, titolo="Documenti per il trimestre", mittente="Studio prova", casella="3MEDical Pioltello", lista="Oggi", lista_dal=ieri, priorita="alta", stato="da gestire", azione="Mandare gli estratti conto.", link="https://mail.google.com/mail/#all/prova1")
     add(area="organizzazione", tipo="mail", data=ieri, titolo="Locandina da pubblicare", mittente="Segreteria prova", casella="Personale", lista="Coda", lista_dal=ieri, priorita="media", stato="da gestire", link="javascript:alert(1)")
@@ -314,6 +317,13 @@ async def main():
         await A.click("button.filtro:has-text('Tutto')")
         await A.click("li:has-text('Documenti per il trimestre') >> button:has-text('Gestita')")
         controlla(await A.locator("li:has-text('Documenti per il trimestre')").count() == 0 and await A.evaluate("S.A.voci.find(v => v.titolo === 'Documenti per il trimestre').stato") == "gestita", "mail segnata come gestita")
+        await A.goto(URL + "#/siti")
+        await A.wait_for_timeout(300)
+        await scatta(A, "09-siti")
+        controlla(await A.locator(".menu-gruppo:has-text('Lavoro') + a[href='#/task'] + a[href='#/mail'] + a[href='#/siti']").count() == 1 and await A.locator("h1:has-text('Siti e gestionali')").count() == 1, "pagina Siti e gestionali sotto Lavoro")
+        g = A.locator("section:has(h2:has-text('Gestionali')) a.sito-link")
+        controlla(await g.get_attribute("href") == "https://gestionale.example.com/accesso" and await g.get_attribute("target") == "_blank" and "noopener" in (await g.get_attribute("rel")), "collegamento che si apre in una scheda nuova")
+        controlla(await A.locator("li.sito:has-text('Banca di prova') .etichetta.e-rosso").count() == 1 and await A.locator("a[href^='javascript']").count() == 0 and await A.locator("li.sito:has-text('Sito sbagliato') :text('Indirizzo non valido')").count() == 1, "etichette e solo indirizzi https")
         await A.goto(URL + "#/da-fare")
         await A.wait_for_timeout(200)
         controlla(await A.locator("h1:has-text('Task')").count() == 1, "il vecchio indirizzo Da fare apre Task")
@@ -372,7 +382,7 @@ async def main():
         stato_ = "({n: S.A.voci.filter(v=>!v.canc).length, tokyo: S.A.voci.some(v=>v.titolo==='Tokyo'), press: S.A.voci.some(v=>v.metrica==='Pressione sistolica'), o1: !!voce('o-1')})"
         sa, sb = await A.evaluate(stato_), await B.evaluate(stato_)
         controlla(sa == sb and sa["tokyo"] and sa["press"] and not sa["o1"], f"modifiche contemporanee unite su entrambi i dispositivi {sa}")
-        for r, n in [("#/", "10-telefono-quadro"), ("#/a/salute", "11-telefono-salute"), ("#/a/finanze", "15-telefono-finanze"), ("#/a/organizzazione", "16-telefono-organizzazione"), ("#/task", "18-telefono-task"), ("#/mail", "19-telefono-mail"), ("#/a/sport", "17-telefono-sport"), ("#/rapporti", "12-telefono-rapporti"), ("#/documenti", "13-telefono-documenti"), ("#/impostazioni", "14-telefono-impostazioni")]:
+        for r, n in [("#/", "10-telefono-quadro"), ("#/a/salute", "11-telefono-salute"), ("#/a/finanze", "15-telefono-finanze"), ("#/a/organizzazione", "16-telefono-organizzazione"), ("#/task", "18-telefono-task"), ("#/mail", "19-telefono-mail"), ("#/siti", "21-telefono-siti"), ("#/a/sport", "17-telefono-sport"), ("#/rapporti", "12-telefono-rapporti"), ("#/documenti", "13-telefono-documenti"), ("#/impostazioni", "14-telefono-impostazioni")]:
             await B.goto(URL + r)
             await B.wait_for_timeout(300)
             await scatta(B, n)

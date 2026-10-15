@@ -245,6 +245,14 @@ li.lavoro .azioni{flex-wrap:wrap}
 .schede a.attiva{color:var(--marca);border-bottom-color:var(--marca);font-weight:600}
 .schede .conta{background:var(--linea2);color:var(--inchiostro2)}
 .schede a.attiva .conta{background:var(--marca);color:var(--marca-su)}
+/* Siti e gestionali */
+.siti{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem}
+.sito{border:1px solid var(--linea);border-radius:12px;background:var(--carta);display:flex;flex-direction:column;overflow:hidden}
+.sito-link{display:flex;flex-direction:column;gap:.15rem;padding:.8rem .9rem .5rem;color:var(--inchiostro);text-decoration:none;flex:1}
+a.sito-link:hover{background:var(--marca-tenue)}
+a.sito-link:hover strong{color:var(--marca)}
+.sito-piede{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;padding:.3rem .9rem .7rem}
+.sito-piede .btn{margin-left:auto}
 </style>
 </head>
 <body>
@@ -892,6 +900,7 @@ const PRIORITA = ['alta', 'media', 'bassa'];
 /* Task ricorrenti: quando si segna fatto, la scadenza passa alla prossima e il task torna in Coda. */
 const RIPETI_TASK = ['ogni giorno', 'nei giorni lavorativi', 'ogni settimana', 'ogni 2 settimane', 'ogni mese', 'ogni 3 mesi', 'ogni 6 mesi', 'ogni anno'];
 const CASELLE = ['Personale', '3MEDical Pioltello', '3MEDical Porta Romana'];
+const CAT_SITI = ['Gestionali', 'Banche e pagamenti', 'Personale e paghe', 'Google e comunicazione', 'Sito e social', 'Altro'];
 const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personale'];
 
 const AREE_BASE = [
@@ -926,6 +935,9 @@ const AREE_BASE = [
       c('data', 'Ricevuta il', 'data', { obbl: true }), c('azione', 'Cosa fare', 'lungo'), c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }),
       c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da gestire', 'in attesa di altri', 'gestita'] }),
       c('link', 'Collegamento a Gmail'), c('nota', 'Nota', 'lungo')] },
+    sito: { nome: 'Sito o gestionale', plur: 'Siti e gestionali', titolo: v => v.titolo, colonne: ['titolo', 'categoria', 'casella', 'link'], campi: [
+      c('titolo', 'Nome', 'testo', { obbl: true }), c('link', 'Indirizzo (https://…)', 'testo', { obbl: true }), c('categoria', 'Tipo', 'scelta', { opzioni: CAT_SITI }),
+      c('casella', 'Riguarda', 'scelta', { opzioni: RIGUARDA }), c('nota', 'Nota (mai password)', 'lungo')] },
     revisione: { nome: 'Revisione della settimana', plur: 'Revisioni settimanali', titolo: v => 'Settimana del ' + fmtData(v.data), colonne: ['data', 'voto', 'focus'], campi: [
       c('data', 'Lunedì della settimana', 'data', { obbl: true }), c('voto', 'Come è andata, da 1 a 5', 'numero'), c('bene', 'Cosa è andato bene', 'lungo'), c('male', 'Cosa non è andato', 'lungo'),
       c('focus', 'Le tre cose della prossima settimana', 'lungo'), c('famiglia', 'Tempo per la famiglia: cosa ho fatto', 'lungo')] },
@@ -1388,6 +1400,7 @@ function menu(rotta) {
     h('div', { class: 'menu-gruppo' }, 'Lavoro'),
     v('#/task', 'Task', 'task', quantiOggi('attivita')),
     v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
+    v('#/siti', 'Siti e gestionali', 'siti'),
     h('div', { class: 'menu-gruppo' }, 'Personale'),
     aree().map(a => v('#/a/' + a.id, a.nome, 'a/' + a.id)),
     h('div', { class: 'menu-gruppo' }, 'Archivio'),
@@ -1420,6 +1433,7 @@ function vistaPer(r) {
   }
   if (r[0] === 'task' || r[0] === 'da-fare') return vistaLavoro('attivita', r[1]);
   if (r[0] === 'mail') return vistaLavoro('mail', r[1]);
+  if (r[0] === 'siti') return vistaSiti();
   if (r[0] === 'scadenze') return vistaScadenze();
   if (r[0] === 'rapporti') return vistaRapporti(r[1]);
   if (r[0] === 'documenti') return vistaDocumenti();
@@ -2266,6 +2280,32 @@ function vistaLavoro(tipo, scheda) {
     h('nav', { class: 'schede', 'aria-label': 'Liste' }, Object.entries(SCHEDE_LAVORO).map(([k, n]) => h('a', { href: base + k, class: k === sc ? 'attiva' : '', 'aria-current': k === sc ? 'page' : null },
       n, h('span', { class: 'conta' }, k === 'tutti' ? l.length : perLista(n).length)))),
     (sc === 'tutti' ? LISTE_LAVORO : [SCHEDE_LAVORO[sc]]).map(n => { const x = perLista(n); return pannello(sc === 'tutti' ? `${n} (${x.length})` : '', x.length ? h('ul', { class: 'elenco' }, x.map(rigaLavoro)) : h('p', { class: 'attenuato' }, testi[n])); }));
+}
+
+/* ===== 8d. Siti e gestionali: i collegamenti di lavoro di tutti i giorni (voci organizzazione/sito). Solo indirizzi https, mai password. ===== */
+const linkSicuro = v => (typeof v.link === 'string' && /^https:\/\/[^\s]+$/.test(v.link.trim()) ? v.link.trim() : '');
+const dominio = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
+function vistaSiti() {
+  const filtro = S.filtro_siti || '';
+  const tutti = voci('organizzazione', 'sito');
+  const l = tutti.filter(v => !filtro || v.casella === filtro);
+  const fonti = [...new Set(tutti.map(v => v.casella).filter(Boolean))].sort();
+  const gruppi = [...CAT_SITI, ''].map(cat => [cat, l.filter(v => (CAT_SITI.includes(v.categoria) ? v.categoria : '') === cat).sort((a, b) => (a.titolo || '').localeCompare(b.titolo || ''))]).filter(([, x]) => x.length);
+  const nuovo = () => apriModulo('organizzazione', 'sito', null, { link: 'https://' });
+  const carta = v => { const u = linkSicuro(v);
+    return h('li', { class: 'sito' },
+      u ? h('a', { class: 'sito-link', href: u, target: '_blank', rel: 'noopener noreferrer' }, h('strong', {}, v.titolo), h('span', { class: 'attenuato piccolo' }, dominio(u) + ' ↗'))
+        : h('div', { class: 'sito-link' }, h('strong', {}, v.titolo), h('span', { class: 'fuori piccolo' }, 'Indirizzo non valido: deve iniziare con https://')),
+      h('div', { class: 'sito-piede' }, etichettaColore(v.casella), v.nota ? h('span', { class: 'attenuato piccolo testo-lungo' }, v.nota) : null, btn('Modifica', () => apriModulo('organizzazione', 'sito', v), 'piccolo')));
+  };
+  return h('div', {},
+    h('div', { class: 'testa' },
+      h('div', {}, h('h1', {}, 'Siti e gestionali'), h('p', { class: 'sotto largo-testo' }, 'I siti e i gestionali che usi ogni giorno, a un clic. Si aprono in una scheda nuova. Le password restano nel gestore di password del browser, mai qui.')),
+      h('div', { class: 'azioni' }, btn('Aggiungi un sito', nuovo, 'primario'))),
+    fonti.length > 1 ? h('div', { class: 'azioni filtri' }, h('span', { class: 'attenuato piccolo' }, 'Mostra:'),
+      ['', ...fonti].map(f => h('button', { type: 'button', class: 'filtro' + (f === filtro ? ' scelto' : ''), 'aria-pressed': f === filtro ? 'true' : 'false', onclick: () => { S.filtro_siti = f; disegna(); } }, f ? etichettaColore(f) : 'Tutto'))) : null,
+    gruppi.length ? gruppi.map(([cat, x]) => pannello(cat || 'Altri', h('ul', { class: 'siti' }, x.map(carta))))
+      : pannello('', vuoto('Nessun sito ancora. Aggiungi i siti e i gestionali che apri ogni giorno.', btn('Aggiungi un sito', nuovo, 'primario'))));
 }
 
 /* ===== 9. Impostazioni: persone, cartelle, repository dei dati, Garmin, sicurezza ===== */
