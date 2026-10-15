@@ -85,7 +85,7 @@ Date `AAAA-MM-GG`, numeri come numeri JSON. Nell'esportazione i documenti posson
 
 ### Task e Gestione mail
 
-Le pagine **Task** (cose da fare) e **Gestione mail** hanno le stesse tre liste, come Google Task: Oggi, Coda, Archivio, ordinate per priorità e poi per data. `lista_dal` è il giorno in cui la voce è stata messa nella lista. Un task in Coda o in Archivio passa da solo in Oggi quando arriva la scadenza, salvo che sia stato spostato dopo; le mail restano dove sono. Il vecchio valore `Domani` vale come `Coda`. La scadenza si mette dal calendario sulla riga del task; "Nel calendario" apre Google Calendar con l'evento compilato (è un collegamento, la pagina non chiama Google). Le mail le carica Claude da Gmail.
+Le pagine **Task** (cose da fare) e **Gestione mail** hanno le stesse tre liste, come Google Task: Oggi, Coda, Archivio, ordinate per priorità e poi per data. `lista_dal` è il giorno in cui la voce è stata messa nella lista. Un task in Coda o in Archivio passa da solo in Oggi quando arriva la scadenza, salvo che sia stato spostato dopo; le mail restano dove sono. Il vecchio valore `Domani` vale come `Coda`. La scadenza si mette dal calendario sulla riga del task. Gli eventi nel calendario Google dedicato li crea e li aggiorna Claude ogni mattina (`evento_id`, `evento_data`, `evento_titolo`); la pagina non chiama Google e mostra solo se il task è già nel calendario. Le mail le carica Claude da Gmail.
 
 ### Indici
 

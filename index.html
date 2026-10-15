@@ -2133,7 +2133,7 @@ function consigliPrincipali() {
 
 /* ===== 8c. Task e Gestione mail: liste Oggi, Coda e Archivio =====
    Le cose da fare sono le voci organizzazione/attivita, le mail sono organizzazione/mail (le carica Claude da Gmail).
-   Per i task la scadenza si mette con il calendario e si porta in Google Calendar. */
+   Per i task la scadenza si mette con il calendario della riga; il calendario Google TASK lo aggiorna Claude. */
 const listaSalvata = x => (x.lista === 'Domani' ? 'Coda' : x.lista);
 /* Un task in Coda o in Archivio passa da solo in Oggi quando arriva la scadenza, a meno che sia stato spostato dopo la scadenza. Le mail restano dove sono. */
 function listaDi(x) {
@@ -2152,13 +2152,8 @@ function perPrioritaLavoro(a, b) {
   return ordinePriorita(a) - ordinePriorita(b) || perData(a, b);
 }
 const quantiOggi = tipo => lavoriAperti().filter(x => x.tipo === tipo && listaDi(x) === 'Oggi').length;
-/* Evento di un giorno intero in Google Calendar, già compilato: lo salva Luis. È un collegamento che apre una scheda, la pagina non chiama Google. */
-function linkCalendario(x) {
-  if (!x.data || !/^\d{4}-\d{2}-\d{2}$/.test(x.data)) return '';
-  const d = new Date(tempo(x.data) + MS_G), fine = isoData(d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()).replace(/-/g, '');
-  const dett = [x.casella || x.ambito, x.nota].filter(Boolean).join('\n');
-  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(x.titolo || '') + '&dates=' + x.data.replace(/-/g, '') + '/' + fine + (dett ? '&details=' + encodeURIComponent(dett) : '');
-}
+/* Calendario Google TASK: gli eventi li crea e li aggiorna Claude ogni mattina (evento_id, evento_data). */
+const statoCalendario = x => (!x.data ? '' : x.evento_id && x.evento_data === x.data ? 'nel calendario TASK' : 'nel calendario domattina');
 const linkGmail = x => (typeof x.link === 'string' && /^https:\/\/mail\.google\.com\//.test(x.link) ? x.link : '');
 
 function spostaLavoro(x, lista) { metti({ ...x, lista, lista_dal: oggi() }); avviso(`Spostata in ${lista}.`); }
@@ -2185,7 +2180,7 @@ function rigaLavoro(x) {
       link ? h('a', { class: 'btn piccolo', href: link, target: '_blank', rel: 'noopener noreferrer' }, 'Apri in Gmail') : null,
       mail ? null : h('label', { class: 'scadenza-rapida' }, h('span', { class: 'attenuato piccolo' }, 'Scadenza'),
         h('input', { type: 'date', value: x.data || '', 'aria-label': 'Scadenza di ' + x.titolo, onchange: e => { const d = e.target.value; const { data, ...resto } = x; metti(d ? { ...resto, data: d } : resto); avviso(d ? `Scadenza il ${fmtData(d)}.` : 'Scadenza tolta.'); } })),
-      !mail && linkCalendario(x) ? h('a', { class: 'btn piccolo', href: linkCalendario(x), target: '_blank', rel: 'noopener noreferrer' }, 'Nel calendario') : null,
+      !mail && statoCalendario(x) ? h('span', { class: 'attenuato piccolo' }, statoCalendario(x)) : null,
       btn('Modifica', () => apriModulo('organizzazione', x.tipo, x), 'piccolo')));
 }
 
@@ -2204,7 +2199,7 @@ function vistaLavoro(tipo) {
     h('div', { class: 'testa' },
       h('div', {}, h('h1', {}, mail ? 'Gestione mail' : 'Task'), h('p', { class: 'sotto largo-testo' }, mail
         ? 'Le mail delle tre caselle che chiedono una risposta o un\'azione. Le porta qui Claude da Gmail ogni mattina.'
-        : 'Le tue cose da fare, come in Google Task. Metti la scadenza con il calendario: quando arriva, il task passa da solo in Oggi. Con "Nel calendario" lo porti in Google Calendar.')),
+        : 'Le tue cose da fare, come in Google Task. Metti la scadenza con il calendario: quando arriva, il task passa da solo in Oggi. I task con scadenza compaiono nel calendario Google TASK, aggiornato ogni mattina.')),
       h('div', { class: 'azioni' }, btn(mail ? 'Aggiungi una mail' : 'Aggiungi un task', nuova, 'primario'))),
     h('div', { class: 'dati' }, dato('Per oggi', perLista('Oggi').length, alte ? `${alte} con priorità alta` : ''), dato('In coda', perLista('Coda').length),
       mail ? dato('In attesa di altri', tutte.filter(x => x.stato === 'in attesa di altri').length) : dato('In ritardo', tutte.filter(x => giorniDaSe(x.data) > 0).length, '', tutte.some(x => giorniDaSe(x.data) > 0) ? 'allerta' : '')),
