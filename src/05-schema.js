@@ -11,8 +11,8 @@ const CAT_ENTRATE = ['Compensi e stipendio', 'Utili e dividendi', 'Contributi fa
 const GIROCONTO = 'Giroconto';
 const CAT_NEUTRE = new Set([GIROCONTO, 'Investimenti e partecipazioni', 'Prestiti ricevuti']);
 const AMBITI = ['Lavoro', 'Famiglia', 'Personale', 'Salute', 'Finanze'];
-/* Liste di lavoro, come in Google Task: Oggi, Domani, Archivio. Valgono per le cose da fare e per le mail da gestire. */
-const LISTE_LAVORO = ['Oggi', 'Domani', 'Archivio'];
+/* Liste di lavoro, come in Google Task: Oggi, Coda, Archivio. Valgono per i task e per le mail da gestire. Il vecchio valore Domani vale come Coda. */
+const LISTE_LAVORO = ['Oggi', 'Coda', 'Archivio'];
 const PRIORITA = ['alta', 'media', 'bassa'];
 const CASELLE = ['Personale', '3MEDical Pioltello', '3MEDical Porta Romana'];
 const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personale'];

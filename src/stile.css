@@ -210,3 +210,5 @@ i.g-barra1{background:var(--serie)} i.g-barra2{background:var(--serie2)}
 .e-cosa{background:var(--marca-tenue);color:var(--marca)}
 .filtri{flex-wrap:wrap;align-items:center;margin:0 0 1rem}
 li.lavoro .azioni{flex-wrap:wrap}
+.scadenza-rapida{display:inline-flex;align-items:center;gap:.35rem}
+.scadenza-rapida input{font:inherit;font-size:.85rem;padding:.15rem .35rem;border:1px solid var(--linea);border-radius:6px;background:var(--carta);color:var(--inchiostro)}

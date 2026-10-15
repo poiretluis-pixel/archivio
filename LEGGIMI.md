@@ -61,7 +61,7 @@ Date `AAAA-MM-GG`, numeri come numeri JSON. Nell'esportazione i documenti posson
 | `patrimonio` | `bene` | `titolo`, `categoria`, `valore`, `data`, `costo`, `acquisto`, `nota` |
 | `patrimonio` | `debito` | `titolo`, `categoria`, `valore` (residuo), `data`, `rata`, `scadenza`, `nota` |
 | `organizzazione` | `obiettivo` | `titolo`, `ambito` (Lavoro, Famiglia, Personale, Salute, Finanze), `data`, `scadenza`, `misura`, `avanzamento` (%), `stato`, `nota` |
-| `organizzazione` | `attivita` | `titolo`, `ambito`, `data` (entro il), `lista` (Oggi, Domani, Archivio), `lista_dal`, `casella`, `priorita`, `stato` (da fare, in corso, fatta), `nota` |
+| `organizzazione` | `attivita` | `titolo`, `ambito`, `data` (scadenza, facoltativa), `lista` (Oggi, Coda, Archivio), `lista_dal`, `casella`, `priorita`, `stato` (da fare, in corso, fatta), `nota` |
 | `organizzazione` | `mail` | `titolo` (oggetto), `mittente`, `casella` (Personale, 3MEDical Pioltello, 3MEDical Porta Romana), `data` (ricevuta il), `azione`, `lista`, `lista_dal`, `priorita`, `stato` (da gestire, in attesa di altri, gestita), `link` (solo indirizzi mail.google.com), `nota` |
 | `organizzazione` | `revisione` | `data` (lunedì), `voto`, `bene`, `male`, `focus`, `famiglia` |
 | `salute` | `misura` | `data`, `parametro`, `categoria`, `valore` oppure `testo`, `unita`, `rif_min`, `rif_max`, `rif_testo`, `fuori`, `laboratorio`, `doc`, `nota` |
@@ -85,7 +85,7 @@ Date `AAAA-MM-GG`, numeri come numeri JSON. Nell'esportazione i documenti posson
 
 ### Task e Gestione mail
 
-Le pagine **Task** (cose da fare) e **Gestione mail** hanno le stesse tre liste, come Google Task: Oggi, Domani, Archivio, ordinate per priorità e poi per data. `lista_dal` è il giorno in cui la voce è stata messa nella lista: una voce in Domani passa da sola in Oggi il giorno dopo. Senza `lista` decide la data. Le mail le carica Claude da Gmail.
+Le pagine **Task** (cose da fare) e **Gestione mail** hanno le stesse tre liste, come Google Task: Oggi, Coda, Archivio, ordinate per priorità e poi per data. `lista_dal` è il giorno in cui la voce è stata messa nella lista. Un task in Coda o in Archivio passa da solo in Oggi quando arriva la scadenza, salvo che sia stato spostato dopo; le mail restano dove sono. Il vecchio valore `Domani` vale come `Coda`. La scadenza si mette dal calendario sulla riga del task; "Nel calendario" apre Google Calendar con l'evento compilato (è un collegamento, la pagina non chiama Google). Le mail le carica Claude da Gmail.
 
 ### Indici
 
