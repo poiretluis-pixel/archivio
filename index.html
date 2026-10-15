@@ -2152,8 +2152,18 @@ function perPrioritaLavoro(a, b) {
   return ordinePriorita(a) - ordinePriorita(b) || perData(a, b);
 }
 const quantiOggi = tipo => lavoriAperti().filter(x => x.tipo === tipo && listaDi(x) === 'Oggi').length;
-/* Calendario Google TASK: gli eventi li crea e li aggiorna Claude ogni mattina (evento_id, evento_data). */
-const statoCalendario = x => (!x.data ? '' : x.evento_id && x.evento_data === x.data ? 'nel calendario TASK' : 'nel calendario domattina');
+/* Calendario Google TASK: Luis sceglie con un clic quali task mettere (calendario: true); gli eventi li crea, sposta e toglie Claude (evento_id, evento_data). */
+function statoCalendario(x) {
+  if (!x.data) return '';
+  if (!x.calendario) return x.evento_id ? 'esce dal calendario al prossimo aggiornamento' : '';
+  return x.evento_id && x.evento_data === x.data ? 'nel calendario TASK' : 'entra nel calendario al prossimo aggiornamento';
+}
+function pulsanteCalendario(x) {
+  if (!x.data) return null;
+  return x.calendario
+    ? btn('Togli dal calendario', () => { metti({ ...x, calendario: false }); avviso('Esce dal calendario TASK al prossimo aggiornamento.'); }, 'piccolo')
+    : btn('Aggiungi al calendario', () => { metti({ ...x, calendario: true }); avviso('Entra nel calendario TASK al prossimo aggiornamento.'); }, 'piccolo');
+}
 const linkGmail = x => (typeof x.link === 'string' && /^https:\/\/mail\.google\.com\//.test(x.link) ? x.link : '');
 
 function spostaLavoro(x, lista) { metti({ ...x, lista, lista_dal: oggi() }); avviso(`Spostata in ${lista}.`); }
@@ -2180,6 +2190,7 @@ function rigaLavoro(x) {
       link ? h('a', { class: 'btn piccolo', href: link, target: '_blank', rel: 'noopener noreferrer' }, 'Apri in Gmail') : null,
       mail ? null : h('label', { class: 'scadenza-rapida' }, h('span', { class: 'attenuato piccolo' }, 'Scadenza'),
         h('input', { type: 'date', value: x.data || '', 'aria-label': 'Scadenza di ' + x.titolo, onchange: e => { const d = e.target.value; const { data, ...resto } = x; metti(d ? { ...resto, data: d } : resto); avviso(d ? `Scadenza il ${fmtData(d)}.` : 'Scadenza tolta.'); } })),
+      mail ? null : pulsanteCalendario(x),
       !mail && statoCalendario(x) ? h('span', { class: 'attenuato piccolo' }, statoCalendario(x)) : null,
       btn('Modifica', () => apriModulo('organizzazione', x.tipo, x), 'piccolo')));
 }
@@ -2199,7 +2210,7 @@ function vistaLavoro(tipo) {
     h('div', { class: 'testa' },
       h('div', {}, h('h1', {}, mail ? 'Gestione mail' : 'Task'), h('p', { class: 'sotto largo-testo' }, mail
         ? 'Le mail delle tre caselle che chiedono una risposta o un\'azione. Le porta qui Claude da Gmail ogni mattina.'
-        : 'Le tue cose da fare, come in Google Task. Metti la scadenza con il calendario: quando arriva, il task passa da solo in Oggi. I task con scadenza compaiono nel calendario Google TASK, aggiornato ogni mattina.')),
+        : 'Le tue cose da fare, come in Google Task. Metti la scadenza con il calendario: quando arriva, il task passa da solo in Oggi. Con "Aggiungi al calendario" lo metti nel calendario Google TASK.')),
       h('div', { class: 'azioni' }, btn(mail ? 'Aggiungi una mail' : 'Aggiungi un task', nuova, 'primario'))),
     h('div', { class: 'dati' }, dato('Per oggi', perLista('Oggi').length, alte ? `${alte} con priorità alta` : ''), dato('In coda', perLista('Coda').length),
       mail ? dato('In attesa di altri', tutte.filter(x => x.stato === 'in attesa di altri').length) : dato('In ritardo', tutte.filter(x => giorniDaSe(x.data) > 0).length, '', tutte.some(x => giorniDaSe(x.data) > 0) ? 'allerta' : '')),
