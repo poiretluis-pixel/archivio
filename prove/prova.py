@@ -263,7 +263,7 @@ async def main():
         await A.click("nav.schede a:has-text('Archivio')")
         await A.wait_for_timeout(200)
         controlla(A.url.endswith("#/task/archivio") and await A.locator("#vista li.lavoro").count() == 2 and await A.locator("li:has-text('Idea da riprendere')").count() == 1, "scheda Archivio")
-        controlla(await A.locator("li:has-text('Task senza scadenza') .etichetta.e-verde").inner_text() == "Psiche e Soma", "etichetta colorata di chi riguarda il task")
+        controlla(await A.locator("li:has-text('Task senza scadenza') .etichetta.e-arancione").inner_text() == "Psiche e Soma", "etichetta colorata di chi riguarda il task")
         await A.goto(URL + "#/task/tutti")
         oggi_ = dt.date.today()
         await A.wait_for_timeout(300)
