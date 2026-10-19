@@ -18,7 +18,7 @@ const PRIORITA = ['alta', 'media', 'bassa'];
 const RIPETI_TASK = ['ogni giorno', 'nei giorni lavorativi', 'ogni settimana', 'ogni 2 settimane', 'ogni mese', 'ogni 3 mesi', 'ogni 6 mesi', 'ogni anno'];
 const CASELLE = ['Personale', '3MEDical Pioltello', '3MEDical Porta Romana'];
 const CAT_SITI = ['Gestionali', 'Banche e pagamenti', 'Personale e paghe', 'Google e comunicazione', 'Sito e social', 'Altro'];
-const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personale'];
+const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personal trainer', 'Personale'];
 /* Etichette dei task personali: un task con una di queste etichette sta in Organizzazione, non nella pagina Task di lavoro. */
 const ETICHETTE_PERSONALI = ['CASA', 'GIARDINO', 'PROGETTI'];
 const SERVIZI_PT = ['Personal', 'Corso posturale', 'Sostituzione corso'];

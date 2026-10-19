@@ -240,7 +240,7 @@ function menu(rotta) {
 function barra() {
   const pp = persone();
   return h('header', { class: 'barra' },
-    h('a', { class: 'marchio', href: '#/' }, 'Life Planning'),
+    h('a', { class: 'marchio', href: '#/' }, logoLp(), h('span', {}, 'Life Planning')),
     pp.length > 1 ? h('select', { class: 'chi', 'aria-label': 'Persona', onchange: e => { S.persona = e.target.value; disegna(); } }, h('option', { value: '' }, 'Tutta la famiglia'), pp.map(p => h('option', { value: p.id, selected: p.id === S.persona }, p.nome))) : h('span', { class: 'chi-solo' }, (pp[0] || {}).nome || ''),
     h('span', { class: 'spazio' }), spiaSync(), btn('Blocca', blocca, 'piatto'));
 }

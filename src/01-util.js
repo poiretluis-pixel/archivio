@@ -23,6 +23,8 @@ function _el(el, attrs, kids) {
 const h = (tag, attrs, ...kids) => _el(document.createElement(tag), attrs, kids);
 const s = (tag, attrs, ...kids) => _el(document.createElementNS(SVGNS, tag), attrs, kids);
 
+/* Logo Life Planning (sigillo LP), file nel repository della pagina. */
+const logoLp = () => h('img', { class: 'logo', src: 'icone/logo.svg', alt: '', width: 32, height: 32 });
 const adesso = () => new Date().toISOString();
 const oggi = () => { const d = new Date(); return isoData(d.getFullYear(), d.getMonth() + 1, d.getDate()); };
 const isoData = (y, m, d) => `${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;

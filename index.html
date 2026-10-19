@@ -51,8 +51,10 @@ a{color:var(--marca)}
 .barra{grid-column:1/-1;display:flex;align-items:center;gap:.75rem;padding:.7rem 1.25rem;min-width:0}
 .barra .btn{white-space:nowrap}
 .chi{min-width:0;flex-shrink:1}
-.marchio{font-size:1.35rem;color:var(--inchiostro);text-decoration:none}
-.marchio.grande{font-size:2.1rem;margin-bottom:.3rem}
+.marchio{font-size:1.35rem;color:var(--inchiostro);text-decoration:none;display:inline-flex;align-items:center;gap:.55rem}
+.marchio .logo{width:2rem;height:2rem;flex:none}
+.marchio.grande{font-size:2.1rem;margin-bottom:.3rem;flex-direction:column;align-items:flex-start;gap:.7rem}
+.marchio.grande .logo{width:4.5rem;height:4.5rem}
 .spazio{flex:1}
 .chi,.chi-solo{font-size:.92rem;color:var(--inchiostro2)}
 .menu{padding:.5rem 0 2rem 1rem;display:flex;flex-direction:column;gap:2px}
@@ -236,7 +238,7 @@ li.lavoro .azioni{flex-wrap:wrap}
 :root{--e-blu-f:#dce8fb;--e-blu-t:#1a4d9e;--e-giallo-f:#fbefc4;--e-giallo-t:#7a5800;--e-rosso-f:#fbe1e0;--e-rosso-t:#a8282a;--e-viola-f:#ebe3fa;--e-viola-t:#5b3a9e;--e-verde-f:#dcf1e1;--e-verde-t:#1f6b35;--e-arancione-f:#fde4cc;--e-arancione-t:#9a4a00;--e-acqua-f:#d5f0ee;--e-acqua-t:#0f6660;--e-grigio-f:var(--linea2);--e-grigio-t:var(--inchiostro2)}
 :root[data-tema=scuro]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf}
 @media (prefers-color-scheme:dark){:root[data-tema=automatico]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf}}
-.etichetta{display:inline-block;font-size:.76rem;font-weight:600;border-radius:99px;padding:0 .55rem;line-height:1.45rem;white-space:nowrap;vertical-align:.08em}
+.etichetta{text-transform:uppercase;letter-spacing:.03em;display:inline-block;font-size:.76rem;font-weight:600;border-radius:99px;padding:0 .55rem;line-height:1.45rem;white-space:nowrap;vertical-align:.08em}
 .e-blu{background:var(--e-blu-f);color:var(--e-blu-t)}
 .e-giallo{background:var(--e-giallo-f);color:var(--e-giallo-t)}
 .e-rosso{background:var(--e-rosso-f);color:var(--e-rosso-t)}
@@ -302,6 +304,8 @@ function _el(el, attrs, kids) {
 const h = (tag, attrs, ...kids) => _el(document.createElement(tag), attrs, kids);
 const s = (tag, attrs, ...kids) => _el(document.createElementNS(SVGNS, tag), attrs, kids);
 
+/* Logo Life Planning (sigillo LP), file nel repository della pagina. */
+const logoLp = () => h('img', { class: 'logo', src: 'icone/logo.svg', alt: '', width: 32, height: 32 });
 const adesso = () => new Date().toISOString();
 const oggi = () => { const d = new Date(); return isoData(d.getFullYear(), d.getMonth() + 1, d.getDate()); };
 const isoData = (y, m, d) => `${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
@@ -919,7 +923,7 @@ const PRIORITA = ['alta', 'media', 'bassa'];
 const RIPETI_TASK = ['ogni giorno', 'nei giorni lavorativi', 'ogni settimana', 'ogni 2 settimane', 'ogni mese', 'ogni 3 mesi', 'ogni 6 mesi', 'ogni anno'];
 const CASELLE = ['Personale', '3MEDical Pioltello', '3MEDical Porta Romana'];
 const CAT_SITI = ['Gestionali', 'Banche e pagamenti', 'Personale e paghe', 'Google e comunicazione', 'Sito e social', 'Altro'];
-const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personale'];
+const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personal trainer', 'Personale'];
 /* Etichette dei task personali: un task con una di queste etichette sta in Organizzazione, non nella pagina Task di lavoro. */
 const ETICHETTE_PERSONALI = ['CASA', 'GIARDINO', 'PROGETTI'];
 const SERVIZI_PT = ['Personal', 'Corso posturale', 'Sostituzione corso'];
@@ -1461,7 +1465,7 @@ function menu(rotta) {
 function barra() {
   const pp = persone();
   return h('header', { class: 'barra' },
-    h('a', { class: 'marchio', href: '#/' }, 'Life Planning'),
+    h('a', { class: 'marchio', href: '#/' }, logoLp(), h('span', {}, 'Life Planning')),
     pp.length > 1 ? h('select', { class: 'chi', 'aria-label': 'Persona', onchange: e => { S.persona = e.target.value; disegna(); } }, h('option', { value: '' }, 'Tutta la famiglia'), pp.map(p => h('option', { value: p.id, selected: p.id === S.persona }, p.nome))) : h('span', { class: 'chi-solo' }, (pp[0] || {}).nome || ''),
     h('span', { class: 'spazio' }), spiaSync(), btn('Blocca', blocca, 'piatto'));
 }
@@ -2276,7 +2280,7 @@ function pulsanteCalendario(x) {
     : btn('Aggiungi al calendario', () => { metti({ ...x, calendario: true }); avviso('Entra nel calendario TASK al prossimo aggiornamento.'); }, 'piccolo');
 }
 /* Etichette colorate per chi riguarda il task o la mail: Pioltello blu, Porta Romana giallo, Personale rosso; per i task personali CASA viola, GIARDINO verde, PROGETTI acqua. */
-const COLORI_ETICHETTA = { '3MEDical Pioltello': 'blu', '3MEDical Porta Romana': 'giallo', 'Personale': 'rosso', '3MEDical': 'blu', 'Psiche e Soma': 'arancione', CASA: 'viola', GIARDINO: 'verde', PROGETTI: 'acqua' };
+const COLORI_ETICHETTA = { '3MEDical Pioltello': 'blu', '3MEDical Porta Romana': 'giallo', 'Personale': 'rosso', '3MEDical': 'blu', 'Psiche e Soma': 'arancione', 'Personal trainer': 'viola', CASA: 'viola', GIARDINO: 'verde', PROGETTI: 'acqua' };
 const etichettaColore = nome => (nome ? h('span', { class: 'etichetta e-' + (COLORI_ETICHETTA[nome] || 'grigio') }, nome) : null);
 const linkGmail = x => (typeof x.link === 'string' && /^https:\/\/mail\.google\.com\//.test(x.link) ? x.link : '');
 
@@ -2699,7 +2703,7 @@ async function schermataBlocco() {
   const err = h('div', { class: 'errore', role: 'alert' });
   const attesa = (form, si) => { const b = form.querySelector('button[type=submit]'); b.disabled = si; if (si) { b.dataset.t = b.textContent; b.textContent = 'Un momento…'; } else if (b.dataset.t) b.textContent = b.dataset.t; };
   const campo = (name, etich, extra = {}) => h('label', { class: 'campo intero' }, h('span', {}, etich), h('input', { name, autocomplete: 'off', spellcheck: 'false', ...extra }));
-  const cornice = (...kids) => h('div', { class: 'blocco' }, h('div', { class: 'blocco-scheda' }, h('div', { class: 'marchio grande' }, 'Life Planning'), kids));
+  const cornice = (...kids) => h('div', { class: 'blocco' }, h('div', { class: 'blocco-scheda' }, h('div', { class: 'marchio grande' }, logoLp(), h('span', {}, 'Life Planning')), kids));
   const invio = (form, fn) => async e => { e.preventDefault(); err.textContent = ''; attesa(form, true); try { await fn(form.elements); } catch (ex) { err.textContent = ex.message === 'Failed to fetch' ? 'Impossibile raggiungere GitHub: controlla la connessione.' : ex.message; attesa(form, false); } };
   const campiFrase = () => {
     const forza = h('div', { class: 'forza intero' });
