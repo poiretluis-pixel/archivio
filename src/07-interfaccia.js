@@ -224,7 +224,7 @@ function menu(rotta) {
     v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
     v('#/siti', 'Siti e gestionali', 'siti'),
     h('div', { class: 'menu-gruppo' }, 'Personale'),
-    aree().map(a => v('#/a/' + a.id, a.nome, 'a/' + a.id)),
+    aree().map(a => v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0)),
     h('div', { class: 'menu-gruppo' }, 'Archivio'),
     v('#/rapporti', 'Rapporti', 'rapporti'), v('#/scadenze', 'Scadenze', 'scadenze', scadute), v('#/documenti', 'Documenti', 'documenti', allegati().filter(a => a.stato === 'da elaborare').length), v('#/impostazioni', 'Impostazioni', 'impostazioni'));
 }
@@ -250,6 +250,7 @@ function vistaPer(r) {
   if (r[0] === 'a' && r[1]) {
     const a = area(r[1]); if (!a) return vuoto('Questa cartella non esiste più.');
     if (r[2] === 'p' && r[3]) return vistaProgetto(r[3]);
+    if (r[1] === 'organizzazione' && SCHEDE_LAVORO[r[2]]) return vistaArea(a, r[2]);
     if (r[2]) return vistaTipo(r[1], r[2]);
     return vistaArea(a);
   }

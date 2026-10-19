@@ -23,9 +23,9 @@ function vistaCasa() {
   for (const x of lav.slice(0, 6)) {
     const mail = x.tipo === 'mail', g = mail || !x.data ? 0 : -giorniDaSe(x.data);
     daFare.push({ tipo: x.priorita === 'alta' || g < 0 ? 'ritardo' : 'vuota', testo: (mail ? 'Mail: ' : '') + x.titolo,
-      nota: [mail ? x.casella : (x.casella || x.ambito), mail ? (x.mittente ? 'da ' + x.mittente : '') : !x.data ? '' : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`].filter(Boolean).join(', '), href: mail ? '#/mail' : '#/task' });
+      nota: [mail ? x.casella : (x.casella || x.ambito), mail ? (x.mittente ? 'da ' + x.mittente : '') : !x.data ? '' : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`].filter(Boolean).join(', '), href: mail ? '#/mail' : taskPersonale(x) ? '#/a/organizzazione' : '#/task' });
   }
-  if (lav.length > 6) daFare.push({ tipo: 'vuota', testo: `Altre ${lav.length - 6} cose per oggi`, nota: 'Tutte nelle pagine Task e Gestione mail.', href: '#/task' });
+  if (lav.length > 6) daFare.push({ tipo: 'vuota', testo: `Altre ${lav.length - 6} cose per oggi`, nota: 'Tutte nelle pagine Task, Gestione mail e Organizzazione.', href: '#/task' });
   const daElab = allegati().filter(a => a.stato === 'da elaborare').length;
   if (daElab) daFare.push({ tipo: 'vuota', testo: daElab === 1 ? '1 documento in attesa che Claude ne inserisca i valori' : `${daElab} documenti in attesa che Claude ne inserisca i valori`, nota: 'Sono al sicuro. Li elabora alla verifica del lunedì, oppure subito se glielo chiedi in chat.', href: '#/documenti' });
   if (!ghPronto()) daFare.push({ tipo: 'ritardo', testo: 'I dati sono solo su questo dispositivo', nota: 'Collega il repository dei dati in Impostazioni.', href: '#/impostazioni' });
@@ -41,7 +41,7 @@ function vistaCasa() {
   const schede = {
     salute: mis.length || S.estVoci.length ? [(ind => (ind ? dato('Indice di salute', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceSalute()), mis.length ? dato('Fuori intervallo all\'ultima misura', nFuori, `su ${perPar.length} parametri seguiti`, nFuori ? 'allerta' : '') : null] : null,
     finanze: voci('finanze').length ? [(ind => (ind ? dato('Indice finanziario', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceFinanze()), voci('finanze', 'saldo').length ? dato('Disponibilità finanziaria', fmtEuro(totaleFinanze(voci('finanze', 'saldo')))) : null] : null,
-    organizzazione: voci('organizzazione').length ? [dato('Obiettivi attivi', voci('organizzazione', 'obiettivo').filter(o => o.stato === 'attivo' || !o.stato).length), dato('Cose da fare aperte', voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta').length)] : null,
+    organizzazione: voci('organizzazione').length ? [dato('Obiettivi attivi', voci('organizzazione', 'obiettivo').filter(o => o.stato === 'attivo' || !o.stato).length), dato('Task personali aperti', voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta' && taskPersonale(x)).length)] : null,
     sport: voci('sport').length ? [dato('Sedute nelle ultime 4 settimane', [...voci('sport', 'allenamento'), ...voci('sport', 'attivita')].filter(v => giorniDa(v.data) < 28).length)] : null,
     mindfulness: voci('mindfulness').length ? [dato('Giorni di pratica negli ultimi 30', new Set(voci('mindfulness', 'pratica').filter(v => giorniDa(v.data) < 30).map(v => v.data)).size)] : null,
     lettura: voci('lettura').length ? [dato('Libri letti quest\'anno', voci('lettura', 'libro').filter(v => v.stato === 'letto' && (v.fine || '').startsWith(oggi().slice(0, 4))).length, (l => (l.length ? 'In lettura: ' + l.map(v => v.titolo).join(', ') : ''))(voci('lettura', 'libro').filter(v => v.stato === 'in lettura')))] : null,
@@ -135,10 +135,10 @@ function vistaRapporti(scelto) {
     h('article', { class: 'largo-testo' }, mdInDom(r.testo)));
 }
 
-function vistaArea(a) {
+function vistaArea(a, scheda) {
   const cr = { salute: cruscottoSalute, finanze: cruscottoFinanze, patrimonio: cruscottoPatrimonio, organizzazione: cruscottoOrganizzazione, sport: cruscottoSport, mindfulness: cruscottoMindfulness, lettura: cruscottoLettura, viaggi: cruscottoViaggi, progetti: cruscottoProgetti }[a.id] || cruscottoLibero;
   return h('div', {},
-    h('div', { class: 'testa' }, h('h1', {}, a.nome)),
+    a.id === 'organizzazione' ? vistaLavoro('personale', scheda) : h('div', { class: 'testa' }, h('h1', {}, a.nome)),
     a.id === 'salute' ? pannelloIndice() : a.id === 'finanze' ? pannelloIndiceFinanze() : null,
     pannelloConsigli(a.id),
     cr(a),
@@ -257,26 +257,19 @@ function pannelloTetti(mov) {
   })));
 }
 
-/* --- Organizzazione: obiettivi, cose da fare, revisione settimanale --- */
+/* --- Organizzazione: sopra i task personali (vistaLavoro), qui sotto obiettivi e revisione settimanale --- */
 function cruscottoOrganizzazione() {
-  const ob = voci('organizzazione', 'obiettivo'), att = voci('organizzazione', 'attivita'), rev = voci('organizzazione', 'revisione').sort(perData);
-  if (!ob.length && !att.length && !rev.length) return pannello('', vuoto('Cartella vuota. Parti da 3-5 obiettivi per i prossimi 12 mesi, divisi tra lavoro, famiglia e personale. Gli appuntamenti restano nei tuoi calendari Google e iCloud: qui ci sono le priorità.', btn('Aggiungi un obiettivo', () => apriModulo('organizzazione', 'obiettivo', null, { data: oggi(), stato: 'attivo', avanzamento: 0 }), 'primario'), btn('Aggiungi una cosa da fare', () => apriModulo('organizzazione', 'attivita', null, { stato: 'da fare', priorita: 'media' }))));
+  const ob = voci('organizzazione', 'obiettivo'), rev = voci('organizzazione', 'revisione').sort(perData);
   const attivi = ob.filter(o => o.stato === 'attivo' || !o.stato);
-  const aperte = att.filter(x => x.stato !== 'fatta').sort((a, b) => ['alta', 'media', 'bassa'].indexOf(a.priorita) - ['alta', 'media', 'bassa'].indexOf(b.priorita) || perData(a, b));
   const ultimaRev = rev[rev.length - 1];
   const perAmbito = raggruppa(attivi, o => o.ambito || 'Senza ambito');
   return [
-    h('div', { class: 'dati' }, dato('Obiettivi attivi', attivi.length, `${ob.filter(o => o.stato === 'raggiunto').length} raggiunti`), dato('Cose da fare aperte', aperte.length, `${aperte.filter(x => x.stato !== 'fatta' && giorniDaSe(x.data) > 0).length} in ritardo`, aperte.some(x => giorniDaSe(x.data) > 0) ? 'allerta' : ''),
-      dato('Ultima revisione', ultimaRev ? fmtData(ultimaRev.data) : 'mai', ultimaRev && ultimaRev.voto ? `voto ${ultimaRev.voto} su 5` : '')),
-    attivi.length ? pannello('Obiettivi', [...perAmbito].map(([amb, l]) => [h('h3', {}, amb), h('ul', { class: 'elenco' }, l.map(o => h('li', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('organizzazione', 'obiettivo', o) },
+    pannello('Obiettivi', attivi.length ? [...perAmbito].map(([amb, l]) => [h('h3', {}, amb), h('ul', { class: 'elenco' }, l.map(o => h('li', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('organizzazione', 'obiettivo', o) },
       h('div', { class: 'tra' }, h('strong', {}, o.titolo), h('span', { class: 'attenuato num' }, `${fmtNum(o.avanzamento || 0, 0)}%` + (o.scadenza ? `, entro il ${fmtData(o.scadenza)}` : ''))),
       h('span', { class: 'rip-pista' }, h('span', { class: 'rip-barra ok', style: `width:${Math.max(2, Math.min(100, o.avanzamento || 0))}%` })),
-      o.misura ? h('div', { class: 'elenco-nota' }, o.misura) : null)))])) : null,
-    pannello('Cose da fare', aperte.length ? h('ul', { class: 'elenco' }, aperte.slice(0, 15).map(x => { const g = -giorniDaSe(x.data); return h('li', {}, h('div', { class: 'tra' }, h('span', {}, h('strong', {}, x.titolo), h('span', { class: 'attenuato' }, [x.ambito, x.priorita ? 'priorità ' + x.priorita : ''].filter(Boolean).map(s => ' ' + s).join(','))),
-      x.data ? stato(g < 0 ? 'ritardo' : 'vuota', g < 0 ? `In ritardo dal ${fmtData(x.data)}` : g === 0 ? 'Oggi' : fmtData(x.data)) : null),
-      h('div', { class: 'azioni' }, btn('Fatta', () => metti({ ...x, stato: 'fatta', fatta_il: oggi() }), 'piccolo'), btn('Modifica', () => apriModulo('organizzazione', 'attivita', x), 'piccolo'))); })) : h('p', { class: 'attenuato' }, 'Niente in sospeso.'),
-      h('div', { class: 'azioni' }, btn('Aggiungi', () => apriModulo('organizzazione', 'attivita', null, { stato: 'da fare', priorita: 'media' }), 'piccolo'), h('a', { class: 'btn piccolo', href: '#/task' }, 'Apri Task'))),
-    pannello('Revisione della settimana', ultimaRev ? [h('p', { class: 'attenuato piccolo' }, `Settimana del ${fmtData(ultimaRev.data)}`), ultimaRev.focus ? h('div', { class: 'testo-lungo' }, h('strong', {}, 'Focus: '), ultimaRev.focus) : null] : h('p', { class: 'attenuato' }, 'Dieci minuti a settimana: cosa è andato, cosa no, le tre cose su cui concentrarti. È l\'abitudine che tiene vivo tutto il resto.'),
+      o.misura ? h('div', { class: 'elenco-nota' }, o.misura) : null)))]) : h('p', { class: 'attenuato' }, 'Nessun obiettivo attivo. Parti da 3-5 obiettivi per i prossimi 12 mesi.'),
+      h('div', { class: 'azioni' }, btn('Aggiungi un obiettivo', () => apriModulo('organizzazione', 'obiettivo', null, { data: oggi(), stato: 'attivo', avanzamento: 0 }), 'piccolo'))),
+    pannello('Revisione della settimana', ultimaRev ? [h('p', { class: 'attenuato piccolo' }, `Settimana del ${fmtData(ultimaRev.data)}` + (ultimaRev.voto ? `, voto ${ultimaRev.voto} su 5` : '')), ultimaRev.focus ? h('div', { class: 'testo-lungo' }, h('strong', {}, 'Focus: '), ultimaRev.focus) : null] : h('p', { class: 'attenuato' }, 'Dieci minuti a settimana: cosa è andato, cosa no, le tre cose su cui concentrarti. È l\'abitudine che tiene vivo tutto il resto.'),
       h('div', { class: 'azioni' }, btn('Scrivi la revisione', () => apriModulo('organizzazione', 'revisione', null, { data: lunedi(oggi()) }), 'piccolo'))),
   ];
 }

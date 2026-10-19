@@ -1,5 +1,6 @@
-/* ===== 8c. Task e Gestione mail: liste Oggi, Coda e Archivio =====
+/* ===== 8c. Task, Gestione mail e task personali: liste Oggi, Coda e Archivio =====
    Le cose da fare sono le voci organizzazione/attivita, le mail sono organizzazione/mail (le carica Claude da Gmail).
+   I task con etichetta CASA, GIARDINO o PROGETTI sono personali: stanno nella cartella Organizzazione, non nella pagina Task.
    Per i task la scadenza si mette con il calendario della riga; il calendario Google TASK lo aggiorna Claude. */
 const listaSalvata = x => (x.lista === 'Domani' ? 'Coda' : x.lista);
 /* Un task in Coda o in Archivio passa da solo in Oggi quando arriva la scadenza, a meno che sia stato spostato dopo la scadenza. Le mail restano dove sono. */
@@ -14,11 +15,14 @@ const apertaLavoro = x => (x.tipo === 'mail' ? x.stato !== 'gestita' : x.stato !
 function lavoriAperti() {
   return [...voci('organizzazione', 'attivita'), ...voci('organizzazione', 'mail')].filter(apertaLavoro);
 }
+/* Tipo di pagina: 'attivita' (task di lavoro), 'personale' (task di Organizzazione) o 'mail'. */
+const taskPersonale = x => x.tipo === 'attivita' && ETICHETTE_PERSONALI.includes(x.casella);
+const tipoPagina = x => (taskPersonale(x) ? 'personale' : x.tipo);
 const ordinePriorita = x => (PRIORITA.includes(x.priorita) ? PRIORITA.indexOf(x.priorita) : 1);
 function perPrioritaLavoro(a, b) {
   return ordinePriorita(a) - ordinePriorita(b) || perData(a, b);
 }
-const quantiOggi = tipo => lavoriAperti().filter(x => x.tipo === tipo && listaDi(x) === 'Oggi').length;
+const quantiOggi = tipo => lavoriAperti().filter(x => tipoPagina(x) === tipo && listaDi(x) === 'Oggi').length;
 /* Calendario Google TASK: Luis sceglie con un clic quali task mettere (calendario: true); gli eventi li crea, sposta e toglie Claude (evento_id, evento_data). */
 function statoCalendario(x) {
   if (!x.data) return '';
@@ -31,8 +35,8 @@ function pulsanteCalendario(x) {
     ? btn('Togli dal calendario', () => { metti({ ...x, calendario: false }); avviso('Esce dal calendario TASK al prossimo aggiornamento.'); }, 'piccolo')
     : btn('Aggiungi al calendario', () => { metti({ ...x, calendario: true }); avviso('Entra nel calendario TASK al prossimo aggiornamento.'); }, 'piccolo');
 }
-/* Etichette colorate per chi riguarda il task o la mail: Pioltello blu, Porta Romana giallo, Personale rosso. */
-const COLORI_ETICHETTA = { '3MEDical Pioltello': 'blu', '3MEDical Porta Romana': 'giallo', 'Personale': 'rosso', '3MEDical': 'blu', 'Psiche e Soma': 'arancione' };
+/* Etichette colorate per chi riguarda il task o la mail: Pioltello blu, Porta Romana giallo, Personale rosso; per i task personali CASA viola, GIARDINO verde, PROGETTI acqua. */
+const COLORI_ETICHETTA = { '3MEDical Pioltello': 'blu', '3MEDical Porta Romana': 'giallo', 'Personale': 'rosso', '3MEDical': 'blu', 'Psiche e Soma': 'arancione', CASA: 'viola', GIARDINO: 'verde', PROGETTI: 'acqua' };
 const etichettaColore = nome => (nome ? h('span', { class: 'etichetta e-' + (COLORI_ETICHETTA[nome] || 'grigio') }, nome) : null);
 const linkGmail = x => (typeof x.link === 'string' && /^https:\/\/mail\.google\.com\//.test(x.link) ? x.link : '');
 
@@ -83,23 +87,26 @@ function rigaLavoro(x) {
       btn('Modifica', () => apriModulo('organizzazione', x.tipo, x), 'piccolo')));
 }
 
-/* Due pagine: Task (cose da fare) e Gestione mail. Stesse liste, stesso comportamento. */
+/* Tre pagine: Task (lavoro), Gestione mail e la cartella Organizzazione (task personali). Stesse liste, stesso comportamento. */
 const fonteDi = x => (x.tipo === 'mail' ? x.casella : (x.casella || x.ambito));
 const SCHEDE_LAVORO = { oggi: 'Oggi', coda: 'Coda', archivio: 'Archivio', tutti: 'Tutti' };
 function vistaLavoro(tipo, scheda) {
-  const base = tipo === 'mail' ? '#/mail/' : '#/task/', sc = SCHEDE_LAVORO[scheda] ? scheda : 'oggi';
-  const mail = tipo === 'mail', chiave = 'filtro_' + tipo, filtro = S[chiave] || '';
-  const tutte = lavoriAperti().filter(x => x.tipo === tipo);
+  const mail = tipo === 'mail', pers = tipo === 'personale';
+  const base = mail ? '#/mail/' : pers ? '#/a/organizzazione/' : '#/task/', sc = SCHEDE_LAVORO[scheda] ? scheda : 'oggi';
+  const chiave = 'filtro_' + tipo, filtro = S[chiave] || '';
+  const tutte = lavoriAperti().filter(x => tipoPagina(x) === tipo);
   const l = tutte.filter(x => !filtro || fonteDi(x) === filtro);
-  const fonti = [...new Set(tutte.map(fonteDi).filter(Boolean))].sort();
+  const fonti = pers ? ETICHETTE_PERSONALI : [...new Set(tutte.map(fonteDi).filter(Boolean))].sort();
   const perLista = n => l.filter(x => listaDi(x) === n).sort(perPrioritaLavoro);
-  const nuova = () => apriModulo('organizzazione', tipo, null, mail ? { stato: 'da gestire', priorita: 'media', lista: 'Oggi', lista_dal: oggi(), data: oggi() } : { stato: 'da fare', priorita: 'media', ambito: 'Lavoro', lista: 'Oggi', lista_dal: oggi(), data: oggi() });
+  const nuova = () => apriModulo('organizzazione', mail ? 'mail' : 'attivita', null, mail ? { stato: 'da gestire', priorita: 'media', lista: 'Oggi', lista_dal: oggi(), data: oggi() }
+    : { stato: 'da fare', priorita: 'media', ambito: pers ? 'Personale' : 'Lavoro', ...(pers ? { casella: ETICHETTE_PERSONALI.includes(filtro) ? filtro : 'CASA' } : {}), lista: 'Oggi', lista_dal: oggi(), data: oggi() });
   const testi = mail ? { Oggi: 'Nessuna mail da gestire oggi.', Coda: 'Nessuna mail in coda.', Archivio: 'Archivio vuoto.' } : { Oggi: 'Nessun task per oggi.', Coda: 'Nessun task in coda.', Archivio: 'Archivio vuoto.' };
   const alte = l.filter(x => listaDi(x) === 'Oggi' && x.priorita === 'alta').length;
   return h('div', {},
     h('div', { class: 'testa' },
-      h('div', {}, h('h1', {}, mail ? 'Gestione mail' : 'Task'), h('p', { class: 'sotto largo-testo' }, mail
+      h('div', {}, h('h1', {}, mail ? 'Gestione mail' : pers ? 'Organizzazione' : 'Task'), h('p', { class: 'sotto largo-testo' }, mail
         ? 'Le mail delle tre caselle che chiedono una risposta o un\'azione. Le porta qui Claude da Gmail ogni mattina.'
+        : pers ? 'Le tue cose personali, divise tra CASA, GIARDINO e PROGETTI. Funziona come Task: con la scadenza il task passa da solo in Oggi, con "Aggiungi al calendario" lo metti nel calendario Google TASK.'
         : 'Le tue cose da fare, come in Google Task. Metti la scadenza con il calendario: quando arriva, il task passa da solo in Oggi. Con "Aggiungi al calendario" lo metti nel calendario Google TASK.')),
       h('div', { class: 'azioni' }, btn(mail ? 'Aggiungi una mail' : 'Aggiungi un task', nuova, 'primario'))),
     h('div', { class: 'dati' }, dato('Per oggi', perLista('Oggi').length, alte ? `${alte} con priorità alta` : ''), dato('In coda', perLista('Coda').length),
