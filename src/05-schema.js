@@ -9,6 +9,10 @@ const RIPETI = { mai: 0, mensile: 1, trimestrale: 3, semestrale: 6, annuale: 12 
 const CAT_USCITE = ['Casa', 'Spesa alimentare', 'Ristoranti e bar', 'Auto e trasporti', 'Salute', 'Figli', 'Istruzione', 'Sport e benessere', 'Abbigliamento', 'Viaggi e svago', 'Abbonamenti', 'Assicurazioni', 'Tasse e imposte', 'Rate e finanziamenti', 'Lavori e ristrutturazioni', 'Regali e donazioni', 'Contanti prelevati', 'Commissioni bancarie', 'Investimenti e partecipazioni', 'Altre uscite'];
 const CAT_ENTRATE = ['Compensi e stipendio', 'Utili e dividendi', 'Contributi famiglia', 'Rimborsi', 'Affitti', 'Prestiti ricevuti', 'Altre entrate'];
 const GIROCONTO = 'Giroconto';
+/* Spese ricorrenti: ogni quanto (in mesi) e di chi. */
+const FREQ_SPESE = ['mensile', 'bimestrale', 'trimestrale', 'quadrimestrale', 'semestrale', 'annuale'];
+const MESI_FREQ = { mensile: 1, bimestrale: 2, trimestrale: 3, quadrimestrale: 4, semestrale: 6, annuale: 12 };
+const DI_CHI_SPESE = ['mie', 'famiglia'];
 const CAT_NEUTRE = new Set([GIROCONTO, 'Investimenti e partecipazioni', 'Prestiti ricevuti']);
 const AMBITI = ['Lavoro', 'Famiglia', 'Personale', 'Salute', 'Finanze'];
 /* Liste di lavoro, come in Google Task: Oggi, Coda, Archivio. Valgono per i task e per le mail da gestire. Il vecchio valore Domani vale come Coda. */
@@ -35,6 +39,14 @@ const AREE_BASE = [
     movimento: { nome: 'Movimento', plur: 'Entrate e uscite', titolo: v => v.descrizione, colonne: ['data', 'descrizione', 'categoria', 'valore', 'conto'], campi: [
       c('data', 'Data', 'data', { obbl: true }), c('descrizione', 'Descrizione', 'testo', { obbl: true }), c('categoria', 'Categoria', 'scelta', { opzioni: [...CAT_USCITE, ...CAT_ENTRATE, GIROCONTO] }),
       c('valore', 'Importo in euro (negativo per le uscite)', 'numero', { obbl: true, euro: true }), c('conto', 'Conto', 'testo', { suggerisci: true }), c('ricorrente', 'Spesa o entrata ricorrente', 'si_no'), c('nota', 'Nota')] },
+    spesa: { nome: 'Spesa ricorrente', plur: 'Spese ricorrenti', titolo: v => v.titolo, colonne: ['titolo', 'valore', 'frequenza', 'di_chi', 'conto', 'stato'], campi: [
+      c('titolo', 'Nome (es. Fastweb, Mutuo, Assicurazione auto)', 'testo', { obbl: true }), c('valore', 'Importo in euro', 'numero', { obbl: true, euro: true }),
+      c('variabile', 'Importo variabile (quello scritto è l\'ultimo o la media)', 'si_no'),
+      c('frequenza', 'Ogni quanto', 'scelta', { obbl: true, opzioni: FREQ_SPESE }), c('data', 'Una scadenza (giorno del mese e mese di partenza)', 'data', { obbl: true }),
+      c('di_chi', 'Di chi', 'scelta', { obbl: true, opzioni: DI_CHI_SPESE }), c('conto', 'Conto', 'testo', { suggerisci: true, esempi: ['BPM personale', 'BPM famiglia'] }),
+      c('categoria', 'Categoria', 'scelta', { opzioni: CAT_USCITE }), c('modo', 'Come si paga', 'scelta', { opzioni: ['addebito automatico', 'bonifico', 'carta', 'contanti'] }),
+      c('riconosci', 'Parola da cercare nei movimenti per segnarla pagata (es. fastweb)'), c('stato', 'Stato', 'scelta', { opzioni: ['attiva', 'chiusa'] }), c('fine', 'Ultima scadenza (se finisce)', 'data'),
+      c('senza_avviso', 'Niente avviso nel calendario SPESE', 'si_no'), c('nota', 'Nota', 'lungo')] },
     budget: { nome: 'Tetto di spesa', plur: 'Tetti di spesa mensili', titolo: v => v.categoria, colonne: ['categoria', 'valore', 'data'], campi: [
       c('categoria', 'Categoria', 'scelta', { obbl: true, opzioni: CAT_USCITE }), c('valore', 'Tetto mensile in euro', 'numero', { obbl: true, euro: true }), c('data', 'In vigore dal', 'data', { obbl: true }), c('nota', 'Nota')] },
   } },

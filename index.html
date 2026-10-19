@@ -14,7 +14,7 @@
 <style>
 :root{
   --fondo:#ece6d9; --carta:#fbf9f4; --inchiostro:#2a2620; --inchiostro2:#5a5348; --tenue:#7d7466; --linea:#ddd5c6; --linea2:#ebe5d8;
-  --marca:#3f5b3a; --marca-su:#ffffff; --marca-tenue:#e1e8d6; --serie:#2a78d6; --serie2:#eb6834;
+  --marca:#3f5b3a; --marca-su:#ffffff; --marca-tenue:#e1e8d6; --lavoro:#1f3a6b; --lavoro-tenue:#e2e8f2; --archivio:#7d7466; --serie:#2a78d6; --serie2:#eb6834;
   --ok:#0a7d0a; --attenzione:#8a5a00; --critico:#c0302f; --critico-tenue:#fbeaea; --attenzione-tenue:#fdf3d9;
   --titoli:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
   --testo:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -22,13 +22,13 @@
 }
 :root[data-tema=scuro]{
   --fondo:#161512; --carta:#201e1a; --inchiostro:#f1ece2; --inchiostro2:#c9c1b2; --tenue:#9a9283; --linea:#38342c; --linea2:#2a2722;
-  --marca:#a9c49a; --marca-su:#172112; --marca-tenue:#2b3326; --serie:#3987e5; --serie2:#d95926;
+  --marca:#a9c49a; --marca-su:#172112; --marca-tenue:#2b3326; --lavoro:#9cc1ff; --lavoro-tenue:#1b2433; --archivio:#9a9283; --serie:#3987e5; --serie2:#d95926;
   --ok:#3fc13f; --attenzione:#f0b429; --critico:#f07a79; --critico-tenue:#3a1e1e; --attenzione-tenue:#3a2f12;
   color-scheme:dark;
 }
 @media (prefers-color-scheme:dark){:root[data-tema=automatico]{
   --fondo:#161512; --carta:#201e1a; --inchiostro:#f1ece2; --inchiostro2:#c9c1b2; --tenue:#9a9283; --linea:#38342c; --linea2:#2a2722;
-  --marca:#a9c49a; --marca-su:#172112; --marca-tenue:#2b3326; --serie:#3987e5; --serie2:#d95926;
+  --marca:#a9c49a; --marca-su:#172112; --marca-tenue:#2b3326; --lavoro:#9cc1ff; --lavoro-tenue:#1b2433; --archivio:#9a9283; --serie:#3987e5; --serie2:#d95926;
   --ok:#3fc13f; --attenzione:#f0b429; --critico:#f07a79; --critico-tenue:#3a1e1e; --attenzione-tenue:#3a2f12;
   color-scheme:dark;
 }}
@@ -275,6 +275,28 @@ a.sito-link:hover strong{color:var(--marca)}
 .contatore-pt{display:inline-flex;align-items:center;gap:.4rem}.contatore-pt strong{min-width:1.4em;text-align:center}.contatore-pt .btn{min-width:2rem;padding-inline:.4rem}
 .seduta-pt{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}.seduta-pt .importo-seduta{display:inline-flex;align-items:center;gap:.3rem}.seduta-pt .importo-seduta input{width:5.5rem}
 .scheda-pt{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.35rem}
+
+/* Sezioni del menu: Lavoro blu scuro, Personale verde, Archivio grigio */
+.menu-gruppo{display:flex;align-items:center;gap:.5rem;margin-top:.6rem}
+.menu-gruppo::before{content:"";width:.55rem;height:.55rem;border-radius:2px;flex:none}
+.menu-gruppo::after{content:"";flex:1;height:1px;background:currentColor;opacity:.25}
+.g-lavoro{color:var(--lavoro)}.g-lavoro::before{background:var(--lavoro)}
+.g-personale{color:var(--marca)}.g-personale::before{background:var(--marca)}
+.g-archivio{color:var(--archivio)}.g-archivio::before{background:var(--archivio)}
+.menu a.m-lavoro{background:var(--lavoro-tenue);color:var(--lavoro)}
+.menu a.m-lavoro:hover{color:var(--lavoro);filter:brightness(.97)}
+.menu a.m-lavoro.attiva{background:var(--carta);box-shadow:inset 4px 0 0 var(--lavoro)}
+.menu a.m-lavoro .conta{background:var(--lavoro);color:#fff}
+.menu a.m-personale.attiva{box-shadow:inset 4px 0 0 var(--marca)}
+@media (max-width:820px){
+  .menu a.m-lavoro{border-color:var(--lavoro);background:var(--lavoro-tenue)}
+  .menu a.m-lavoro.attiva{background:var(--lavoro);border-color:var(--lavoro);color:#fff}
+  .menu a.m-personale{border-color:var(--marca)}
+  .menu a.m-archivio{border-style:dashed}
+  .menu-gruppo{margin:0;padding:0 .1rem 0 .5rem;font-size:.66rem;white-space:nowrap;flex:none}
+  .menu-gruppo::after{display:none}
+}
+.marchio span{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -916,6 +938,10 @@ const RIPETI = { mai: 0, mensile: 1, trimestrale: 3, semestrale: 6, annuale: 12 
 const CAT_USCITE = ['Casa', 'Spesa alimentare', 'Ristoranti e bar', 'Auto e trasporti', 'Salute', 'Figli', 'Istruzione', 'Sport e benessere', 'Abbigliamento', 'Viaggi e svago', 'Abbonamenti', 'Assicurazioni', 'Tasse e imposte', 'Rate e finanziamenti', 'Lavori e ristrutturazioni', 'Regali e donazioni', 'Contanti prelevati', 'Commissioni bancarie', 'Investimenti e partecipazioni', 'Altre uscite'];
 const CAT_ENTRATE = ['Compensi e stipendio', 'Utili e dividendi', 'Contributi famiglia', 'Rimborsi', 'Affitti', 'Prestiti ricevuti', 'Altre entrate'];
 const GIROCONTO = 'Giroconto';
+/* Spese ricorrenti: ogni quanto (in mesi) e di chi. */
+const FREQ_SPESE = ['mensile', 'bimestrale', 'trimestrale', 'quadrimestrale', 'semestrale', 'annuale'];
+const MESI_FREQ = { mensile: 1, bimestrale: 2, trimestrale: 3, quadrimestrale: 4, semestrale: 6, annuale: 12 };
+const DI_CHI_SPESE = ['mie', 'famiglia'];
 const CAT_NEUTRE = new Set([GIROCONTO, 'Investimenti e partecipazioni', 'Prestiti ricevuti']);
 const AMBITI = ['Lavoro', 'Famiglia', 'Personale', 'Salute', 'Finanze'];
 /* Liste di lavoro, come in Google Task: Oggi, Coda, Archivio. Valgono per i task e per le mail da gestire. Il vecchio valore Domani vale come Coda. */
@@ -942,6 +968,14 @@ const AREE_BASE = [
     movimento: { nome: 'Movimento', plur: 'Entrate e uscite', titolo: v => v.descrizione, colonne: ['data', 'descrizione', 'categoria', 'valore', 'conto'], campi: [
       c('data', 'Data', 'data', { obbl: true }), c('descrizione', 'Descrizione', 'testo', { obbl: true }), c('categoria', 'Categoria', 'scelta', { opzioni: [...CAT_USCITE, ...CAT_ENTRATE, GIROCONTO] }),
       c('valore', 'Importo in euro (negativo per le uscite)', 'numero', { obbl: true, euro: true }), c('conto', 'Conto', 'testo', { suggerisci: true }), c('ricorrente', 'Spesa o entrata ricorrente', 'si_no'), c('nota', 'Nota')] },
+    spesa: { nome: 'Spesa ricorrente', plur: 'Spese ricorrenti', titolo: v => v.titolo, colonne: ['titolo', 'valore', 'frequenza', 'di_chi', 'conto', 'stato'], campi: [
+      c('titolo', 'Nome (es. Fastweb, Mutuo, Assicurazione auto)', 'testo', { obbl: true }), c('valore', 'Importo in euro', 'numero', { obbl: true, euro: true }),
+      c('variabile', 'Importo variabile (quello scritto è l\'ultimo o la media)', 'si_no'),
+      c('frequenza', 'Ogni quanto', 'scelta', { obbl: true, opzioni: FREQ_SPESE }), c('data', 'Una scadenza (giorno del mese e mese di partenza)', 'data', { obbl: true }),
+      c('di_chi', 'Di chi', 'scelta', { obbl: true, opzioni: DI_CHI_SPESE }), c('conto', 'Conto', 'testo', { suggerisci: true, esempi: ['BPM personale', 'BPM famiglia'] }),
+      c('categoria', 'Categoria', 'scelta', { opzioni: CAT_USCITE }), c('modo', 'Come si paga', 'scelta', { opzioni: ['addebito automatico', 'bonifico', 'carta', 'contanti'] }),
+      c('riconosci', 'Parola da cercare nei movimenti per segnarla pagata (es. fastweb)'), c('stato', 'Stato', 'scelta', { opzioni: ['attiva', 'chiusa'] }), c('fine', 'Ultima scadenza (se finisce)', 'data'),
+      c('senza_avviso', 'Niente avviso nel calendario SPESE', 'si_no'), c('nota', 'Nota', 'lungo')] },
     budget: { nome: 'Tetto di spesa', plur: 'Tetti di spesa mensili', titolo: v => v.categoria, colonne: ['categoria', 'valore', 'data'], campi: [
       c('categoria', 'Categoria', 'scelta', { obbl: true, opzioni: CAT_USCITE }), c('valore', 'Tetto mensile in euro', 'numero', { obbl: true, euro: true }), c('data', 'In vigore dal', 'data', { obbl: true }), c('nota', 'Nota')] },
   } },
@@ -1448,20 +1482,24 @@ function spiaSync() {
   const testo = !pronto ? 'Solo su questo dispositivo' : st.stato === 'in corso' ? 'Sincronizzo…' : st.stato === 'errore' ? 'Non sincronizzato' : S.sporco ? 'Modifiche da inviare' : st.ultimo ? 'Sincronizzato ' + new Date(st.ultimo).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'Sincronizzazione attiva';
   return h('button', { id: 'stato-sync', class: 'btn piatto spia ' + (!pronto ? 'spenta' : st.stato === 'errore' ? 'ko' : 'ok'), title: st.errore || (pronto ? 'Sincronizza adesso' : 'Configura la sincronizzazione'), 'aria-label': testo, onclick: () => (pronto ? sincronizza(true) : (location.hash = '#/impostazioni')) }, h('span', { class: 'spia-testo' }, testo));
 }
+/* Il menu ha tre sezioni riconoscibili: Lavoro (blu scuro), Personale (verde) e Archivio (grigio). Ogni voce porta il colore della sua sezione. */
 function menu(rotta) {
-  const attiva = r => (rotta.join('/') || 'casa').startsWith(r) || (r === 'passioni' && rotta[0] === 'a' && PASSIONI.includes(rotta[1])) || (r === 'pt' && rotta[0] === 'a' && rotta[1] === 'pt');
-  const v = (href, testo, chiave, n) => h('a', { href, class: attiva(chiave) ? 'attiva' : '', 'aria-current': attiva(chiave) ? 'page' : null }, testo, n ? h('span', { class: 'conta' }, n) : null);
+  const attiva = r => (rotta.join('/') || 'casa').startsWith(r) || (r === 'passioni' && rotta[0] === 'a' && PASSIONI.includes(rotta[1])) || (r === 'pt' && rotta[0] === 'a' && rotta[1] === 'pt') || (r === 'spese' && rotta[0] === 'a' && rotta[1] === 'finanze' && rotta[2] === 'spesa');
+  let sez = '';
+  const v = (href, testo, chiave, n) => h('a', { href, class: [sez ? 'm-' + sez : '', attiva(chiave) ? 'attiva' : ''].filter(Boolean).join(' '), 'aria-current': attiva(chiave) ? 'page' : null }, h('span', { class: 'm-testo' }, testo), n ? h('span', { class: 'conta' }, n) : null);
+  const gruppo = (nome, chiave) => { sez = chiave; return h('div', { class: 'menu-gruppo g-' + chiave }, nome); };
   const scadute = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta' && x.data <= oggi()).length;
   return h('nav', { class: 'menu', 'aria-label': 'Cartelle' },
     v('#/', 'Quadro generale', 'casa'),
-    h('div', { class: 'menu-gruppo' }, 'Lavoro'),
+    gruppo('Lavoro', 'lavoro'),
     v('#/task', 'Task', 'task', quantiOggi('attivita')),
     v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
     v('#/pt', 'Personal trainer', 'pt', voci('pt', 'presenza').filter(x => x.stato === 'da abbinare').length),
     v('#/siti', 'Siti e gestionali', 'siti'),
-    h('div', { class: 'menu-gruppo' }, 'Personale'),
-    aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) || AREE_LAVORO.includes(a.id) ? null : v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0))),
-    h('div', { class: 'menu-gruppo' }, 'Archivio'),
+    gruppo('Personale', 'personale'),
+    aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) || AREE_LAVORO.includes(a.id) ? null
+      : [v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0), a.id === 'finanze' ? v('#/spese', 'Spese', 'spese', speseDaPagareOggi()) : null])),
+    gruppo('Archivio', 'archivio'),
     v('#/rapporti', 'Rapporti', 'rapporti'), v('#/scadenze', 'Scadenze', 'scadenze', scadute), v('#/documenti', 'Documenti', 'documenti', allegati().filter(a => a.stato === 'da elaborare').length), v('#/impostazioni', 'Impostazioni', 'impostazioni'));
 }
 function barra() {
@@ -1496,6 +1534,7 @@ function vistaPer(r) {
   if (r[0] === 'siti') return vistaSiti();
   if (r[0] === 'passioni') return vistaPassioni();
   if (r[0] === 'pt') return vistaPt(r[1]);
+  if (r[0] === 'spese') return vistaSpese(r[1]);
   if (r[0] === 'scadenze') return vistaScadenze();
   if (r[0] === 'rapporti') return vistaRapporti(r[1]);
   if (r[0] === 'documenti') return vistaDocumenti();
@@ -2574,6 +2613,110 @@ function vistaPt(meseRotta) {
     perMese.some(v => v > 0) ? pannello(`Incassi del ${anno}`, grafico(`Importi per mese del ${anno}`, w => graficoBarre(w, { categorie: mesi.map(m => fmtMese(m).replace(/ \d{4}$/, '')), serie: [{ nome: 'Importo', classe: 'g-barra1', valori: perMese }], fmt: v => fmtNum(v, 0) })),
       h('p', { class: 'attenuato piccolo' }, `Totale ${fmtEuro(somma(perMese))}, media ${fmtEuro(somma(perMese) / Math.max(1, perMese.filter(v => v > 0).length))} al mese.`)) : null);
 }
+
+/* ===== 8f. Spese: le spese ricorrenti mese per mese, mie e della famiglia =====
+   Ogni spesa (finanze/spesa) ha importo, frequenza e una scadenza di riferimento: da lì si calcolano le scadenze di ogni mese.
+   È pagata quando nei movimenti del conto c'è un'uscita che contiene la parola "riconosci" vicino alla scadenza,
+   oppure quando Luis la segna a mano (campo pagati, elenco di mesi AAAA-MM). L'avviso del giorno prima, nel calendario
+   Google SPESE, lo crea Claude ogni mattina. */
+const spesaAttiva = sp => sp.stato !== 'chiusa';
+const mesiTra = (da, a) => (+a.slice(0, 4) - +da.slice(0, 4)) * 12 + (+a.slice(5, 7) - +da.slice(5, 7));
+function scadenzaNelMese(sp, mese) {
+  if (!sp.data) return null;
+  const passo = MESI_FREQ[sp.frequenza] || 1, diff = mesiTra(sp.data.slice(0, 7), mese);
+  if (diff < 0 || diff % passo) return null;
+  const ultimo = +ultimoDelMese(mese).slice(8, 10), giorno = Math.min(+sp.data.slice(8, 10), ultimo);
+  const d = `${mese}-${String(giorno).padStart(2, '0')}`;
+  return sp.fine && d > sp.fine ? null : d;
+}
+function prossimaScadenza(sp, dal = oggi()) {
+  let m = dal.slice(0, 7);
+  for (let i = 0; i < 25; i++, m = meseDopo(m, 1)) { const d = scadenzaNelMese(sp, m); if (d && d >= dal) return d; }
+  return null;
+}
+const mesiPagati = sp => String(sp.pagati || '').split(',').map(t => t.trim()).filter(Boolean);
+/* Movimento che paga la spesa: uscita entro 10 giorni dalla scadenza, dello stesso conto se indicato, con la parola da riconoscere. */
+function movimentoDi(sp, scad, uscite) {
+  if (!sp.riconosci || !scad) return null;
+  const parola = normaNome(sp.riconosci), t = tempo(scad);
+  return uscite.find(m => Math.abs(tempo(m.data) - t) <= 10 * MS_G && (!sp.conto || normaNome(m.conto) === normaNome(sp.conto)) && normaNome(m.descrizione).includes(parola)) || null;
+}
+function righeSpese(mese) {
+  const uscite = voci('finanze', 'movimento').filter(m => m.valore < 0);
+  return voci('finanze', 'spesa').filter(spesaAttiva).map(sp => {
+    const scad = scadenzaNelMese(sp, mese);
+    if (!scad) return null;
+    const mov = movimentoDi(sp, scad, uscite), aMano = mesiPagati(sp).includes(mese);
+    return { sp, scad, mov, pagata: !!mov || aMano, aMano, importo: mov ? Math.abs(mov.valore) : sp.valore };
+  }).filter(Boolean).sort((a, b) => a.scad.localeCompare(b.scad) || a.sp.titolo.localeCompare(b.sp.titolo, 'it'));
+}
+function speseDaPagareOggi() {
+  const domani = piuGiorni(oggi(), 1);
+  return righeSpese(oggi().slice(0, 7)).filter(r => !r.pagata && r.scad <= domani).length;
+}
+function segnaPagata(sp, mese, si) {
+  const l = mesiPagati(sp).filter(m => m !== mese), { pagati, ...resto } = sp;
+  if (si) l.push(mese);
+  metti(l.length ? { ...resto, pagati: l.sort().join(', ') } : resto);
+  avviso(si ? `${sp.titolo}: segnata pagata.` : `${sp.titolo}: di nuovo da pagare.`);
+}
+const etichettaDiChi = d => (d ? h('span', { class: 'etichetta e-' + (d === 'mie' ? 'acqua' : 'arancione') }, d) : null);
+const mensileEquivalente = sp => sp.valore / (MESI_FREQ[sp.frequenza] || 1);
+
+function vistaSpese(meseRotta) {
+  const mese = /^\d{4}-\d{2}$/.test(meseRotta || '') ? meseRotta : oggi().slice(0, 7);
+  const nuova = () => apriModulo('finanze', 'spesa', null, { frequenza: 'mensile', di_chi: 'mie', stato: 'attiva', modo: 'addebito automatico', data: oggi() });
+  const tutte = voci('finanze', 'spesa').filter(spesaAttiva);
+  if (!voci('finanze', 'spesa').length) return h('div', {}, h('div', { class: 'testa' }, h('h1', {}, 'Spese')),
+    pannello('', vuoto('Nessuna spesa ricorrente. Aggiungi mutuo, rate, bollette e abbonamenti: qui vedi ogni mese cosa scade e cosa è già pagato, e il giorno prima arriva l\'avviso nel calendario SPESE.', btn('Aggiungi una spesa', nuova, 'primario'))));
+  const chi = DI_CHI_SPESE.includes(S.speseChi) ? S.speseChi : '';
+  const righe = righeSpese(mese), viste = righe.filter(r => !chi || r.sp.di_chi === chi);
+  const tot = l => somma(l.map(r => r.importo));
+  const perChi = (l, d) => tot(l.filter(r => r.sp.di_chi === d));
+  const daPagare = righe.filter(r => !r.pagata), prossima = daPagare.find(r => r.scad >= oggi());
+  const filtro = (valore, testo) => h('button', { type: 'button', class: 'filtro' + (chi === valore ? ' scelto' : ''), 'aria-pressed': chi === valore ? 'true' : 'false', onclick: () => { S.speseChi = valore; disegna(); } }, testo);
+  const statoRiga = r => {
+    if (r.mov) return stato('ok', `pagata il ${fmtData(r.mov.data)}`);
+    if (r.aMano) return stato('ok', 'pagata');
+    const g = -giorniDaSe(r.scad);
+    return g < 0 ? stato('ritardo', `scaduta il ${fmtData(r.scad)}`) : g <= 1 ? stato('ritardo', g === 0 ? 'scade oggi' : 'scade domani') : stato('vuota', 'da pagare');
+  };
+  const tabella = l => h('div', { class: 'scorri' }, h('table', { class: 'tabella-spese' },
+    h('thead', {}, h('tr', {}, ['Giorno', 'Spesa', 'Di chi', 'Importo', 'Conto', 'Stato', ''].map((t, i) => h('th', { class: i === 3 ? 'destra' : '' }, t)))),
+    h('tbody', {}, l.map(r => h('tr', { class: 'cliccabile', tabindex: 0, title: 'Modifica la spesa', onclick: () => apriModulo('finanze', 'spesa', r.sp), onkeydown: e => { if (e.key === 'Enter') apriModulo('finanze', 'spesa', r.sp); } },
+      h('td', { class: 'nonspezza' }, fmtData(r.scad).replace(/ \d{4}$/, '')),
+      h('td', {}, h('strong', {}, r.sp.titolo), r.sp.categoria ? h('div', { class: 'attenuato piccolo' }, r.sp.categoria + (r.sp.modo ? ', ' + r.sp.modo : '')) : null),
+      h('td', {}, etichettaDiChi(r.sp.di_chi)),
+      h('td', { class: 'num destra nonspezza' }, (r.sp.variabile && !r.mov ? '~ ' : '') + fmtEuro2(r.importo)),
+      h('td', { class: 'attenuato' }, r.sp.conto || ''),
+      h('td', {}, statoRiga(r)),
+      h('td', { class: 'destra', onclick: e => e.stopPropagation() }, r.mov ? null : btn(r.aMano ? 'Annulla' : 'Pagata', () => segnaPagata(r.sp, mese, !r.aMano), 'piccolo')))))));
+  const blocco = (titolo, l, vuotoTesto) => pannello(titolo,
+    l.length ? [tabella(l), h('p', { class: 'attenuato piccolo' }, `Totale ${fmtEuro2(tot(l))}: mie ${fmtEuro2(perChi(l, 'mie'))}, famiglia ${fmtEuro2(perChi(l, 'famiglia'))}.`)] : h('p', { class: 'attenuato' }, vuotoTesto));
+  const altre = tutte.filter(sp => sp.frequenza && sp.frequenza !== 'mensile' && (!chi || sp.di_chi === chi) && !scadenzaNelMese(sp, mese));
+  const equivalente = d => somma(tutte.filter(sp => !d || sp.di_chi === d).map(mensileEquivalente));
+  return h('div', {},
+    h('div', { class: 'testa' },
+      h('div', {}, h('h1', {}, 'Spese'), h('p', { class: 'sotto largo-testo' }, 'Le spese ricorrenti del mese, tue e della famiglia. Quando il movimento arriva dalla banca la spesa risulta pagata da sola; il giorno prima di ogni scadenza trovi l\'avviso nel calendario Google SPESE.')),
+      h('div', { class: 'azioni' }, btn('Aggiungi una spesa', nuova, 'primario'))),
+    h('nav', { class: 'mese-nav azioni', 'aria-label': 'Mese' },
+      h('a', { class: 'btn piccolo', href: '#/spese/' + meseDopo(mese, -1), 'aria-label': 'Mese precedente' }, '‹'),
+      h('strong', { class: 'mese-pt' }, meseLungo(mese)),
+      h('a', { class: 'btn piccolo', href: '#/spese/' + meseDopo(mese, 1), 'aria-label': 'Mese successivo' }, '›'),
+      mese !== oggi().slice(0, 7) ? h('a', { class: 'btn piccolo', href: '#/spese' }, 'Questo mese') : null),
+    h('div', { class: 'dati' },
+      dato('Spese del mese', fmtEuro(tot(righe)), `mie ${fmtEuro(perChi(righe, 'mie'))}, famiglia ${fmtEuro(perChi(righe, 'famiglia'))}`),
+      dato('Già pagate', fmtEuro(tot(righe.filter(r => r.pagata))), `${righe.filter(r => r.pagata).length} su ${righe.length}`),
+      dato('Da pagare', daPagare.length, prossima ? `prossima: ${prossima.sp.titolo}, ${fmtData(prossima.scad)}` : '', daPagare.some(r => r.scad < oggi()) ? 'allerta' : ''),
+      dato('Impegno medio al mese', fmtEuro(equivalente()), `mie ${fmtEuro(equivalente('mie'))}, famiglia ${fmtEuro(equivalente('famiglia'))}`)),
+    h('div', { class: 'azioni filtri' }, h('span', { class: 'attenuato piccolo' }, 'Mostra:'), filtro('', 'Tutte'), filtro('mie', 'Mie'), filtro('famiglia', 'Famiglia')),
+    blocco('Spese mensili', viste.filter(r => (r.sp.frequenza || 'mensile') === 'mensile'), 'Nessuna spesa mensile.'),
+    blocco('Altre spese ricorrenti di questo mese', viste.filter(r => r.sp.frequenza && r.sp.frequenza !== 'mensile'), 'Questo mese non scadono spese bimestrali, trimestrali o annuali.'),
+    altre.length ? pannello('Le altre ricorrenti, prossime scadenze', h('ul', { class: 'elenco' }, altre.map(sp => ({ sp, d: prossimaScadenza(sp, meseDopo(mese, 1) + '-01') })).sort((a, b) => (a.d || '9').localeCompare(b.d || '9')).map(({ sp, d }) =>
+      h('li', { class: 'tra cliccabile', tabindex: 0, onclick: () => apriModulo('finanze', 'spesa', sp) }, h('span', {}, h('strong', {}, sp.titolo), ' ', etichettaDiChi(sp.di_chi), h('span', { class: 'attenuato' }, ` ${sp.frequenza}, ${fmtEuro2(sp.valore)}`)), h('span', { class: 'attenuato nonspezza' }, d ? fmtData(d) : 'finita'))))) : null,
+    h('div', { class: 'azioni' }, h('a', { class: 'btn piccolo', href: '#/a/finanze/spesa' }, 'Tutte le spese in tabella')));
+}
+const fmtEuro2 = n => (n == null || isNaN(n) ? '' : Number(n).toLocaleString('it-IT', { style: 'currency', currency: 'EUR', minimumFractionDigits: Number.isInteger(+n) ? 0 : 2, maximumFractionDigits: 2 }));
 
 /* ===== 9. Impostazioni: persone, cartelle, repository dei dati, Garmin, sicurezza ===== */
 function toccaImpostazioni() { S.A.impostazioni.agg = adesso(); }

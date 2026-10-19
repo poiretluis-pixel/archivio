@@ -221,20 +221,24 @@ function spiaSync() {
   const testo = !pronto ? 'Solo su questo dispositivo' : st.stato === 'in corso' ? 'Sincronizzo…' : st.stato === 'errore' ? 'Non sincronizzato' : S.sporco ? 'Modifiche da inviare' : st.ultimo ? 'Sincronizzato ' + new Date(st.ultimo).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'Sincronizzazione attiva';
   return h('button', { id: 'stato-sync', class: 'btn piatto spia ' + (!pronto ? 'spenta' : st.stato === 'errore' ? 'ko' : 'ok'), title: st.errore || (pronto ? 'Sincronizza adesso' : 'Configura la sincronizzazione'), 'aria-label': testo, onclick: () => (pronto ? sincronizza(true) : (location.hash = '#/impostazioni')) }, h('span', { class: 'spia-testo' }, testo));
 }
+/* Il menu ha tre sezioni riconoscibili: Lavoro (blu scuro), Personale (verde) e Archivio (grigio). Ogni voce porta il colore della sua sezione. */
 function menu(rotta) {
-  const attiva = r => (rotta.join('/') || 'casa').startsWith(r) || (r === 'passioni' && rotta[0] === 'a' && PASSIONI.includes(rotta[1])) || (r === 'pt' && rotta[0] === 'a' && rotta[1] === 'pt');
-  const v = (href, testo, chiave, n) => h('a', { href, class: attiva(chiave) ? 'attiva' : '', 'aria-current': attiva(chiave) ? 'page' : null }, testo, n ? h('span', { class: 'conta' }, n) : null);
+  const attiva = r => (rotta.join('/') || 'casa').startsWith(r) || (r === 'passioni' && rotta[0] === 'a' && PASSIONI.includes(rotta[1])) || (r === 'pt' && rotta[0] === 'a' && rotta[1] === 'pt') || (r === 'spese' && rotta[0] === 'a' && rotta[1] === 'finanze' && rotta[2] === 'spesa');
+  let sez = '';
+  const v = (href, testo, chiave, n) => h('a', { href, class: [sez ? 'm-' + sez : '', attiva(chiave) ? 'attiva' : ''].filter(Boolean).join(' '), 'aria-current': attiva(chiave) ? 'page' : null }, h('span', { class: 'm-testo' }, testo), n ? h('span', { class: 'conta' }, n) : null);
+  const gruppo = (nome, chiave) => { sez = chiave; return h('div', { class: 'menu-gruppo g-' + chiave }, nome); };
   const scadute = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta' && x.data <= oggi()).length;
   return h('nav', { class: 'menu', 'aria-label': 'Cartelle' },
     v('#/', 'Quadro generale', 'casa'),
-    h('div', { class: 'menu-gruppo' }, 'Lavoro'),
+    gruppo('Lavoro', 'lavoro'),
     v('#/task', 'Task', 'task', quantiOggi('attivita')),
     v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
     v('#/pt', 'Personal trainer', 'pt', voci('pt', 'presenza').filter(x => x.stato === 'da abbinare').length),
     v('#/siti', 'Siti e gestionali', 'siti'),
-    h('div', { class: 'menu-gruppo' }, 'Personale'),
-    aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) || AREE_LAVORO.includes(a.id) ? null : v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0))),
-    h('div', { class: 'menu-gruppo' }, 'Archivio'),
+    gruppo('Personale', 'personale'),
+    aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) || AREE_LAVORO.includes(a.id) ? null
+      : [v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0), a.id === 'finanze' ? v('#/spese', 'Spese', 'spese', speseDaPagareOggi()) : null])),
+    gruppo('Archivio', 'archivio'),
     v('#/rapporti', 'Rapporti', 'rapporti'), v('#/scadenze', 'Scadenze', 'scadenze', scadute), v('#/documenti', 'Documenti', 'documenti', allegati().filter(a => a.stato === 'da elaborare').length), v('#/impostazioni', 'Impostazioni', 'impostazioni'));
 }
 function barra() {
@@ -269,6 +273,7 @@ function vistaPer(r) {
   if (r[0] === 'siti') return vistaSiti();
   if (r[0] === 'passioni') return vistaPassioni();
   if (r[0] === 'pt') return vistaPt(r[1]);
+  if (r[0] === 'spese') return vistaSpese(r[1]);
   if (r[0] === 'scadenze') return vistaScadenze();
   if (r[0] === 'rapporti') return vistaRapporti(r[1]);
   if (r[0] === 'documenti') return vistaDocumenti();
