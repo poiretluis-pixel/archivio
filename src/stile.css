@@ -254,3 +254,5 @@ a.sito-link:hover strong{color:var(--marca)}
 /* Personal trainer */
 .mese-nav{align-items:center;margin:0 0 1rem}.mese-pt{font-family:var(--titoli);font-size:1.15rem;min-width:9.5rem;text-align:center;text-transform:capitalize}
 .tabella-pt td{vertical-align:top}.tabella-pt tr.cliccabile{cursor:pointer}
+.contatore-pt{display:inline-flex;align-items:center;gap:.4rem}.contatore-pt strong{min-width:1.4em;text-align:center}.contatore-pt .btn{min-width:2rem;padding-inline:.4rem}
+.seduta-pt{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}.seduta-pt .importo-seduta{display:inline-flex;align-items:center;gap:.3rem}.seduta-pt .importo-seduta input{width:5.5rem}

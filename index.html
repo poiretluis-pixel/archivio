@@ -266,6 +266,8 @@ a.sito-link:hover strong{color:var(--marca)}
 /* Personal trainer */
 .mese-nav{align-items:center;margin:0 0 1rem}.mese-pt{font-family:var(--titoli);font-size:1.15rem;min-width:9.5rem;text-align:center;text-transform:capitalize}
 .tabella-pt td{vertical-align:top}.tabella-pt tr.cliccabile{cursor:pointer}
+.contatore-pt{display:inline-flex;align-items:center;gap:.4rem}.contatore-pt strong{min-width:1.4em;text-align:center}.contatore-pt .btn{min-width:2rem;padding-inline:.4rem}
+.seduta-pt{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}.seduta-pt .importo-seduta{display:inline-flex;align-items:center;gap:.3rem}.seduta-pt .importo-seduta input{width:5.5rem}
 </style>
 </head>
 <body>
@@ -2463,6 +2465,43 @@ function abbina(x, nome) {
   metti({ ...x, cliente: nome, stato: 'fatta' }); avviso(`Presenza abbinata a ${nome}.`);
 }
 
+/* --- Sedute di un cliente nel mese: aggiungere, spostare, togliere --- */
+const ultimoDelMese = m => new Date(Date.UTC(+m.slice(0, 4), +m.slice(5, 7), 0)).toISOString().slice(0, 10);
+const giornoNelMese = m => (oggi().startsWith(m) ? oggi() : ultimoDelMese(m));
+function aggiungiSeduta(c, data) {
+  if (!data) return;
+  metti({ area: 'pt', tipo: 'presenza', persona: titolarePt(), data, cliente: c.titolo, stato: 'fatta', origine: 'a mano' });
+  avviso(`Seduta del ${fmtData(data)} aggiunta.`);
+}
+/* Una seduta del calendario non si cancella ma si annulla, così l'aggiornamento della sera non la rimette; per il corso si toglie solo il nome dai presenti. */
+function togliSeduta(c, x) {
+  if (lezioneCorso(x)) {
+    const resto = partecipantiDi(x).filter(p => normaNome(p) !== normaNome(c.titolo)), { partecipanti, ...v } = x;
+    metti(resto.length ? { ...v, partecipanti: resto.join(', ') } : v);
+  } else if (x.origine === 'calendario') metti({ ...x, stato: 'annullata', a_mano: true });
+  else togli('voci', x.id);
+  avviso(`Seduta del ${fmtData(x.data)} tolta.`);
+}
+function dettaglioMesePt(c, mese) {
+  const riapri = () => dettaglioMesePt(voce(c.id) || c, mese);
+  const pres = delMese(presenzeCliente(c), mese), calc = importoCalcolato(c, pres), salvato = conteggioDi(c, mese);
+  const nuovaData = h('input', { type: 'date', value: giornoNelMese(mese), 'aria-label': 'Giorno della nuova seduta' });
+  const riga = x => h('li', { class: 'seduta-pt' },
+    h('input', { type: 'date', value: x.data, disabled: lezioneCorso(x), 'aria-label': 'Giorno della seduta', onchange: e => { if (!e.target.value) return; metti({ ...x, data: e.target.value, a_mano: true }); avviso(`Spostata al ${fmtData(e.target.value)}.`); riapri(); } }),
+    h('span', { class: 'attenuato piccolo' }, [x.ora, lezioneCorso(x) ? 'lezione del corso' : x.origine === 'calendario' ? 'dal calendario' : 'aggiunta a mano'].filter(Boolean).join(', ')),
+    lezioneCorso(x) ? null : h('label', { class: 'importo-seduta' }, h('span', { class: 'attenuato piccolo' }, '€'),
+      h('input', { type: 'number', min: 0, step: 1, inputmode: 'decimal', value: typeof x.importo === 'number' ? x.importo : '', placeholder: typeof c.tariffa === 'number' ? String(c.tariffa) : '', 'aria-label': 'Importo di questa seduta',
+        onchange: e => { const n = e.target.value === '' ? null : Number(e.target.value); const { importo, ...v } = x; metti(n == null || isNaN(n) ? v : { ...v, importo: n }); riapri(); } })),
+    btn('Togli', () => { togliSeduta(c, x); riapri(); }, 'piccolo'));
+  apriModale(`${c.titolo}, ${meseLungo(mese)}`, h('div', {},
+    h('p', { class: 'sotto' }, [`${pres.length} ${pres.length === 1 ? 'seduta' : 'sedute'}`, calc == null ? 'tariffa da indicare' : fmtEuro(calc), c.pagamento ? 'paga con ' + c.pagamento : '', c.tariffa_mese ? `${fmtEuro(c.tariffa_mese)} al mese` : typeof c.tariffa === 'number' ? `${fmtEuro(c.tariffa)} a seduta` : ''].filter(Boolean).join(', ')),
+    salvato && salvato.valore !== calc ? h('p', { class: 'attenuato piccolo' }, `Conteggio già registrato per questo mese: ${fmtEuro(salvato.valore)}. Se hai cambiato le sedute, aggiornalo da "Conteggi e incassi".`) : null,
+    pres.length ? h('ul', { class: 'elenco' }, pres.map(riga)) : h('p', { class: 'attenuato' }, 'Nessuna seduta in questo mese.'),
+    h('div', { class: 'azioni' }, nuovaData, btn('Aggiungi una seduta', () => { aggiungiSeduta(c, nuovaData.value); riapri(); }, 'primario')),
+    h('p', { class: 'attenuato piccolo' }, 'Cambia il giorno con il calendario della riga. L\'importo della singola seduta serve solo quando il prezzo varia: vuoto vuol dire tariffa normale.'),
+    h('div', { class: 'azioni' }, btn('Modifica i dati del cliente', () => { chiudiModale(); apriModulo('pt', 'cliente', voce(c.id) || c); }), btn('Chiudi', chiudiModale))), true);
+}
+
 function vistaPt(meseRotta) {
   const mese = /^\d{4}-\d{2}$/.test(meseRotta || '') ? meseRotta : oggi().slice(0, 7);
   const tutte = righeMesePt(mese), righe = tutte.filter(r => r.sedute || r.salvato || attivoPt(r.c));
@@ -2505,13 +2544,17 @@ function vistaPt(meseRotta) {
       mostrate.length ? h('div', { class: 'scorri' }, h('table', { class: 'tabella-pt' },
       h('thead', {}, h('tr', {}, ['Cliente', 'Paga con', 'Giorni abituali', 'Sedute', 'Importo', 'Pacchetto', 'Scheda', 'Ultima volta'].map((t, i) => h('th', { class: [3, 4].includes(i) ? 'destra' : '' }, t)))),
       h('tbody', {}, mostrate.map(r => { const sc = statoScheda(r.c), ult = r.pres[r.pres.length - 1];
-        return h('tr', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('pt', 'cliente', r.c), onkeydown: e => { if (e.key === 'Enter') apriModulo('pt', 'cliente', r.c); } },
+        const apri = () => dettaglioMesePt(r.c, mese), ferma = e => e.stopPropagation();
+        return h('tr', { class: 'cliccabile', tabindex: 0, title: 'Apri le sedute del mese', onclick: apri, onkeydown: e => { if (e.key === 'Enter') apri(); } },
           cella(h('span', {}, h('strong', {}, r.c.titolo), r.c.servizio === CORSO_PT ? h('span', { class: 'attenuato piccolo' }, ' corso') : null, !attivoPt(r.c) ? h('span', { class: 'attenuato piccolo' }, ' inattivo') : null)),
-          cella(etichettaPagamento(r.c.pagamento)), cella(giorniAbituali(r.pres), 'attenuato'), cella(String(r.sedute), 'num destra'),
+          cella(etichettaPagamento(r.c.pagamento)), cella(giorniAbituali(r.pres), 'attenuato'), cella(h('span', { class: 'contatore-pt', onclick: ferma },
+            h('button', { type: 'button', class: 'btn piccolo', 'aria-label': 'Togli una seduta a ' + r.c.titolo, disabled: !r.sedute, onclick: () => { const m = delMese(r.pres, mese); if (m.length) togliSeduta(r.c, m[m.length - 1]); } }, '−'),
+            h('strong', { class: 'num' }, String(r.sedute)),
+            h('button', { type: 'button', class: 'btn piccolo', 'aria-label': 'Aggiungi una seduta a ' + r.c.titolo, onclick: () => aggiungiSeduta(r.c, giornoNelMese(mese)) }, '+')), 'destra nonspezza'),
           cella(r.importo == null ? (r.sedute ? 'tariffa?' : '') : fmtEuro(r.importo) + (r.salvato ? (r.salvato.incassato ? ' ✓' : '') : ''), 'num destra nonspezza' + (r.importo == null && r.sedute ? ' fuori' : '')),
           cella(pacchettoUsato(r.c, r.pres)), cella(sc.testo ? (sc.tipo ? stato(sc.tipo, sc.testo) : sc.testo) : ''), cella(ult ? fmtData(ult.data) : '', 'nonspezza'));
       })))) : h('p', { class: 'attenuato' }, vedi === 'inattivi' ? 'Nessun cliente inattivo.' : 'Nessuna seduta in questo mese.'),
-      h('p', { class: 'attenuato piccolo' }, 'Importo: sedute per euro a seduta, oppure la cifra fissa mensile; per le sedute con prezzo variabile (come le sostituzioni del corso) vale l\'importo scritto nella presenza. Dopo "Registra i conteggi" l\'importo resta fisso e puoi segnarlo come incassato. ✓ vuol dire incassato.'),
+      h('p', { class: 'attenuato piccolo' }, 'Tocca un cliente per vedere e modificare le sedute del mese, giorno per giorno; con − e + togli l\'ultima seduta o ne aggiungi una oggi. Importo: sedute per euro a seduta, oppure la cifra fissa mensile; per le sedute con prezzo variabile (come le sostituzioni del corso) vale l\'importo scritto nella presenza. Dopo "Registra i conteggi" l\'importo resta fisso e puoi segnarlo come incassato. ✓ vuol dire incassato.'),
       h('div', { class: 'azioni' }, btn('Registra i conteggi del mese', () => registraConteggi(mese, righe), 'piccolo'), h('a', { class: 'btn piccolo', href: '#/a/pt/conteggio' }, 'Conteggi e incassi'), h('a', { class: 'btn piccolo', href: '#/a/pt/presenza' }, 'Tutte le presenze'), h('a', { class: 'btn piccolo', href: '#/a/pt/cliente' }, 'Tutti i clienti'))),
     lezioni.length ? pannello('Corso posturale', h('ul', { class: 'elenco' }, lezioni.map(x => h('li', { class: 'tra' },
       h('span', {}, h('strong', {}, fmtData(x.data) + (x.ora ? ', ' + x.ora : '')), h('span', { class: 'attenuato' }, partecipantiDi(x).length ? ` ${partecipantiDi(x).join(', ')}` : ' presenti da segnare')),
