@@ -311,6 +311,38 @@ async def main():
         await r.locator("button:has-text('Togli dal calendario')").click()
         await A.wait_for_timeout(200)
         controlla(await A.locator("li:has-text('Task senza scadenza') :text('esce dal calendario')").count() == 1, "Togli dal calendario: uscita registrata")
+        # Calendario Google collegato dalla pagina: l'evento si crea, si sposta e si toglie subito, con Google simulato.
+        chiamate = []
+        async def google(route):
+            rq = route.request
+            chiamate.append((rq.method, rq.url, rq.post_data or ""))
+            if rq.method == "POST":
+                return await route.fulfill(status=200, headers={"Content-Type": "application/json"}, body=json.dumps({"id": "ev-prova"}))
+            if rq.method == "PATCH":
+                return await route.fulfill(status=200, headers={"Content-Type": "application/json"}, body="{}")
+            return await route.fulfill(status=204, body="")
+        await A.route("https://www.googleapis.com/**", google)
+        await A.evaluate("S.A.impostazioni.google_client_id = 'prova.apps.googleusercontent.com'; S.A.impostazioni.calendario_task = 'cal-prova@group.calendar.google.com'; GCAL.token = 'tok'; GCAL.scade = Date.now() + 3600e3; (v => metti(senzaEvento({...v, calendario: false})))(S.A.voci.find(v => v.titolo === 'Task senza scadenza'))")
+        await A.wait_for_timeout(200)
+        await A.locator("li:has-text('Task senza scadenza') button:has-text('Aggiungi al calendario')").click()
+        await A.wait_for_timeout(600)
+        t = await A.evaluate("S.A.voci.find(v => v.titolo === 'Task senza scadenza')")
+        post = [c for c in chiamate if c[0] == "POST"]
+        controlla(t.get("evento_id") == "ev-prova" and t.get("evento_data") == "2026-12-01" and len(post) == 1 and "cal-prova%40group.calendar.google.com" in post[0][1]
+                  and json.loads(post[0][2]).get("start") == {"date": "2026-12-01"} and json.loads(post[0][2]).get("end") == {"date": "2026-12-02"} and json.loads(post[0][2]).get("transparency") == "transparent", f"Google collegato: evento creato subito {post}")
+        controlla(await A.locator("li:has-text('Task senza scadenza') :text('nel calendario TASK')").count() == 1, "Google collegato: la riga dice nel calendario TASK")
+        await A.locator("li:has-text('Task senza scadenza') input[type=date]").fill("2026-12-03")
+        await A.wait_for_timeout(200)
+        await A.locator("li:has-text('Task senza scadenza') button:has-text('Togli dal calendario')").click()
+        await A.wait_for_timeout(600)
+        t = await A.evaluate("S.A.voci.find(v => v.titolo === 'Task senza scadenza')")
+        controlla(any(c[0] == "DELETE" and "ev-prova" in c[1] for c in chiamate) and "evento_id" not in t and not t.get("calendario"), "Google collegato: Togli dal calendario cancella l'evento")
+        await A.evaluate("delete S.A.impostazioni.google_client_id; delete S.A.impostazioni.calendario_task; GCAL.token = ''")
+        await A.goto(URL + "#/impostazioni")
+        await A.wait_for_timeout(300)
+        controlla(await A.locator("h2:has-text('Calendario Google TASK')").count() == 1, "Impostazioni: pannello del calendario Google")
+        await A.goto(URL + "#/task/tutti")
+        await A.wait_for_timeout(300)
         await A.locator("li:has-text('Task senza scadenza') input[type=date]").fill("")
         await A.wait_for_timeout(200)
         controlla(await A.evaluate("!('data' in S.A.voci.find(v => v.titolo === 'Task senza scadenza'))"), "scadenza tolta")

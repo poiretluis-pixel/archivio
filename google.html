@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Accesso a Google</title>
+</head>
+<body style="font-family: system-ui, sans-serif; padding: 2rem;">
+<p id="testo">Un momento…</p>
+<script>
+/* Ritorno dall'accesso a Google: passa il token a Life Planning (messaggio, BroadcastChannel e, per 15 secondi, localStorage) e si chiude. */
+(function () {
+  var p = new URLSearchParams(location.hash.slice(1) || location.search.slice(1));
+  history.replaceState(null, '', location.pathname);
+  var dati = { tipo: 'accesso-google', access_token: p.get('access_token') || '', expires_in: p.get('expires_in') || '', state: p.get('state') || '', error: p.get('error') || '' };
+  try { new BroadcastChannel('accesso-google').postMessage(dati); } catch (e) {}
+  try { localStorage.setItem('accesso-google', JSON.stringify(dati)); setTimeout(function () { try { localStorage.removeItem('accesso-google'); } catch (e) {} }, 15000); } catch (e) {}
+  try { if (window.opener && !window.opener.closed) window.opener.postMessage(dati, location.origin); } catch (e) {}
+  document.getElementById('testo').textContent = dati.access_token ? 'Fatto. Questa finestra si chiude da sola; se resta aperta, chiudila e torna a Life Planning.' : 'Accesso non riuscito: chiudi questa finestra e riprova.';
+  setTimeout(function () { window.close(); }, 800);
+})();
+</script>
+</body>
+</html>

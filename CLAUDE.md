@@ -10,7 +10,7 @@ Il programma deriva da ArchivioGhessa di Lorenzo Ghessa: le migliorie generali s
 - GitHub Pages pubblica da `main`, radice, all'indirizzo https://poiretluis-pixel.github.io/archivio/: ogni push è online in 1-2 minuti.
 
 ## Regole
-- Nessuna libreria esterna, nessuna chiamata di rete oltre a `api.github.com`.
+- Nessuna libreria esterna, nessuna chiamata di rete oltre a `api.github.com`. Unica eccezione, voluta da Luis il 19/10/2026: il calendario Google TASK (`src/08g-google.js` e `google.html`), con accesso da `accounts.google.com` e chiamate solo a `www.googleapis.com/calendar`.
 - Il testo dei dati va inserito nella pagina sempre come testo (funzioni `h` e `s`), mai come HTML.
 - Non cambiare il significato dei campi esistenti. Un cambiamento incompatibile del formato richiede `archivio-vita/2` e la conversione automatica della versione 1.
 - La forma di `archivio.json` (funzione `serializza`) deve restare identica a quella di `strumenti/archivio.py` nel repository dei dati.

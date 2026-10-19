@@ -23,7 +23,7 @@ function perPrioritaLavoro(a, b) {
   return ordinePriorita(a) - ordinePriorita(b) || perData(a, b);
 }
 const quantiOggi = tipo => lavoriAperti().filter(x => tipoPagina(x) === tipo && listaDi(x) === 'Oggi').length;
-/* Calendario Google TASK: Luis sceglie con un clic quali task mettere (calendario: true); gli eventi li crea, sposta e toglie Claude (evento_id, evento_data). */
+/* Calendario Google TASK: Luis sceglie con un clic quali task mettere (calendario: true); se Google è collegato (8g) la pagina crea subito l'evento, altrimenti lo crea Claude (evento_id, evento_data). */
 function statoCalendario(x) {
   if (!x.data) return '';
   if (!x.calendario) return x.evento_id ? 'esce dal calendario al prossimo aggiornamento' : '';
@@ -32,8 +32,8 @@ function statoCalendario(x) {
 function pulsanteCalendario(x) {
   if (!x.data) return null;
   return x.calendario
-    ? btn('Togli dal calendario', () => { metti({ ...x, calendario: false }); avviso('Esce dal calendario TASK al prossimo aggiornamento.'); }, 'piccolo')
-    : btn('Aggiungi al calendario', () => { metti({ ...x, calendario: true }); avviso('Entra nel calendario TASK al prossimo aggiornamento.'); }, 'piccolo');
+    ? btn('Togli dal calendario', () => { metti({ ...x, calendario: false }); gcalDopoClic('Esce dal calendario TASK'); }, 'piccolo')
+    : btn('Aggiungi al calendario', () => { metti({ ...x, calendario: true }); gcalDopoClic('Entra nel calendario TASK'); }, 'piccolo');
 }
 /* Etichette colorate per chi riguarda il task o la mail: Pioltello blu, Porta Romana giallo, Personale rosso; per i task personali CASA viola, GIARDINO verde, PROGETTI acqua. */
 const COLORI_ETICHETTA = { '3MEDical Pioltello': 'blu', '3MEDical Porta Romana': 'giallo', 'Personale': 'rosso', '3MEDical': 'bluscuro', 'Psiche e Soma': 'arancione', 'Personal trainer': 'nero', CASA: 'viola', GIARDINO: 'verde', PROGETTI: 'acqua' };

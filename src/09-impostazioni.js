@@ -102,6 +102,7 @@ function vistaImpostazioni() {
         h('li', {}, 'Copia il token e incollalo qui. Quando scade, la pagina lo segnala: se ne crea uno nuovo e lo si incolla di nuovo.')),
         h('p', { class: 'attenuato piccolo' }, 'Il token resta solo su questo dispositivo, cifrato con la tua frase.'))),
     pannelloGarmin(),
+    pannelloGoogle(),
     pannello('Esportazione',
       h('div', { class: 'azioni' }, btn('Esporta tutto (.json)', async () => scarica(`archivio-${oggi()}.json`, JSON.stringify(await esportaChiaro(inclDoc.checked), null, 1), 'application/json')), h('label', { class: 'spunta' }, inclDoc, 'includi i documenti')),
       h('p', { class: 'attenuato piccolo' }, 'Formato aperto e leggibile, descritto nel LEGGIMI: serve per spostare i dati in qualunque sistema futuro. Il file non è protetto: conservalo con cura.'),
