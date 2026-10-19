@@ -21,6 +21,8 @@ const CAT_SITI = ['Gestionali', 'Banche e pagamenti', 'Personale e paghe', 'Goog
 const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personale'];
 /* Etichette dei task personali: un task con una di queste etichette sta in Organizzazione, non nella pagina Task di lavoro. */
 const ETICHETTE_PERSONALI = ['CASA', 'GIARDINO', 'PROGETTI'];
+/* Cartelle raccolte nel menu sotto l'unica voce Passioni. */
+const PASSIONI = ['sport', 'mindfulness', 'lettura', 'viaggi'];
 
 const AREE_BASE = [
   { id: 'finanze', nome: 'Finanze', tipi: {

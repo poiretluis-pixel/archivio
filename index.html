@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#0d5c57">
-<title>Archivio</title>
+<title>Life Planning</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d5c57'/%3E%3Cpath d='M18 46V22a4 4 0 0 1 4-4h8l4 5h8a4 4 0 0 1 4 4v19a4 4 0 0 1-4 4H22a4 4 0 0 1-4-4z' fill='%23fff'/%3E%3C/svg%3E">
 <!-- Versione costruita il 2026-10-19. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
 <style>
@@ -906,6 +906,8 @@ const CAT_SITI = ['Gestionali', 'Banche e pagamenti', 'Personale e paghe', 'Goog
 const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personale'];
 /* Etichette dei task personali: un task con una di queste etichette sta in Organizzazione, non nella pagina Task di lavoro. */
 const ETICHETTE_PERSONALI = ['CASA', 'GIARDINO', 'PROGETTI'];
+/* Cartelle raccolte nel menu sotto l'unica voce Passioni. */
+const PASSIONI = ['sport', 'mindfulness', 'lettura', 'viaggi'];
 
 const AREE_BASE = [
   { id: 'finanze', nome: 'Finanze', tipi: {
@@ -1396,7 +1398,7 @@ function spiaSync() {
   return h('button', { id: 'stato-sync', class: 'btn piatto spia ' + (!pronto ? 'spenta' : st.stato === 'errore' ? 'ko' : 'ok'), title: st.errore || (pronto ? 'Sincronizza adesso' : 'Configura la sincronizzazione'), 'aria-label': testo, onclick: () => (pronto ? sincronizza(true) : (location.hash = '#/impostazioni')) }, h('span', { class: 'spia-testo' }, testo));
 }
 function menu(rotta) {
-  const attiva = r => (rotta.join('/') || 'casa').startsWith(r);
+  const attiva = r => (rotta.join('/') || 'casa').startsWith(r) || (r === 'passioni' && rotta[0] === 'a' && PASSIONI.includes(rotta[1]));
   const v = (href, testo, chiave, n) => h('a', { href, class: attiva(chiave) ? 'attiva' : '', 'aria-current': attiva(chiave) ? 'page' : null }, testo, n ? h('span', { class: 'conta' }, n) : null);
   const scadute = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta' && x.data <= oggi()).length;
   return h('nav', { class: 'menu', 'aria-label': 'Cartelle' },
@@ -1406,14 +1408,14 @@ function menu(rotta) {
     v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
     v('#/siti', 'Siti e gestionali', 'siti'),
     h('div', { class: 'menu-gruppo' }, 'Personale'),
-    aree().map(a => v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0)),
+    aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) ? null : v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0))),
     h('div', { class: 'menu-gruppo' }, 'Archivio'),
     v('#/rapporti', 'Rapporti', 'rapporti'), v('#/scadenze', 'Scadenze', 'scadenze', scadute), v('#/documenti', 'Documenti', 'documenti', allegati().filter(a => a.stato === 'da elaborare').length), v('#/impostazioni', 'Impostazioni', 'impostazioni'));
 }
 function barra() {
   const pp = persone();
   return h('header', { class: 'barra' },
-    h('a', { class: 'marchio', href: '#/' }, 'Archivio'),
+    h('a', { class: 'marchio', href: '#/' }, 'Life Planning'),
     pp.length > 1 ? h('select', { class: 'chi', 'aria-label': 'Persona', onchange: e => { S.persona = e.target.value; disegna(); } }, h('option', { value: '' }, 'Tutta la famiglia'), pp.map(p => h('option', { value: p.id, selected: p.id === S.persona }, p.nome))) : h('span', { class: 'chi-solo' }, (pp[0] || {}).nome || ''),
     h('span', { class: 'spazio' }), spiaSync(), btn('Blocca', blocca, 'piatto'));
 }
@@ -1439,6 +1441,7 @@ function vistaPer(r) {
   if (r[0] === 'task' || r[0] === 'da-fare') return vistaLavoro('attivita', r[1]);
   if (r[0] === 'mail') return vistaLavoro('mail', r[1]);
   if (r[0] === 'siti') return vistaSiti();
+  if (r[0] === 'passioni') return vistaPassioni();
   if (r[0] === 'scadenze') return vistaScadenze();
   if (r[0] === 'rapporti') return vistaRapporti(r[1]);
   if (r[0] === 'documenti') return vistaDocumenti();
@@ -1464,6 +1467,27 @@ function riassuntoEsito(r) {
   return p.join(', ') || 'nessuna modifica';
 }
 
+/* Riassunto di ogni cartella: i numeri delle schede del quadro generale e della pagina Passioni. */
+function riassuntiAree() {
+  const mis = voci('salute', 'misura');
+  const perPar = [...raggruppa(mis.sort(perData), v => v.parametro).values()].map(l => l[l.length - 1]);
+  const nFuori = perPar.filter(fuoriIntervallo).length;
+  const ultimoPrelievo = mis.length ? mis[mis.length - 1].data : null;
+  const viaggi = voci('viaggi', 'viaggio'), prossimo = viaggi.filter(v => v.data > oggi()).sort(perData)[0];
+  const prog = voci('progetti', 'progetto');
+  return {
+    salute: mis.length || S.estVoci.length ? [(ind => (ind ? dato('Indice di salute', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceSalute()), mis.length ? dato('Fuori intervallo all\'ultima misura', nFuori, `su ${perPar.length} parametri seguiti`, nFuori ? 'allerta' : '') : null] : null,
+    finanze: voci('finanze').length ? [(ind => (ind ? dato('Indice finanziario', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceFinanze()), voci('finanze', 'saldo').length ? dato('Disponibilità finanziaria', fmtEuro(totaleFinanze(voci('finanze', 'saldo')))) : null] : null,
+    organizzazione: voci('organizzazione').length ? [dato('Obiettivi attivi', voci('organizzazione', 'obiettivo').filter(o => o.stato === 'attivo' || !o.stato).length), dato('Task personali aperti', voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta' && taskPersonale(x)).length)] : null,
+    sport: voci('sport').length ? [dato('Sedute nelle ultime 4 settimane', [...voci('sport', 'allenamento'), ...voci('sport', 'attivita')].filter(v => giorniDa(v.data) < 28).length)] : null,
+    mindfulness: voci('mindfulness').length ? [dato('Giorni di pratica negli ultimi 30', new Set(voci('mindfulness', 'pratica').filter(v => giorniDa(v.data) < 30).map(v => v.data)).size)] : null,
+    lettura: voci('lettura').length ? [dato('Libri letti quest\'anno', voci('lettura', 'libro').filter(v => v.stato === 'letto' && (v.fine || '').startsWith(oggi().slice(0, 4))).length, (l => (l.length ? 'In lettura: ' + l.map(v => v.titolo).join(', ') : ''))(voci('lettura', 'libro').filter(v => v.stato === 'in lettura')))] : null,
+    patrimonio: voci('patrimonio').length || voci('finanze', 'saldo').length ? [dato('Patrimonio netto', fmtEuro(patrimonioNetto()), 'beni e disponibilità meno debiti')] : null,
+    viaggi: viaggi.length ? [dato('Viaggi registrati', viaggi.length, prossimo ? `Prossimo: ${prossimo.titolo}, ${fmtData(prossimo.data)}` : '')] : null,
+    progetti: prog.length ? [dato('Progetti', prog.length, `${prog.filter(p => p.stato === 'attivo').length} attivi`)] : null,
+  };
+}
+
 function vistaCasa() {
   const daFare = [];
   const sc = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta').sort(perData);
@@ -1481,29 +1505,13 @@ function vistaCasa() {
   else if (S.sync.stato === 'errore') daFare.push({ tipo: 'ritardo', testo: 'La sincronizzazione non riesce', nota: S.sync.errore, href: '#/impostazioni' });
   const sg = statoGarmin(); if (sg && sg.tipo !== 'ok') daFare.push({ ...sg, href: '#/impostazioni' });
 
-  const mis = voci('salute', 'misura');
-  const perPar = [...raggruppa(mis.sort(perData), v => v.parametro).values()].map(l => l[l.length - 1]);
-  const nFuori = perPar.filter(fuoriIntervallo).length;
-  const ultimoPrelievo = mis.length ? mis[mis.length - 1].data : null;
-  const viaggi = voci('viaggi', 'viaggio'), prossimo = viaggi.filter(v => v.data > oggi()).sort(perData)[0];
-  const prog = voci('progetti', 'progetto');
-  const schede = {
-    salute: mis.length || S.estVoci.length ? [(ind => (ind ? dato('Indice di salute', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceSalute()), mis.length ? dato('Fuori intervallo all\'ultima misura', nFuori, `su ${perPar.length} parametri seguiti`, nFuori ? 'allerta' : '') : null] : null,
-    finanze: voci('finanze').length ? [(ind => (ind ? dato('Indice finanziario', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceFinanze()), voci('finanze', 'saldo').length ? dato('Disponibilità finanziaria', fmtEuro(totaleFinanze(voci('finanze', 'saldo')))) : null] : null,
-    organizzazione: voci('organizzazione').length ? [dato('Obiettivi attivi', voci('organizzazione', 'obiettivo').filter(o => o.stato === 'attivo' || !o.stato).length), dato('Task personali aperti', voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta' && taskPersonale(x)).length)] : null,
-    sport: voci('sport').length ? [dato('Sedute nelle ultime 4 settimane', [...voci('sport', 'allenamento'), ...voci('sport', 'attivita')].filter(v => giorniDa(v.data) < 28).length)] : null,
-    mindfulness: voci('mindfulness').length ? [dato('Giorni di pratica negli ultimi 30', new Set(voci('mindfulness', 'pratica').filter(v => giorniDa(v.data) < 30).map(v => v.data)).size)] : null,
-    lettura: voci('lettura').length ? [dato('Libri letti quest\'anno', voci('lettura', 'libro').filter(v => v.stato === 'letto' && (v.fine || '').startsWith(oggi().slice(0, 4))).length, (l => (l.length ? 'In lettura: ' + l.map(v => v.titolo).join(', ') : ''))(voci('lettura', 'libro').filter(v => v.stato === 'in lettura')))] : null,
-    patrimonio: voci('patrimonio').length || voci('finanze', 'saldo').length ? [dato('Patrimonio netto', fmtEuro(patrimonioNetto()), 'beni e disponibilità meno debiti')] : null,
-    viaggi: viaggi.length ? [dato('Viaggi registrati', viaggi.length, prossimo ? `Prossimo: ${prossimo.titolo}, ${fmtData(prossimo.data)}` : '')] : null,
-    progetti: prog.length ? [dato('Progetti', prog.length, `${prog.filter(p => p.stato === 'attivo').length} attivi`)] : null,
-  };
+  const schede = riassuntiAree();
   return h('div', {},
     h('div', { class: 'testa' }, h('div', {}, h('h1', {}, 'Quadro generale'), h('p', { class: 'sotto' }, new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })))),
     pannello('Da fare', daFare.length ? h('ul', { class: 'elenco' }, daFare.map(x => h('li', {}, h('a', { href: x.href }, stato(x.tipo, x.testo)), h('div', { class: 'elenco-nota' }, x.nota)))) : h('p', { class: 'attenuato' }, 'Niente in sospeso.')),
     consigliPrincipali(),
-    h('div', { class: 'griglia' }, aree().map(a => h('a', { class: 'scheda', href: '#/a/' + a.id }, h('h3', {}, a.nome),
-      schede[a.id] || (a.libera && voci(a.id).length ? dato('Voci', voci(a.id).length) : h('p', { class: 'attenuato' }, 'Ancora vuota.'))))),
+    h('div', { class: 'griglia' }, aree().filter(a => !PASSIONI.includes(a.id)).map(a => schedaArea(a, schede)),
+      h('a', { class: 'scheda', href: '#/passioni' }, h('h3', {}, 'Passioni'), h('p', { class: 'attenuato' }, PASSIONI.map(area).filter(Boolean).map(a => a.nome).join(', ')))),
     pannello('Stato dei caricamenti', h('ul', { class: 'elenco' }, FONTI.map(f => { const st = statoFonte(f); return h('li', {}, h('div', { class: 'tra' }, h('strong', {}, f.nome), stato(st.stato, st.stato === 'ok' ? 'In regola' : st.stato === 'ritardo' ? 'In ritardo' : 'Mai caricati')), h('div', { class: 'elenco-nota' }, st.stato === 'ok' ? st.testo : (st.stato === 'ritardo' ? st.testo + '. ' : '') + f.come)); }))),
     ultimoRapporto(),
     pannello('Ultimi caricamenti', ultimiCaricamenti()));
@@ -1584,9 +1592,24 @@ function vistaRapporti(scelto) {
     h('article', { class: 'largo-testo' }, mdInDom(r.testo)));
 }
 
+const schedaArea = (a, schede) => h('a', { class: 'scheda', href: '#/a/' + a.id }, h('h3', {}, a.nome),
+  schede[a.id] || (a.libera && voci(a.id).length ? dato('Voci', voci(a.id).length) : h('p', { class: 'attenuato' }, 'Ancora vuota.')));
+
+/* Passioni: sport, mindfulness, lettura, viaggi ed esperienze in una pagina sola. */
+function vistaPassioni() {
+  const schede = riassuntiAree(), pp = PASSIONI.map(area).filter(Boolean);
+  return h('div', {},
+    h('div', { class: 'testa' }, h('div', {}, h('h1', {}, 'Passioni'), h('p', { class: 'sotto' }, 'Il tempo per te: sport, mindfulness, lettura, viaggi ed esperienze.'))),
+    h('div', { class: 'griglia' }, pp.map(a => schedaArea(a, schede))),
+    pp.map(a => pannello(a.nome, h('div', { class: 'sezioni' }, Object.entries(a.tipi).filter(([k]) => k !== 'consiglio').map(([k, d]) => h('div', { class: 'sezione' },
+      h('a', { href: `#/a/${a.id}/${k}` }, d.plur), h('span', { class: 'attenuato' }, ` ${voci(a.id, k).length}`), btn('Aggiungi', () => apriModulo(a.id, k), 'piccolo')))),
+      h('div', { class: 'azioni' }, h('a', { class: 'btn piccolo', href: '#/a/' + a.id }, 'Apri ' + a.nome.toLowerCase())))));
+}
+
 function vistaArea(a, scheda) {
   const cr = { salute: cruscottoSalute, finanze: cruscottoFinanze, patrimonio: cruscottoPatrimonio, organizzazione: cruscottoOrganizzazione, sport: cruscottoSport, mindfulness: cruscottoMindfulness, lettura: cruscottoLettura, viaggi: cruscottoViaggi, progetti: cruscottoProgetti }[a.id] || cruscottoLibero;
   return h('div', {},
+    PASSIONI.includes(a.id) ? h('p', { class: 'briciole' }, h('a', { href: '#/passioni' }, '← Passioni')) : null,
     a.id === 'organizzazione' ? vistaLavoro('personale', scheda) : h('div', { class: 'testa' }, h('h1', {}, a.nome)),
     a.id === 'salute' ? pannelloIndice() : a.id === 'finanze' ? pannelloIndiceFinanze() : null,
     pannelloConsigli(a.id),
@@ -2440,7 +2463,7 @@ async function schermataBlocco() {
   const err = h('div', { class: 'errore', role: 'alert' });
   const attesa = (form, si) => { const b = form.querySelector('button[type=submit]'); b.disabled = si; if (si) { b.dataset.t = b.textContent; b.textContent = 'Un momento…'; } else if (b.dataset.t) b.textContent = b.dataset.t; };
   const campo = (name, etich, extra = {}) => h('label', { class: 'campo intero' }, h('span', {}, etich), h('input', { name, autocomplete: 'off', spellcheck: 'false', ...extra }));
-  const cornice = (...kids) => h('div', { class: 'blocco' }, h('div', { class: 'blocco-scheda' }, h('div', { class: 'marchio grande' }, 'Archivio'), kids));
+  const cornice = (...kids) => h('div', { class: 'blocco' }, h('div', { class: 'blocco-scheda' }, h('div', { class: 'marchio grande' }, 'Life Planning'), kids));
   const invio = (form, fn) => async e => { e.preventDefault(); err.textContent = ''; attesa(form, true); try { await fn(form.elements); } catch (ex) { err.textContent = ex.message === 'Failed to fetch' ? 'Impossibile raggiungere GitHub: controlla la connessione.' : ex.message; attesa(form, false); } };
   const campiFrase = () => {
     const forza = h('div', { class: 'forza intero' });

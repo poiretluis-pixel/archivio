@@ -13,7 +13,7 @@ html = f"""<!doctype html>
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#0d5c57">
-<title>Archivio</title>
+<title>Life Planning</title>
 <link rel="icon" href="{icona}">
 <!-- Versione costruita il {datetime.date.today().isoformat()}. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
 <style>

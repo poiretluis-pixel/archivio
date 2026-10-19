@@ -346,6 +346,21 @@ async def main():
         await A.click("li:has-text('Montare la mensola') >> button:has-text('In oggi')")
         controlla(await A.evaluate("S.A.voci.find(v => v.titolo === 'Montare la mensola').lista") == "Oggi", "task personale spostato in Oggi")
         controlla(await A.locator("section:has(h2:has-text('Obiettivi')) :text('Riserva di 6 mesi')").count() == 1 and await A.locator("section:has(h2:has-text('Revisione della settimana'))").count() == 1, "sotto i task restano obiettivi e revisione")
+        # --- Passioni: sport, mindfulness, lettura e viaggi sotto una voce sola; nome Life Planning
+        voci_menu = await A.locator(".menu a").all_inner_texts()
+        controlla("Passioni" in voci_menu and not any(x.startswith(("Sport", "Mindfulness", "Lettura", "Viaggi")) for x in voci_menu), f"una sola voce Passioni nel menu {voci_menu}")
+        controlla(await A.locator(".barra .marchio").inner_text() == "Life Planning" and await A.title() == "Life Planning", "il gestionale si chiama Life Planning")
+        await A.goto(URL + "#/passioni")
+        await A.wait_for_timeout(300)
+        await scatta(A, "22-passioni")
+        controlla(await A.locator("h1:has-text('Passioni')").count() == 1 and await A.locator(".griglia a.scheda").count() == 4 and await A.locator(".menu a.attiva").inner_text() == "Passioni", "pagina Passioni con le quattro cartelle")
+        controlla(await A.locator("a.scheda[href='#/a/lettura'] :text('Libro di prova')").count() == 1, "scheda Lettura con il libro in lettura")
+        await A.click("a.scheda[href='#/a/sport']")
+        await A.wait_for_timeout(200)
+        controlla(await A.locator("h1:has-text('Sport')").count() == 1 and await A.locator(".menu a.attiva").inner_text() == "Passioni" and await A.locator(".briciole a[href='#/passioni']").count() == 1, "Sport si apre da Passioni e il menu resta su Passioni")
+        await A.goto(URL + "#/")
+        await A.wait_for_timeout(200)
+        controlla(await A.locator(".griglia a.scheda[href='#/passioni']").count() == 1 and await A.locator(".griglia a.scheda[href='#/a/sport']").count() == 0, "quadro generale con la scheda Passioni")
         await A.goto(URL + "#/da-fare")
         await A.wait_for_timeout(200)
         controlla(await A.locator("h1:has-text('Task')").count() == 1, "il vecchio indirizzo Da fare apre Task")
@@ -404,7 +419,7 @@ async def main():
         stato_ = "({n: S.A.voci.filter(v=>!v.canc).length, tokyo: S.A.voci.some(v=>v.titolo==='Tokyo'), press: S.A.voci.some(v=>v.metrica==='Pressione sistolica'), o1: !!voce('o-1')})"
         sa, sb = await A.evaluate(stato_), await B.evaluate(stato_)
         controlla(sa == sb and sa["tokyo"] and sa["press"] and not sa["o1"], f"modifiche contemporanee unite su entrambi i dispositivi {sa}")
-        for r, n in [("#/", "10-telefono-quadro"), ("#/a/salute", "11-telefono-salute"), ("#/a/finanze", "15-telefono-finanze"), ("#/a/organizzazione", "16-telefono-organizzazione"), ("#/task", "18-telefono-task"), ("#/mail", "19-telefono-mail"), ("#/siti", "21-telefono-siti"), ("#/a/sport", "17-telefono-sport"), ("#/rapporti", "12-telefono-rapporti"), ("#/documenti", "13-telefono-documenti"), ("#/impostazioni", "14-telefono-impostazioni")]:
+        for r, n in [("#/", "10-telefono-quadro"), ("#/a/salute", "11-telefono-salute"), ("#/a/finanze", "15-telefono-finanze"), ("#/a/organizzazione", "16-telefono-organizzazione"), ("#/task", "18-telefono-task"), ("#/mail", "19-telefono-mail"), ("#/siti", "21-telefono-siti"), ("#/passioni", "23-telefono-passioni"), ("#/a/sport", "17-telefono-sport"), ("#/rapporti", "12-telefono-rapporti"), ("#/documenti", "13-telefono-documenti"), ("#/impostazioni", "14-telefono-impostazioni")]:
             await B.goto(URL + r)
             await B.wait_for_timeout(300)
             await scatta(B, n)

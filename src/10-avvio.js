@@ -13,7 +13,7 @@ async function schermataBlocco() {
   const err = h('div', { class: 'errore', role: 'alert' });
   const attesa = (form, si) => { const b = form.querySelector('button[type=submit]'); b.disabled = si; if (si) { b.dataset.t = b.textContent; b.textContent = 'Un momento…'; } else if (b.dataset.t) b.textContent = b.dataset.t; };
   const campo = (name, etich, extra = {}) => h('label', { class: 'campo intero' }, h('span', {}, etich), h('input', { name, autocomplete: 'off', spellcheck: 'false', ...extra }));
-  const cornice = (...kids) => h('div', { class: 'blocco' }, h('div', { class: 'blocco-scheda' }, h('div', { class: 'marchio grande' }, 'Archivio'), kids));
+  const cornice = (...kids) => h('div', { class: 'blocco' }, h('div', { class: 'blocco-scheda' }, h('div', { class: 'marchio grande' }, 'Life Planning'), kids));
   const invio = (form, fn) => async e => { e.preventDefault(); err.textContent = ''; attesa(form, true); try { await fn(form.elements); } catch (ex) { err.textContent = ex.message === 'Failed to fetch' ? 'Impossibile raggiungere GitHub: controlla la connessione.' : ex.message; attesa(form, false); } };
   const campiFrase = () => {
     const forza = h('div', { class: 'forza intero' });
