@@ -269,13 +269,12 @@ a.sito-link:hover strong{color:var(--marca)}
 .g-lavoro{color:var(--lavoro)}.g-lavoro::before{background:var(--lavoro)}
 .g-personale{color:var(--marca)}.g-personale::before{background:var(--marca)}
 .g-archivio{color:var(--archivio)}.g-archivio::before{background:var(--archivio)}
-.menu a.m-lavoro{background:var(--lavoro-tenue);color:var(--lavoro)}
-.menu a.m-lavoro:hover{color:var(--lavoro);filter:brightness(.97)}
+.menu a.m-lavoro{color:var(--lavoro)}
 .menu a.m-lavoro.attiva{background:var(--carta);box-shadow:inset 4px 0 0 var(--lavoro)}
 .menu a.m-lavoro .conta{background:var(--lavoro);color:#fff}
 .menu a.m-personale.attiva{box-shadow:inset 4px 0 0 var(--marca)}
 @media (max-width:820px){
-  .menu a.m-lavoro{border-color:var(--lavoro);background:var(--lavoro-tenue)}
+  .menu a.m-lavoro{border-color:var(--lavoro)}
   .menu a.m-lavoro.attiva{background:var(--lavoro);border-color:var(--lavoro);color:#fff}
   .menu a.m-personale{border-color:var(--marca)}
   .menu a.m-archivio{border-style:dashed}

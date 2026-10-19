@@ -457,6 +457,7 @@ async def main():
         controlla(await A.locator("h1:has-text('Spese')").count() == 1 and await A.locator(".menu a.attiva[href='#/spese']").count() == 1, "pagina Spese")
         controlla(await A.locator("tr:has-text('Internet di prova') :text('pagata il')").count() == 1, "spesa riconosciuta come pagata dal movimento")
         controlla(await A.locator("tr:has-text('Rata di prova') :text('scade oggi')").count() == 1 and await A.locator("li:has-text('Bollo di prova')").count() == 1, "spesa di oggi da pagare, annuale tra le prossime scadenze")
+        controlla("Rata di prova" in (await A.locator(".tabella-spese tbody tr").all_inner_texts())[0] and "242" in await A.locator("#vista .dati .dato >> nth=0").inner_text(), "da pagare in alto, totale ancora da pagare nel riepilogo")
         await A.click("tr:has-text('Rata di prova') button:has-text('Pagata')")
         controlla(await A.locator("tr:has-text('Rata di prova') :text('pagata')").count() == 1 and await A.evaluate("S.A.voci.find(v => v.titolo === 'Rata di prova').pagati") == await A.evaluate("oggi().slice(0, 7)"), "segnata pagata a mano")
         await A.click("button.filtro:has-text('Mie')")

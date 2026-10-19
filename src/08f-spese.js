@@ -32,7 +32,7 @@ function righeSpese(mese) {
     if (!scad) return null;
     const mov = movimentoDi(sp, scad, uscite), aMano = mesiPagati(sp).includes(mese);
     return { sp, scad, mov, pagata: !!mov || aMano, aMano, importo: mov ? Math.abs(mov.valore) : sp.valore };
-  }).filter(Boolean).sort((a, b) => a.scad.localeCompare(b.scad) || a.sp.titolo.localeCompare(b.sp.titolo, 'it'));
+  }).filter(Boolean).sort((a, b) => a.pagata - b.pagata || a.scad.localeCompare(b.scad) || a.sp.titolo.localeCompare(b.sp.titolo, 'it'));
 }
 function speseDaPagareOggi() {
   const domani = piuGiorni(oggi(), 1);
@@ -89,9 +89,9 @@ function vistaSpese(meseRotta) {
       h('a', { class: 'btn piccolo', href: '#/spese/' + meseDopo(mese, 1), 'aria-label': 'Mese successivo' }, '›'),
       mese !== oggi().slice(0, 7) ? h('a', { class: 'btn piccolo', href: '#/spese' }, 'Questo mese') : null),
     h('div', { class: 'dati' },
+      dato('Ancora da pagare', fmtEuro(tot(daPagare)), [daPagare.length ? `${daPagare.length} ${daPagare.length === 1 ? 'spesa' : 'spese'}` : 'tutto pagato', prossima ? `prossima: ${prossima.sp.titolo}, ${fmtData(prossima.scad)}` : ''].filter(Boolean).join(', '), daPagare.some(r => r.scad < oggi()) ? 'allerta' : ''),
       dato('Spese del mese', fmtEuro(tot(righe)), `mie ${fmtEuro(perChi(righe, 'mie'))}, famiglia ${fmtEuro(perChi(righe, 'famiglia'))}`),
       dato('Già pagate', fmtEuro(tot(righe.filter(r => r.pagata))), `${righe.filter(r => r.pagata).length} su ${righe.length}`),
-      dato('Da pagare', daPagare.length, prossima ? `prossima: ${prossima.sp.titolo}, ${fmtData(prossima.scad)}` : '', daPagare.some(r => r.scad < oggi()) ? 'allerta' : ''),
       dato('Impegno medio al mese', fmtEuro(equivalente()), `mie ${fmtEuro(equivalente('mie'))}, famiglia ${fmtEuro(equivalente('famiglia'))}`)),
     h('div', { class: 'azioni filtri' }, h('span', { class: 'attenuato piccolo' }, 'Mostra:'), filtro('', 'Tutte'), filtro('mie', 'Mie'), filtro('famiglia', 'Famiglia')),
     blocco('Spese mensili', viste.filter(r => (r.sp.frequenza || 'mensile') === 'mensile'), 'Nessuna spesa mensile.'),
