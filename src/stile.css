@@ -269,7 +269,6 @@ a.sito-link:hover strong{color:var(--marca)}
 .g-lavoro{color:var(--lavoro)}.g-lavoro::before{background:var(--lavoro)}
 .g-personale{color:var(--marca)}.g-personale::before{background:var(--marca)}
 .g-archivio{color:var(--archivio)}.g-archivio::before{background:var(--archivio)}
-.menu a.m-lavoro{color:var(--lavoro)}
 .menu a.m-lavoro.attiva{background:var(--carta);box-shadow:inset 4px 0 0 var(--lavoro)}
 .menu a.m-lavoro .conta{background:var(--lavoro);color:#fff}
 .menu a.m-personale.attiva{box-shadow:inset 4px 0 0 var(--marca)}
