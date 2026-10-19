@@ -29,7 +29,7 @@ function controllo(f, v, idArea, idTipo) {
   if (f.tipo === 'data') return h('input', { ...base, type: 'date', value: val || '' });
   if (f.tipo === 'numero') return h('input', { ...base, type: 'text', inputmode: 'decimal', value: val == null ? '' : String(val).replace('.', ','), autocomplete: 'off' });
   if (f.tipo === 'si_no') return h('input', { ...base, type: 'checkbox', checked: !!val });
-  if (f.tipo === 'scelta') return h('select', base, h('option', { value: '' }, ''), f.opzioni.map(o => h('option', { value: o, selected: o === val }, o)));
+  if (f.tipo === 'scelta') return h('select', base, h('option', { value: '' }, ''), f.opzioni.map(o => h('option', { value: o, selected: o === val }, f.maiuscolo ? o.toUpperCase() : o)));
   if (f.tipo === 'allegato') return h('select', base, h('option', { value: '' }, 'Nessuno'), S.A.allegati.filter(a => !a.canc).map(a => h('option', { value: a.id, selected: a.id === val }, `${a.nome} (${fmtData(a.data)})`)));
   const attr = { ...base, type: 'text', value: val || '', autocomplete: 'off' };
   if (f.suggerisci) {

@@ -221,9 +221,9 @@ li.lavoro .azioni{flex-wrap:wrap}
 .scadenza-rapida{display:inline-flex;align-items:center;gap:.35rem}
 .scadenza-rapida input{font:inherit;font-size:.85rem;padding:.15rem .35rem;border:1px solid var(--linea);border-radius:6px;background:var(--carta);color:var(--inchiostro)}
 /* Etichette di chi riguarda task e mail */
-:root{--e-blu-f:#dce8fb;--e-blu-t:#1a4d9e;--e-giallo-f:#fbefc4;--e-giallo-t:#7a5800;--e-rosso-f:#fbe1e0;--e-rosso-t:#a8282a;--e-viola-f:#ebe3fa;--e-viola-t:#5b3a9e;--e-verde-f:#dcf1e1;--e-verde-t:#1f6b35;--e-arancione-f:#fde4cc;--e-arancione-t:#9a4a00;--e-acqua-f:#d5f0ee;--e-acqua-t:#0f6660;--e-grigio-f:var(--linea2);--e-grigio-t:var(--inchiostro2)}
-:root[data-tema=scuro]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf}
-@media (prefers-color-scheme:dark){:root[data-tema=automatico]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf}}
+:root{--e-blu-f:#dce8fb;--e-blu-t:#1a4d9e;--e-giallo-f:#fbefc4;--e-giallo-t:#7a5800;--e-rosso-f:#fbe1e0;--e-rosso-t:#a8282a;--e-viola-f:#ebe3fa;--e-viola-t:#5b3a9e;--e-verde-f:#dcf1e1;--e-verde-t:#1f6b35;--e-arancione-f:#fde4cc;--e-arancione-t:#9a4a00;--e-acqua-f:#d5f0ee;--e-acqua-t:#0f6660;--e-bluscuro-f:#1f3a6b;--e-bluscuro-t:#ffffff;--e-nero-f:#1c1c1c;--e-nero-t:#ffffff;--e-grigio-f:var(--linea2);--e-grigio-t:var(--inchiostro2)}
+:root[data-tema=scuro]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf;--e-bluscuro-f:#9cc1ff;--e-bluscuro-t:#0f1d36;--e-nero-f:#f1ece2;--e-nero-t:#161512}
+@media (prefers-color-scheme:dark){:root[data-tema=automatico]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf;--e-bluscuro-f:#9cc1ff;--e-bluscuro-t:#0f1d36;--e-nero-f:#f1ece2;--e-nero-t:#161512}}
 .etichetta{text-transform:uppercase;letter-spacing:.03em;display:inline-block;font-size:.76rem;font-weight:600;border-radius:99px;padding:0 .55rem;line-height:1.45rem;white-space:nowrap;vertical-align:.08em}
 .e-blu{background:var(--e-blu-f);color:var(--e-blu-t)}
 .e-giallo{background:var(--e-giallo-f);color:var(--e-giallo-t)}
@@ -231,6 +231,8 @@ li.lavoro .azioni{flex-wrap:wrap}
 .e-viola{background:var(--e-viola-f);color:var(--e-viola-t)}
 .e-verde{background:var(--e-verde-f);color:var(--e-verde-t)}
 .e-arancione{background:var(--e-arancione-f);color:var(--e-arancione-t)}
+.e-bluscuro{background:var(--e-bluscuro-f);color:var(--e-bluscuro-t)}
+.e-nero{background:var(--e-nero-f);color:var(--e-nero-t)}
 .e-acqua{background:var(--e-acqua-f);color:var(--e-acqua-t)}
 .e-grigio{background:var(--e-grigio-f);color:var(--e-grigio-t)}
 .titolo-lavoro{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem}

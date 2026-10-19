@@ -36,7 +36,7 @@ function pulsanteCalendario(x) {
     : btn('Aggiungi al calendario', () => { metti({ ...x, calendario: true }); avviso('Entra nel calendario TASK al prossimo aggiornamento.'); }, 'piccolo');
 }
 /* Etichette colorate per chi riguarda il task o la mail: Pioltello blu, Porta Romana giallo, Personale rosso; per i task personali CASA viola, GIARDINO verde, PROGETTI acqua. */
-const COLORI_ETICHETTA = { '3MEDical Pioltello': 'blu', '3MEDical Porta Romana': 'giallo', 'Personale': 'rosso', '3MEDical': 'blu', 'Psiche e Soma': 'arancione', 'Personal trainer': 'viola', CASA: 'viola', GIARDINO: 'verde', PROGETTI: 'acqua' };
+const COLORI_ETICHETTA = { '3MEDical Pioltello': 'blu', '3MEDical Porta Romana': 'giallo', 'Personale': 'rosso', '3MEDical': 'bluscuro', 'Psiche e Soma': 'arancione', 'Personal trainer': 'nero', CASA: 'viola', GIARDINO: 'verde', PROGETTI: 'acqua' };
 const etichettaColore = nome => (nome ? h('span', { class: 'etichetta e-' + (COLORI_ETICHETTA[nome] || 'grigio') }, nome) : null);
 const linkGmail = x => (typeof x.link === 'string' && /^https:\/\/mail\.google\.com\//.test(x.link) ? x.link : '');
 

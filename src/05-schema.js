@@ -53,16 +53,16 @@ const AREE_BASE = [
     attivita: { nome: 'Cosa da fare', plur: 'Cose da fare', titolo: v => v.titolo, colonne: ['data', 'titolo', 'ambito', 'lista', 'priorita', 'stato'], campi: [
       c('titolo', 'Cosa', 'testo', { obbl: true }), c('ambito', 'Ambito', 'scelta', { opzioni: AMBITI }), c('data', 'Entro il (facoltativo)', 'data'),
       c('ripeti', 'Si ripete (serve la scadenza)', 'scelta', { opzioni: RIPETI_TASK }),
-      c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }), c('casella', 'Riguarda (CASA, GIARDINO e PROGETTI stanno in Organizzazione)', 'scelta', { opzioni: [...RIGUARDA, ...ETICHETTE_PERSONALI] }),
+      c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }), c('casella', 'Riguarda (CASA, GIARDINO e PROGETTI stanno in Organizzazione)', 'scelta', { opzioni: [...RIGUARDA, ...ETICHETTE_PERSONALI], maiuscolo: true }),
       c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da fare', 'in corso', 'fatta'] }), c('nota', 'Nota', 'lungo')] },
     mail: { nome: 'Mail da gestire', plur: 'Mail da gestire', titolo: v => v.titolo, colonne: ['data', 'titolo', 'mittente', 'casella', 'lista', 'stato'], campi: [
-      c('titolo', 'Oggetto', 'testo', { obbl: true }), c('mittente', 'Da chi', 'testo', { suggerisci: true }), c('casella', 'Casella', 'scelta', { opzioni: CASELLE }),
+      c('titolo', 'Oggetto', 'testo', { obbl: true }), c('mittente', 'Da chi', 'testo', { suggerisci: true }), c('casella', 'Casella', 'scelta', { opzioni: CASELLE, maiuscolo: true }),
       c('data', 'Ricevuta il', 'data', { obbl: true }), c('azione', 'Cosa fare', 'lungo'), c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }),
       c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da gestire', 'in attesa di altri', 'gestita'] }),
       c('link', 'Collegamento a Gmail'), c('nota', 'Nota', 'lungo')] },
     sito: { nome: 'Sito o gestionale', plur: 'Siti e gestionali', titolo: v => v.titolo, colonne: ['titolo', 'categoria', 'casella', 'link'], campi: [
       c('titolo', 'Nome', 'testo', { obbl: true }), c('link', 'Indirizzo (https://…)', 'testo', { obbl: true }), c('categoria', 'Tipo', 'scelta', { opzioni: CAT_SITI }),
-      c('casella', 'Riguarda', 'scelta', { opzioni: RIGUARDA }), c('nota', 'Nota (mai password)', 'lungo')] },
+      c('casella', 'Riguarda', 'scelta', { opzioni: RIGUARDA, maiuscolo: true }), c('nota', 'Nota (mai password)', 'lungo')] },
     revisione: { nome: 'Revisione della settimana', plur: 'Revisioni settimanali', titolo: v => 'Settimana del ' + fmtData(v.data), colonne: ['data', 'voto', 'focus'], campi: [
       c('data', 'Lunedì della settimana', 'data', { obbl: true }), c('voto', 'Come è andata, da 1 a 5', 'numero'), c('bene', 'Cosa è andato bene', 'lungo'), c('male', 'Cosa non è andato', 'lungo'),
       c('focus', 'Le tre cose della prossima settimana', 'lungo'), c('famiglia', 'Tempo per la famiglia: cosa ho fatto', 'lungo')] },

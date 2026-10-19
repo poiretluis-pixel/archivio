@@ -235,9 +235,9 @@ li.lavoro .azioni{flex-wrap:wrap}
 .scadenza-rapida{display:inline-flex;align-items:center;gap:.35rem}
 .scadenza-rapida input{font:inherit;font-size:.85rem;padding:.15rem .35rem;border:1px solid var(--linea);border-radius:6px;background:var(--carta);color:var(--inchiostro)}
 /* Etichette di chi riguarda task e mail */
-:root{--e-blu-f:#dce8fb;--e-blu-t:#1a4d9e;--e-giallo-f:#fbefc4;--e-giallo-t:#7a5800;--e-rosso-f:#fbe1e0;--e-rosso-t:#a8282a;--e-viola-f:#ebe3fa;--e-viola-t:#5b3a9e;--e-verde-f:#dcf1e1;--e-verde-t:#1f6b35;--e-arancione-f:#fde4cc;--e-arancione-t:#9a4a00;--e-acqua-f:#d5f0ee;--e-acqua-t:#0f6660;--e-grigio-f:var(--linea2);--e-grigio-t:var(--inchiostro2)}
-:root[data-tema=scuro]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf}
-@media (prefers-color-scheme:dark){:root[data-tema=automatico]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf}}
+:root{--e-blu-f:#dce8fb;--e-blu-t:#1a4d9e;--e-giallo-f:#fbefc4;--e-giallo-t:#7a5800;--e-rosso-f:#fbe1e0;--e-rosso-t:#a8282a;--e-viola-f:#ebe3fa;--e-viola-t:#5b3a9e;--e-verde-f:#dcf1e1;--e-verde-t:#1f6b35;--e-arancione-f:#fde4cc;--e-arancione-t:#9a4a00;--e-acqua-f:#d5f0ee;--e-acqua-t:#0f6660;--e-bluscuro-f:#1f3a6b;--e-bluscuro-t:#ffffff;--e-nero-f:#1c1c1c;--e-nero-t:#ffffff;--e-grigio-f:var(--linea2);--e-grigio-t:var(--inchiostro2)}
+:root[data-tema=scuro]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf;--e-bluscuro-f:#9cc1ff;--e-bluscuro-t:#0f1d36;--e-nero-f:#f1ece2;--e-nero-t:#161512}
+@media (prefers-color-scheme:dark){:root[data-tema=automatico]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf;--e-bluscuro-f:#9cc1ff;--e-bluscuro-t:#0f1d36;--e-nero-f:#f1ece2;--e-nero-t:#161512}}
 .etichetta{text-transform:uppercase;letter-spacing:.03em;display:inline-block;font-size:.76rem;font-weight:600;border-radius:99px;padding:0 .55rem;line-height:1.45rem;white-space:nowrap;vertical-align:.08em}
 .e-blu{background:var(--e-blu-f);color:var(--e-blu-t)}
 .e-giallo{background:var(--e-giallo-f);color:var(--e-giallo-t)}
@@ -245,6 +245,8 @@ li.lavoro .azioni{flex-wrap:wrap}
 .e-viola{background:var(--e-viola-f);color:var(--e-viola-t)}
 .e-verde{background:var(--e-verde-f);color:var(--e-verde-t)}
 .e-arancione{background:var(--e-arancione-f);color:var(--e-arancione-t)}
+.e-bluscuro{background:var(--e-bluscuro-f);color:var(--e-bluscuro-t)}
+.e-nero{background:var(--e-nero-f);color:var(--e-nero-t)}
 .e-acqua{background:var(--e-acqua-f);color:var(--e-acqua-t)}
 .e-grigio{background:var(--e-grigio-f);color:var(--e-grigio-t)}
 .titolo-lavoro{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem}
@@ -958,16 +960,16 @@ const AREE_BASE = [
     attivita: { nome: 'Cosa da fare', plur: 'Cose da fare', titolo: v => v.titolo, colonne: ['data', 'titolo', 'ambito', 'lista', 'priorita', 'stato'], campi: [
       c('titolo', 'Cosa', 'testo', { obbl: true }), c('ambito', 'Ambito', 'scelta', { opzioni: AMBITI }), c('data', 'Entro il (facoltativo)', 'data'),
       c('ripeti', 'Si ripete (serve la scadenza)', 'scelta', { opzioni: RIPETI_TASK }),
-      c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }), c('casella', 'Riguarda (CASA, GIARDINO e PROGETTI stanno in Organizzazione)', 'scelta', { opzioni: [...RIGUARDA, ...ETICHETTE_PERSONALI] }),
+      c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }), c('casella', 'Riguarda (CASA, GIARDINO e PROGETTI stanno in Organizzazione)', 'scelta', { opzioni: [...RIGUARDA, ...ETICHETTE_PERSONALI], maiuscolo: true }),
       c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da fare', 'in corso', 'fatta'] }), c('nota', 'Nota', 'lungo')] },
     mail: { nome: 'Mail da gestire', plur: 'Mail da gestire', titolo: v => v.titolo, colonne: ['data', 'titolo', 'mittente', 'casella', 'lista', 'stato'], campi: [
-      c('titolo', 'Oggetto', 'testo', { obbl: true }), c('mittente', 'Da chi', 'testo', { suggerisci: true }), c('casella', 'Casella', 'scelta', { opzioni: CASELLE }),
+      c('titolo', 'Oggetto', 'testo', { obbl: true }), c('mittente', 'Da chi', 'testo', { suggerisci: true }), c('casella', 'Casella', 'scelta', { opzioni: CASELLE, maiuscolo: true }),
       c('data', 'Ricevuta il', 'data', { obbl: true }), c('azione', 'Cosa fare', 'lungo'), c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }),
       c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da gestire', 'in attesa di altri', 'gestita'] }),
       c('link', 'Collegamento a Gmail'), c('nota', 'Nota', 'lungo')] },
     sito: { nome: 'Sito o gestionale', plur: 'Siti e gestionali', titolo: v => v.titolo, colonne: ['titolo', 'categoria', 'casella', 'link'], campi: [
       c('titolo', 'Nome', 'testo', { obbl: true }), c('link', 'Indirizzo (https://…)', 'testo', { obbl: true }), c('categoria', 'Tipo', 'scelta', { opzioni: CAT_SITI }),
-      c('casella', 'Riguarda', 'scelta', { opzioni: RIGUARDA }), c('nota', 'Nota (mai password)', 'lungo')] },
+      c('casella', 'Riguarda', 'scelta', { opzioni: RIGUARDA, maiuscolo: true }), c('nota', 'Nota (mai password)', 'lungo')] },
     revisione: { nome: 'Revisione della settimana', plur: 'Revisioni settimanali', titolo: v => 'Settimana del ' + fmtData(v.data), colonne: ['data', 'voto', 'focus'], campi: [
       c('data', 'Lunedì della settimana', 'data', { obbl: true }), c('voto', 'Come è andata, da 1 a 5', 'numero'), c('bene', 'Cosa è andato bene', 'lungo'), c('male', 'Cosa non è andato', 'lungo'),
       c('focus', 'Le tre cose della prossima settimana', 'lungo'), c('famiglia', 'Tempo per la famiglia: cosa ho fatto', 'lungo')] },
@@ -1254,7 +1256,7 @@ function controllo(f, v, idArea, idTipo) {
   if (f.tipo === 'data') return h('input', { ...base, type: 'date', value: val || '' });
   if (f.tipo === 'numero') return h('input', { ...base, type: 'text', inputmode: 'decimal', value: val == null ? '' : String(val).replace('.', ','), autocomplete: 'off' });
   if (f.tipo === 'si_no') return h('input', { ...base, type: 'checkbox', checked: !!val });
-  if (f.tipo === 'scelta') return h('select', base, h('option', { value: '' }, ''), f.opzioni.map(o => h('option', { value: o, selected: o === val }, o)));
+  if (f.tipo === 'scelta') return h('select', base, h('option', { value: '' }, ''), f.opzioni.map(o => h('option', { value: o, selected: o === val }, f.maiuscolo ? o.toUpperCase() : o)));
   if (f.tipo === 'allegato') return h('select', base, h('option', { value: '' }, 'Nessuno'), S.A.allegati.filter(a => !a.canc).map(a => h('option', { value: a.id, selected: a.id === val }, `${a.nome} (${fmtData(a.data)})`)));
   const attr = { ...base, type: 'text', value: val || '', autocomplete: 'off' };
   if (f.suggerisci) {
@@ -2280,7 +2282,7 @@ function pulsanteCalendario(x) {
     : btn('Aggiungi al calendario', () => { metti({ ...x, calendario: true }); avviso('Entra nel calendario TASK al prossimo aggiornamento.'); }, 'piccolo');
 }
 /* Etichette colorate per chi riguarda il task o la mail: Pioltello blu, Porta Romana giallo, Personale rosso; per i task personali CASA viola, GIARDINO verde, PROGETTI acqua. */
-const COLORI_ETICHETTA = { '3MEDical Pioltello': 'blu', '3MEDical Porta Romana': 'giallo', 'Personale': 'rosso', '3MEDical': 'blu', 'Psiche e Soma': 'arancione', 'Personal trainer': 'viola', CASA: 'viola', GIARDINO: 'verde', PROGETTI: 'acqua' };
+const COLORI_ETICHETTA = { '3MEDical Pioltello': 'blu', '3MEDical Porta Romana': 'giallo', 'Personale': 'rosso', '3MEDical': 'bluscuro', 'Psiche e Soma': 'arancione', 'Personal trainer': 'nero', CASA: 'viola', GIARDINO: 'verde', PROGETTI: 'acqua' };
 const etichettaColore = nome => (nome ? h('span', { class: 'etichetta e-' + (COLORI_ETICHETTA[nome] || 'grigio') }, nome) : null);
 const linkGmail = x => (typeof x.link === 'string' && /^https:\/\/mail\.google\.com\//.test(x.link) ? x.link : '');
 
