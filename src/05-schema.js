@@ -21,7 +21,8 @@ const CAT_SITI = ['Gestionali', 'Banche e pagamenti', 'Personale e paghe', 'Goog
 const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personale'];
 /* Etichette dei task personali: un task con una di queste etichette sta in Organizzazione, non nella pagina Task di lavoro. */
 const ETICHETTE_PERSONALI = ['CASA', 'GIARDINO', 'PROGETTI'];
-const SERVIZI_PT = ['Personal', 'Corso posturale'];
+const SERVIZI_PT = ['Personal', 'Corso posturale', 'Sostituzione corso'];
+const PAGAMENTI_PT = ['contanti', 'carta'];
 /* Cartelle di lavoro: stanno nel menu sotto Lavoro, non tra le cartelle personali. */
 const AREE_LAVORO = ['pt'];
 /* Cartelle raccolte nel menu sotto l'unica voce Passioni. */
@@ -70,18 +71,18 @@ const AREE_BASE = [
   { id: 'pt', nome: 'Personal trainer', tipi: {
     cliente: { nome: 'Cliente', plur: 'Clienti', titolo: v => v.titolo, colonne: ['titolo', 'servizio', 'tariffa', 'stato', 'scheda_fine'], campi: [
       c('titolo', 'Nome e cognome', 'testo', { obbl: true }), c('calendario', 'Come compare nel calendario (es. Nata; più nomi separati da virgola)'),
-      c('servizio', 'Servizio', 'scelta', { opzioni: SERVIZI_PT }), c('stato', 'Stato', 'scelta', { opzioni: ['attivo', 'in pausa', 'concluso'] }),
-      c('tariffa', 'Euro a seduta', 'numero', { euro: true }), c('tariffa_mese', 'Oppure euro fissi al mese', 'numero', { euro: true }),
+      c('servizio', 'Servizio', 'scelta', { opzioni: SERVIZI_PT }), c('stato', 'Stato', 'scelta', { opzioni: ['attivo', 'inattivo'] }),
+      c('tariffa', 'Euro a seduta', 'numero', { euro: true }), c('tariffa_mese', 'Oppure euro fissi al mese', 'numero', { euro: true }), c('pagamento', 'Paga con', 'scelta', { opzioni: PAGAMENTI_PT }),
       c('pacchetto', 'Sedute del pacchetto', 'numero'), c('pacchetto_dal', 'Pacchetto iniziato il', 'data'),
       c('scheda', 'Scheda attiva (nome o obiettivo)'), c('scheda_inizio', 'Scheda dal', 'data'), c('scheda_fine', 'Scheda fino al', 'data'), c('scheda_doc', 'File della scheda', 'allegato'),
       c('nota', 'Nota', 'lungo')] },
     presenza: { nome: 'Presenza', plur: 'Presenze', titolo: v => v.cliente, colonne: ['data', 'ora', 'cliente', 'stato', 'origine'], campi: [
       c('data', 'Data', 'data', { obbl: true }), c('ora', 'Ora (es. 08:00)'), c('cliente', 'Cliente o corso', 'testo', { obbl: true, suggerisci: true }),
-      c('partecipanti', 'Partecipanti del corso (nomi separati da virgola)', 'lungo'),
+      c('partecipanti', 'Partecipanti del corso (nomi separati da virgola)', 'lungo'), c('importo', 'Importo di questa seduta in euro (quando varia)', 'numero', { euro: true }),
       c('stato', 'Stato', 'scelta', { opzioni: ['fatta', 'annullata', 'da abbinare'] }), c('origine', 'Origine', 'scelta', { opzioni: ['calendario', 'a mano'] }), c('nota', 'Nota', 'lungo')] },
-    conteggio: { nome: 'Conteggio del mese', plur: 'Conteggi mensili', titolo: v => v.cliente, colonne: ['data', 'cliente', 'sedute', 'valore', 'incassato'], campi: [
+    conteggio: { nome: 'Conteggio del mese', plur: 'Conteggi mensili', titolo: v => v.cliente, colonne: ['data', 'cliente', 'sedute', 'valore', 'pagamento', 'incassato'], campi: [
       c('data', 'Mese (primo giorno)', 'data', { obbl: true }), c('cliente', 'Cliente', 'testo', { obbl: true, suggerisci: true }), c('sedute', 'Sedute', 'numero'),
-      c('valore', 'Importo in euro', 'numero', { obbl: true, euro: true }), c('incassato', 'Incassato', 'si_no'), c('nota', 'Nota', 'lungo')] },
+      c('valore', 'Importo in euro', 'numero', { obbl: true, euro: true }), c('pagamento', 'Pagato con', 'scelta', { opzioni: PAGAMENTI_PT }), c('incassato', 'Incassato', 'si_no'), c('nota', 'Nota', 'lungo')] },
   } },
   { id: 'salute', nome: 'Salute e longevità', tipi: {
     misura: { nome: 'Esame di laboratorio', plur: 'Esami di laboratorio', titolo: v => v.parametro, colonne: ['data', 'parametro', 'valore', 'unita', 'rif_testo', 'laboratorio'], campi: [

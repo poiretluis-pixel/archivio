@@ -15,10 +15,15 @@ function presenzeCliente(c, lista = presenzeFatte()) {
   return lista.filter(x => (lezioneCorso(x) ? partecipantiDi(x).some(p => normaNome(p) === n) : normaNome(x.cliente) === n)).sort(perData);
 }
 const delMese = (l, mese) => l.filter(x => (x.data || '').startsWith(mese));
-function importoCalcolato(c, sedute) {
-  if (c.tariffa_mese) return sedute ? c.tariffa_mese : 0;
-  return typeof c.tariffa === 'number' ? sedute * c.tariffa : null;
+const attivoPt = c => (c.stato || 'attivo') === 'attivo';
+/* Importo del mese: cifra fissa mensile, altrimenti per ogni seduta il suo importo (quando varia) o la tariffa. Senza tariffa resta da indicare. */
+function importoCalcolato(c, pres) {
+  if (c.tariffa_mese) return pres.length ? c.tariffa_mese : 0;
+  let tot = 0;
+  for (const x of pres) { const v = typeof x.importo === 'number' && !lezioneCorso(x) ? x.importo : c.tariffa; if (typeof v !== 'number') return null; tot += v; }
+  return tot;
 }
+const etichettaPagamento = p => (p ? h('span', { class: 'etichetta e-' + (p === 'contanti' ? 'verde' : 'blu') }, p) : h('span', { class: 'attenuato piccolo' }, '?'));
 /* Giorni in cui viene di solito: i giorni della settimana con almeno due presenze negli ultimi 60 giorni, con l'ora più frequente. */
 function giorniAbituali(pres) {
   const recenti = pres.filter(x => giorniDa(x.data) >= 0 && giorniDa(x.data) < 60);
@@ -50,18 +55,18 @@ function righeMesePt(mese) {
   const tutte = presenzeFatte();
   return clientiPt().map(c => {
     const pres = presenzeCliente(c, tutte), mesePres = delMese(pres, mese), salvato = conteggioDi(c, mese);
-    const calc = importoCalcolato(c, mesePres.length);
+    const calc = importoCalcolato(c, mesePres);
     return { c, pres, sedute: mesePres.length, calc, salvato, importo: salvato ? salvato.valore : calc };
-  }).filter(r => r.sedute || r.salvato || (r.c.stato || 'attivo') === 'attivo');
+  });
 }
 function registraConteggi(mese, righe) {
   const da = righe.filter(r => !r.salvato && r.sedute && r.calc != null);
   if (!da.length) { avviso('Niente da registrare: i conteggi del mese sono già salvati o manca la tariffa.'); return; }
-  for (const r of da) metti({ area: 'pt', tipo: 'conteggio', persona: titolarePt(), data: mese + '-01', cliente: r.c.titolo, sedute: r.sedute, valore: r.calc, origine: 'calcolo' }, false);
+  for (const r of da) metti({ area: 'pt', tipo: 'conteggio', persona: titolarePt(), data: mese + '-01', cliente: r.c.titolo, sedute: r.sedute, valore: r.calc, ...(r.c.pagamento ? { pagamento: r.c.pagamento } : {}), origine: 'calcolo' }, false);
   disegna(); avviso(`Registrati ${da.length} conteggi di ${meseLungo(mese)}.`);
 }
 function segnaPresenti(lezione) {
-  const corsisti = clientiPt().filter(c => c.servizio === CORSO_PT && c.stato !== 'concluso');
+  const corsisti = clientiPt().filter(c => c.servizio === CORSO_PT && attivoPt(c));
   const gia = new Set(partecipantiDi(lezione).map(normaNome));
   const caselle = corsisti.map(c => h('label', { class: 'campo riga' }, h('input', { type: 'checkbox', value: c.titolo, checked: gia.has(normaNome(c.titolo)) }), h('span', {}, c.titolo)));
   apriModale(`Presenti al corso del ${fmtData(lezione.data)}`, h('div', {},
@@ -79,8 +84,12 @@ function abbina(x, nome) {
 
 function vistaPt(meseRotta) {
   const mese = /^\d{4}-\d{2}$/.test(meseRotta || '') ? meseRotta : oggi().slice(0, 7);
-  const righe = righeMesePt(mese);
-  const clienti = clientiPt(), attivi = clienti.filter(c => (c.stato || 'attivo') === 'attivo');
+  const tutte = righeMesePt(mese), righe = tutte.filter(r => r.sedute || r.salvato || attivoPt(r.c));
+  const clienti = clientiPt(), attivi = clienti.filter(attivoPt), inattivi = clienti.filter(c => !attivoPt(c));
+  const vedi = S.ptClienti === 'inattivi' ? 'inattivi' : 'attivi', pag = PAGAMENTI_PT.includes(S.ptPagamento) ? S.ptPagamento : '';
+  const mostrate = (vedi === 'inattivi' ? tutte.filter(r => !attivoPt(r.c)) : righe).filter(r => !pag || r.c.pagamento === pag);
+  const perPag = p => somma(righe.filter(r => r.c.pagamento === p).map(r => r.importo || 0));
+  const filtro = (chiave, valore, testo, scelto) => h('button', { type: 'button', class: 'filtro' + (scelto ? ' scelto' : ''), 'aria-pressed': scelto ? 'true' : 'false', onclick: () => { S[chiave] = valore; disegna(); } }, testo);
   const nuovaPresenza = () => apriModulo('pt', 'presenza', null, { data: oggi(), stato: 'fatta', origine: 'a mano' });
   if (!clienti.length && !voci('pt', 'presenza').length) return h('div', {}, h('div', { class: 'testa' }, h('h1', {}, 'Personal trainer')),
     pannello('', vuoto('Nessun cliente. Aggiungi i clienti con il nome che usi nel calendario Personal trainer: le presenze arrivano da sole ogni sera.', btn('Aggiungi un cliente', () => apriModulo('pt', 'cliente', null, { stato: 'attivo', servizio: 'Personal' }), 'primario'))));
@@ -103,22 +112,25 @@ function vistaPt(meseRotta) {
       h('a', { class: 'btn piccolo', href: '#/pt/' + meseDopo(mese, 1), 'aria-label': 'Mese successivo' }, '›'),
       mese !== oggi().slice(0, 7) ? h('a', { class: 'btn piccolo', href: '#/pt' }, 'Questo mese') : null),
     h('div', { class: 'dati' }, dato('Sedute nel mese', totSedute, lezioni.length ? `${lezioni.length} lezioni del corso` : ''),
-      dato('Da fatturare', fmtEuro(totImporto), senzaTariffa ? `${senzaTariffa} clienti senza tariffa` : incassato ? `incassati ${fmtEuro(incassato)}` : '', senzaTariffa ? 'allerta' : ''),
-      dato('Clienti attivi', attivi.length), dato('Schede da rinnovare', daRinnovare.length, '', daRinnovare.length ? 'allerta' : '')),
+      dato('Da fatturare', fmtEuro(totImporto), [`contanti ${fmtEuro(perPag('contanti'))}, carta ${fmtEuro(perPag('carta'))}`, senzaTariffa ? `${senzaTariffa} senza tariffa` : '', incassato ? `incassati ${fmtEuro(incassato)}` : ''].filter(Boolean).join('; '), senzaTariffa ? 'allerta' : ''),
+      dato('Clienti attivi', attivi.length, `${inattivi.length} inattivi`), dato('Schede da rinnovare', daRinnovare.length, '', daRinnovare.length ? 'allerta' : '')),
     daAbbinare.length ? pannello('Presenze da abbinare', h('p', { class: 'attenuato piccolo' }, 'Appuntamenti del calendario con un nome che non corrisponde a nessun cliente. Sceglilo una volta: poi aggiungi quel nome nel campo "Come compare nel calendario" del cliente.'),
       h('ul', { class: 'elenco' }, daAbbinare.map(x => h('li', { class: 'tra' }, h('span', {}, h('strong', {}, x.cliente), h('span', { class: 'attenuato' }, ` ${fmtData(x.data)}${x.ora ? ', ' + x.ora : ''}`)),
         h('span', { class: 'azioni' }, h('select', { 'aria-label': 'Cliente per ' + x.cliente, onchange: e => abbina(x, e.target.value) }, h('option', { value: '' }, 'Scegli il cliente…'), [CORSO_PT, ...clienti.map(c => c.titolo)].map(n => h('option', { value: n }, n))),
           btn('Non è una seduta', () => { metti({ ...x, stato: 'annullata' }); avviso('Presenza scartata.'); }, 'piccolo')))))) : null,
-    pannello('Clienti del mese', righe.length ? h('div', { class: 'scorri' }, h('table', { class: 'tabella-pt' },
-      h('thead', {}, h('tr', {}, ['Cliente', 'Giorni abituali', 'Sedute', 'Importo', 'Pacchetto', 'Scheda', 'Ultima volta'].map((t, i) => h('th', { class: [2, 3].includes(i) ? 'destra' : '' }, t)))),
-      h('tbody', {}, righe.map(r => { const sc = statoScheda(r.c), ult = r.pres[r.pres.length - 1];
+    pannello('Clienti del mese',
+      h('div', { class: 'azioni filtri' }, h('span', { class: 'attenuato piccolo' }, 'Clienti:'), filtro('ptClienti', 'attivi', `Attivi (${attivi.length})`, vedi === 'attivi'), filtro('ptClienti', 'inattivi', `Inattivi (${inattivi.length})`, vedi === 'inattivi'),
+        h('span', { class: 'attenuato piccolo' }, 'Pagamento:'), filtro('ptPagamento', '', 'Tutti', !pag), filtro('ptPagamento', 'contanti', 'Contanti', pag === 'contanti'), filtro('ptPagamento', 'carta', 'Carta', pag === 'carta')),
+      mostrate.length ? h('div', { class: 'scorri' }, h('table', { class: 'tabella-pt' },
+      h('thead', {}, h('tr', {}, ['Cliente', 'Paga con', 'Giorni abituali', 'Sedute', 'Importo', 'Pacchetto', 'Scheda', 'Ultima volta'].map((t, i) => h('th', { class: [3, 4].includes(i) ? 'destra' : '' }, t)))),
+      h('tbody', {}, mostrate.map(r => { const sc = statoScheda(r.c), ult = r.pres[r.pres.length - 1];
         return h('tr', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('pt', 'cliente', r.c), onkeydown: e => { if (e.key === 'Enter') apriModulo('pt', 'cliente', r.c); } },
-          cella(h('span', {}, h('strong', {}, r.c.titolo), r.c.servizio === CORSO_PT ? h('span', { class: 'attenuato piccolo' }, ' corso') : null, r.c.stato && r.c.stato !== 'attivo' ? h('span', { class: 'attenuato piccolo' }, ' ' + r.c.stato) : null)),
-          cella(giorniAbituali(r.pres), 'attenuato'), cella(String(r.sedute), 'num destra'),
+          cella(h('span', {}, h('strong', {}, r.c.titolo), r.c.servizio === CORSO_PT ? h('span', { class: 'attenuato piccolo' }, ' corso') : null, !attivoPt(r.c) ? h('span', { class: 'attenuato piccolo' }, ' inattivo') : null)),
+          cella(etichettaPagamento(r.c.pagamento)), cella(giorniAbituali(r.pres), 'attenuato'), cella(String(r.sedute), 'num destra'),
           cella(r.importo == null ? (r.sedute ? 'tariffa?' : '') : fmtEuro(r.importo) + (r.salvato ? (r.salvato.incassato ? ' ✓' : '') : ''), 'num destra nonspezza' + (r.importo == null && r.sedute ? ' fuori' : '')),
           cella(pacchettoUsato(r.c, r.pres)), cella(sc.testo ? (sc.tipo ? stato(sc.tipo, sc.testo) : sc.testo) : ''), cella(ult ? fmtData(ult.data) : '', 'nonspezza'));
-      })))) : h('p', { class: 'attenuato' }, 'Nessuna seduta in questo mese.'),
-      h('p', { class: 'attenuato piccolo' }, 'Importo: sedute per euro a seduta, oppure la cifra fissa mensile. Dopo "Registra i conteggi" l\'importo resta fisso e puoi segnarlo come incassato. ✓ vuol dire incassato.'),
+      })))) : h('p', { class: 'attenuato' }, vedi === 'inattivi' ? 'Nessun cliente inattivo.' : 'Nessuna seduta in questo mese.'),
+      h('p', { class: 'attenuato piccolo' }, 'Importo: sedute per euro a seduta, oppure la cifra fissa mensile; per le sedute con prezzo variabile (come le sostituzioni del corso) vale l\'importo scritto nella presenza. Dopo "Registra i conteggi" l\'importo resta fisso e puoi segnarlo come incassato. ✓ vuol dire incassato.'),
       h('div', { class: 'azioni' }, btn('Registra i conteggi del mese', () => registraConteggi(mese, righe), 'piccolo'), h('a', { class: 'btn piccolo', href: '#/a/pt/conteggio' }, 'Conteggi e incassi'), h('a', { class: 'btn piccolo', href: '#/a/pt/presenza' }, 'Tutte le presenze'), h('a', { class: 'btn piccolo', href: '#/a/pt/cliente' }, 'Tutti i clienti'))),
     lezioni.length ? pannello('Corso posturale', h('ul', { class: 'elenco' }, lezioni.map(x => h('li', { class: 'tra' },
       h('span', {}, h('strong', {}, fmtData(x.data) + (x.ora ? ', ' + x.ora : '')), h('span', { class: 'attenuato' }, partecipantiDi(x).length ? ` ${partecipantiDi(x).join(', ')}` : ' presenti da segnare')),
