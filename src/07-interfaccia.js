@@ -207,6 +207,14 @@ function ricevuta(esito) {
 }
 
 /* --- Guscio dell'applicazione --- */
+/* Tema chiaro, scuro o automatico (segue il dispositivo). Scelta per dispositivo; se la memoria del browser non c'è, resta chiaro. */
+const TEMI = { chiaro: 'Sempre chiaro', scuro: 'Sempre scuro', automatico: 'Come il dispositivo' };
+function temaScelto() { try { const t = localStorage.getItem('tema'); return TEMI[t] ? t : 'chiaro'; } catch (e) { return 'chiaro'; } }
+function applicaTema(t) {
+  if (t) { try { localStorage.setItem('tema', t); } catch (e) { /* resta solo per questa visita */ } }
+  document.documentElement.dataset.tema = t || temaScelto();
+}
+applicaTema();
 function leggiRotta() { return location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent); }
 function spiaSync() {
   const st = S.sync, pronto = S.sbloccato && ghPronto();

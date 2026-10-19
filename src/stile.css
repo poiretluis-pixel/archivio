@@ -6,7 +6,13 @@
   --testo:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   color-scheme:light;
 }
-@media (prefers-color-scheme:dark){:root{
+:root[data-tema=scuro]{
+  --fondo:#161512; --carta:#201e1a; --inchiostro:#f1ece2; --inchiostro2:#c9c1b2; --tenue:#9a9283; --linea:#38342c; --linea2:#2a2722;
+  --marca:#a9c49a; --marca-su:#172112; --marca-tenue:#2b3326; --serie:#3987e5; --serie2:#d95926;
+  --ok:#3fc13f; --attenzione:#f0b429; --critico:#f07a79; --critico-tenue:#3a1e1e; --attenzione-tenue:#3a2f12;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:dark){:root[data-tema=automatico]{
   --fondo:#161512; --carta:#201e1a; --inchiostro:#f1ece2; --inchiostro2:#c9c1b2; --tenue:#9a9283; --linea:#38342c; --linea2:#2a2722;
   --marca:#a9c49a; --marca-su:#172112; --marca-tenue:#2b3326; --serie:#3987e5; --serie2:#d95926;
   --ok:#3fc13f; --attenzione:#f0b429; --critico:#f07a79; --critico-tenue:#3a1e1e; --attenzione-tenue:#3a2f12;
@@ -214,7 +220,8 @@ li.lavoro .azioni{flex-wrap:wrap}
 .scadenza-rapida input{font:inherit;font-size:.85rem;padding:.15rem .35rem;border:1px solid var(--linea);border-radius:6px;background:var(--carta);color:var(--inchiostro)}
 /* Etichette di chi riguarda task e mail */
 :root{--e-blu-f:#dce8fb;--e-blu-t:#1a4d9e;--e-giallo-f:#fbefc4;--e-giallo-t:#7a5800;--e-rosso-f:#fbe1e0;--e-rosso-t:#a8282a;--e-viola-f:#ebe3fa;--e-viola-t:#5b3a9e;--e-verde-f:#dcf1e1;--e-verde-t:#1f6b35;--e-arancione-f:#fde4cc;--e-arancione-t:#9a4a00;--e-acqua-f:#d5f0ee;--e-acqua-t:#0f6660;--e-grigio-f:var(--linea2);--e-grigio-t:var(--inchiostro2)}
-@media (prefers-color-scheme:dark){:root{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf}}
+:root[data-tema=scuro]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf}
+@media (prefers-color-scheme:dark){:root[data-tema=automatico]{--e-blu-f:#1c2f4d;--e-blu-t:#9cc1ff;--e-giallo-f:#3b3112;--e-giallo-t:#f3cf5d;--e-rosso-f:#3f1f20;--e-rosso-t:#ff9c9a;--e-viola-f:#2e2443;--e-viola-t:#c7b0ff;--e-verde-f:#16331f;--e-verde-t:#86d79c;--e-arancione-f:#3f2612;--e-arancione-t:#ffb36b;--e-acqua-f:#123734;--e-acqua-t:#7fd8cf}}
 .etichetta{display:inline-block;font-size:.76rem;font-weight:600;border-radius:99px;padding:0 .55rem;line-height:1.45rem;white-space:nowrap;vertical-align:.08em}
 .e-blu{background:var(--e-blu-f);color:var(--e-blu-t)}
 .e-giallo{background:var(--e-giallo-f);color:var(--e-giallo-t)}

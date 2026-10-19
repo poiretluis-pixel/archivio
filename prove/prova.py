@@ -361,6 +361,17 @@ async def main():
         await A.goto(URL + "#/")
         await A.wait_for_timeout(200)
         controlla(await A.locator(".griglia a.scheda[href='#/passioni']").count() == 1 and await A.locator(".griglia a.scheda[href='#/a/sport']").count() == 0, "quadro generale con la scheda Passioni")
+        # --- Tema: chiaro anche con il dispositivo in modalità scura, scuro o automatico a scelta
+        await A.emulate_media(color_scheme="dark")
+        sfondo = "getComputedStyle(document.body).backgroundColor"
+        controlla(await A.evaluate(sfondo) == "rgb(236, 230, 217)", "tema chiaro anche con il dispositivo in modalità scura")
+        await A.goto(URL + "#/impostazioni")
+        await A.wait_for_timeout(200)
+        await A.select_option("select[name=tema]", "automatico")
+        controlla(await A.evaluate(sfondo) == "rgb(22, 21, 18)" and await A.evaluate("localStorage.getItem('tema')") == "automatico", "tema automatico: segue la modalità scura")
+        await A.select_option("select[name=tema]", "chiaro")
+        controlla(await A.evaluate(sfondo) == "rgb(236, 230, 217)", "di nuovo chiaro")
+        await A.emulate_media(color_scheme="light")
         await A.goto(URL + "#/da-fare")
         await A.wait_for_timeout(200)
         controlla(await A.locator("h1:has-text('Task')").count() == 1, "il vecchio indirizzo Da fare apre Task")
