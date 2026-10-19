@@ -363,6 +363,8 @@ async def main():
         voci_menu = await A.locator(".menu a").all_inner_texts()
         controlla("Passioni" in voci_menu and not any(x.startswith(("Sport", "Mindfulness", "Lettura", "Viaggi")) for x in voci_menu), f"una sola voce Passioni nel menu {voci_menu}")
         controlla(await A.locator(".barra .marchio").inner_text() == "Life Planning" and await A.title() == "Life Planning", "il gestionale si chiama Life Planning")
+        icona = await A.evaluate("document.querySelector('link[rel=icon]').href")
+        controlla(icona.startswith("data:image/svg+xml,") and "c9a54e" in icona and await A.evaluate("document.querySelector('link[rel=apple-touch-icon]').getAttribute('href')") == "icone/apple-touch-icon.png", "logo Life Planning come icona")
         await A.goto(URL + "#/passioni")
         await A.wait_for_timeout(300)
         await scatta(A, "22-passioni")
