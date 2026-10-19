@@ -58,7 +58,7 @@ function vistaCasa() {
     h('div', { class: 'testa' }, h('div', {}, h('h1', {}, 'Quadro generale'), h('p', { class: 'sotto' }, new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })))),
     pannello('Da fare', daFare.length ? h('ul', { class: 'elenco' }, daFare.map(x => h('li', {}, h('a', { href: x.href }, stato(x.tipo, x.testo)), h('div', { class: 'elenco-nota' }, x.nota)))) : h('p', { class: 'attenuato' }, 'Niente in sospeso.')),
     consigliPrincipali(),
-    h('div', { class: 'griglia' }, aree().filter(a => !PASSIONI.includes(a.id)).map(a => schedaArea(a, schede)),
+    h('div', { class: 'griglia' }, aree().filter(a => !PASSIONI.includes(a.id) && !AREE_LAVORO.includes(a.id)).map(a => schedaArea(a, schede)),
       h('a', { class: 'scheda', href: '#/passioni' }, h('h3', {}, 'Passioni'), h('p', { class: 'attenuato' }, PASSIONI.map(area).filter(Boolean).map(a => a.nome).join(', ')))),
     pannello('Stato dei caricamenti', h('ul', { class: 'elenco' }, FONTI.map(f => { const st = statoFonte(f); return h('li', {}, h('div', { class: 'tra' }, h('strong', {}, f.nome), stato(st.stato, st.stato === 'ok' ? 'In regola' : st.stato === 'ritardo' ? 'In ritardo' : 'Mai caricati')), h('div', { class: 'elenco-nota' }, st.stato === 'ok' ? st.testo : (st.stato === 'ritardo' ? st.testo + '. ' : '') + f.come)); }))),
     ultimoRapporto(),

@@ -250,3 +250,7 @@ a.sito-link:hover{background:var(--marca-tenue)}
 a.sito-link:hover strong{color:var(--marca)}
 .sito-piede{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;padding:.3rem .9rem .7rem}
 .sito-piede .btn{margin-left:auto}
+
+/* Personal trainer */
+.mese-nav{align-items:center;margin:0 0 1rem}.mese-pt{font-family:var(--titoli);font-size:1.15rem;min-width:9.5rem;text-align:center;text-transform:capitalize}
+.tabella-pt td{vertical-align:top}.tabella-pt tr.cliccabile{cursor:pointer}

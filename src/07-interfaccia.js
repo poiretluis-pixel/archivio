@@ -222,7 +222,7 @@ function spiaSync() {
   return h('button', { id: 'stato-sync', class: 'btn piatto spia ' + (!pronto ? 'spenta' : st.stato === 'errore' ? 'ko' : 'ok'), title: st.errore || (pronto ? 'Sincronizza adesso' : 'Configura la sincronizzazione'), 'aria-label': testo, onclick: () => (pronto ? sincronizza(true) : (location.hash = '#/impostazioni')) }, h('span', { class: 'spia-testo' }, testo));
 }
 function menu(rotta) {
-  const attiva = r => (rotta.join('/') || 'casa').startsWith(r) || (r === 'passioni' && rotta[0] === 'a' && PASSIONI.includes(rotta[1]));
+  const attiva = r => (rotta.join('/') || 'casa').startsWith(r) || (r === 'passioni' && rotta[0] === 'a' && PASSIONI.includes(rotta[1])) || (r === 'pt' && rotta[0] === 'a' && rotta[1] === 'pt');
   const v = (href, testo, chiave, n) => h('a', { href, class: attiva(chiave) ? 'attiva' : '', 'aria-current': attiva(chiave) ? 'page' : null }, testo, n ? h('span', { class: 'conta' }, n) : null);
   const scadute = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta' && x.data <= oggi()).length;
   return h('nav', { class: 'menu', 'aria-label': 'Cartelle' },
@@ -230,9 +230,10 @@ function menu(rotta) {
     h('div', { class: 'menu-gruppo' }, 'Lavoro'),
     v('#/task', 'Task', 'task', quantiOggi('attivita')),
     v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
+    v('#/pt', 'Personal trainer', 'pt', voci('pt', 'presenza').filter(x => x.stato === 'da abbinare').length),
     v('#/siti', 'Siti e gestionali', 'siti'),
     h('div', { class: 'menu-gruppo' }, 'Personale'),
-    aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) ? null : v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0))),
+    aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) || AREE_LAVORO.includes(a.id) ? null : v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0))),
     h('div', { class: 'menu-gruppo' }, 'Archivio'),
     v('#/rapporti', 'Rapporti', 'rapporti'), v('#/scadenze', 'Scadenze', 'scadenze', scadute), v('#/documenti', 'Documenti', 'documenti', allegati().filter(a => a.stato === 'da elaborare').length), v('#/impostazioni', 'Impostazioni', 'impostazioni'));
 }
@@ -259,6 +260,7 @@ function vistaPer(r) {
     const a = area(r[1]); if (!a) return vuoto('Questa cartella non esiste più.');
     if (r[2] === 'p' && r[3]) return vistaProgetto(r[3]);
     if (r[1] === 'organizzazione' && SCHEDE_LAVORO[r[2]]) return vistaArea(a, r[2]);
+    if (r[1] === 'pt' && !r[2]) return vistaPt();
     if (r[2]) return vistaTipo(r[1], r[2]);
     return vistaArea(a);
   }
@@ -266,6 +268,7 @@ function vistaPer(r) {
   if (r[0] === 'mail') return vistaLavoro('mail', r[1]);
   if (r[0] === 'siti') return vistaSiti();
   if (r[0] === 'passioni') return vistaPassioni();
+  if (r[0] === 'pt') return vistaPt(r[1]);
   if (r[0] === 'scadenze') return vistaScadenze();
   if (r[0] === 'rapporti') return vistaRapporti(r[1]);
   if (r[0] === 'documenti') return vistaDocumenti();
