@@ -72,7 +72,7 @@ def voci_nuove(T, oggi):
     # Personal trainer: due clienti, un corsista, presenze del mese, una lezione del corso e un nome da abbinare
     mese = oggi.isoformat()[:7]
     giorno = lambda n: f"{mese}-{n:02d}"
-    add(area="pt", tipo="cliente", titolo="Anna Prova", calendario="Annina", servizio="Personal", stato="attivo", tariffa=30, pagamento="carta", pacchetto=10, pacchetto_dal=mese + "-01", scheda_fine=(oggi + dt.timedelta(days=5)).isoformat())
+    add(area="pt", tipo="cliente", titolo="Anna Prova", calendario="Annina", servizio="Personal", stato="attivo", tariffa=30, pagamento="carta", ha_scheda=True, pacchetto=10, pacchetto_dal=mese + "-01", scheda_fine=(oggi + dt.timedelta(days=5)).isoformat())
     add(area="pt", tipo="cliente", titolo="Bruno Prova", servizio="Personal", stato="attivo", tariffa_mese=100, pagamento="contanti")
     add(area="pt", tipo="cliente", titolo="Dario Fermo", servizio="Personal", stato="inattivo", tariffa=25, pagamento="contanti")
     add(area="pt", tipo="cliente", titolo="Carla Corso", servizio="Corso posturale", stato="attivo", tariffa=15)
@@ -410,6 +410,10 @@ async def main():
         await A.click("button.filtro:has-text('Tutti')")
         await A.evaluate("(v => metti({...v, importo: 50}))(S.A.voci.find(v => v.cliente === 'Anna Prova' && v.tipo === 'presenza'))")
         controlla((await A.locator(".tabella-pt tr:has-text('Anna Prova') td").all_inner_texts())[4].startswith("80"), "importo variabile della singola seduta")
+        controlla(await A.locator(".tabella-pt tr:has-text('Bruno Prova') .scheda-pt button").inner_text() == "no", "colonna scheda: no")
+        await A.click(".tabella-pt tr:has-text('Bruno Prova') .scheda-pt button")
+        controlla(await A.evaluate("S.A.voci.find(v => v.titolo === 'Bruno Prova').ha_scheda") is True and await A.locator("#modale").count() == 0, "scheda sì con un tocco")
+        await A.click(".tabella-pt tr:has-text('Bruno Prova') .scheda-pt button")
         # sedute del mese: + e −, dettaglio cliccando la riga
         conta = lambda nome: A.locator(f".tabella-pt tr:has-text('{nome}') .contatore-pt strong").inner_text()
         await A.click("button[aria-label='Aggiungi una seduta a Bruno Prova']")

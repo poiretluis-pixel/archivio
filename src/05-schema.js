@@ -74,7 +74,7 @@ const AREE_BASE = [
       c('servizio', 'Servizio', 'scelta', { opzioni: SERVIZI_PT }), c('stato', 'Stato', 'scelta', { opzioni: ['attivo', 'inattivo'] }),
       c('tariffa', 'Euro a seduta', 'numero', { euro: true }), c('tariffa_mese', 'Oppure euro fissi al mese', 'numero', { euro: true }), c('pagamento', 'Paga con', 'scelta', { opzioni: PAGAMENTI_PT }),
       c('pacchetto', 'Sedute del pacchetto', 'numero'), c('pacchetto_dal', 'Pacchetto iniziato il', 'data'),
-      c('scheda', 'Scheda attiva (nome o obiettivo)'), c('scheda_inizio', 'Scheda dal', 'data'), c('scheda_fine', 'Scheda fino al', 'data'), c('scheda_doc', 'File della scheda', 'allegato'),
+      c('ha_scheda', 'Ha la scheda', 'si_no'), c('scheda', 'Scheda attiva (nome o obiettivo)'), c('scheda_inizio', 'Scheda dal', 'data'), c('scheda_fine', 'Scheda fino al', 'data'), c('scheda_doc', 'File della scheda', 'allegato'),
       c('nota', 'Nota', 'lungo')] },
     presenza: { nome: 'Presenza', plur: 'Presenze', titolo: v => v.cliente, colonne: ['data', 'ora', 'cliente', 'stato', 'origine'], campi: [
       c('data', 'Data', 'data', { obbl: true }), c('ora', 'Ora (es. 08:00)'), c('cliente', 'Cliente o corso', 'testo', { obbl: true, suggerisci: true }),

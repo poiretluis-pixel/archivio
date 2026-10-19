@@ -256,3 +256,4 @@ a.sito-link:hover strong{color:var(--marca)}
 .tabella-pt td{vertical-align:top}.tabella-pt tr.cliccabile{cursor:pointer}
 .contatore-pt{display:inline-flex;align-items:center;gap:.4rem}.contatore-pt strong{min-width:1.4em;text-align:center}.contatore-pt .btn{min-width:2rem;padding-inline:.4rem}
 .seduta-pt{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .8rem}.seduta-pt .importo-seduta{display:inline-flex;align-items:center;gap:.3rem}.seduta-pt .importo-seduta input{width:5.5rem}
+.scheda-pt{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.35rem}

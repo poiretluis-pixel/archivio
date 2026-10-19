@@ -131,7 +131,7 @@ function vistaPt(meseRotta) {
   if (!clienti.length && !voci('pt', 'presenza').length) return h('div', {}, h('div', { class: 'testa' }, h('h1', {}, 'Personal trainer')),
     pannello('', vuoto('Nessun cliente. Aggiungi i clienti con il nome che usi nel calendario Personal trainer: le presenze arrivano da sole ogni sera.', btn('Aggiungi un cliente', () => apriModulo('pt', 'cliente', null, { stato: 'attivo', servizio: 'Personal' }), 'primario'))));
   const totSedute = somma(righe.map(r => r.sedute)), totImporto = somma(righe.map(r => r.importo || 0)), senzaTariffa = righe.filter(r => r.sedute && r.importo == null).length;
-  const daRinnovare = attivi.filter(c => ['ritardo', 'vuota'].includes(statoScheda(c).tipo));
+  const daRinnovare = attivi.filter(c => c.ha_scheda && ['ritardo', 'vuota'].includes(statoScheda(c).tipo));
   const daAbbinare = voci('pt', 'presenza').filter(x => x.stato === 'da abbinare').sort(perData);
   const lezioni = delMese(presenzeFatte().filter(lezioneCorso), mese).sort(perData);
   const incassato = somma(voci('pt', 'conteggio').filter(x => x.data.startsWith(mese) && x.incassato).map(x => x.valore));
@@ -169,9 +169,11 @@ function vistaPt(meseRotta) {
             h('strong', { class: 'num' }, String(r.sedute)),
             h('button', { type: 'button', class: 'btn piccolo', 'aria-label': 'Aggiungi una seduta a ' + r.c.titolo, onclick: () => aggiungiSeduta(r.c, giornoNelMese(mese)) }, '+')), 'destra nonspezza'),
           cella(r.importo == null ? (r.sedute ? 'tariffa?' : '') : fmtEuro(r.importo) + (r.salvato ? (r.salvato.incassato ? ' ✓' : '') : ''), 'num destra nonspezza' + (r.importo == null && r.sedute ? ' fuori' : '')),
-          cella(pacchettoUsato(r.c, r.pres)), cella(sc.testo ? (sc.tipo ? stato(sc.tipo, sc.testo) : sc.testo) : ''), cella(ult ? fmtData(ult.data) : '', 'nonspezza'));
+          cella(pacchettoUsato(r.c, r.pres)), cella(h('span', { class: 'scheda-pt', onclick: ferma }, h('button', { type: 'button', class: 'filtro' + (r.c.ha_scheda ? ' scelto' : ''), 'aria-pressed': r.c.ha_scheda ? 'true' : 'false', title: 'Tocca per cambiare', 'aria-label': (r.c.ha_scheda ? 'Ha la scheda: ' : 'Senza scheda: ') + r.c.titolo,
+            onclick: () => { const { ha_scheda, ...v } = r.c; metti(r.c.ha_scheda ? v : { ...v, ha_scheda: true }); avviso(r.c.ha_scheda ? `${r.c.titolo}: senza scheda.` : `${r.c.titolo}: ha la scheda.`); } }, r.c.ha_scheda ? 'sì' : 'no'),
+            r.c.ha_scheda && sc.testo ? (sc.tipo ? stato(sc.tipo, sc.testo) : h('span', { class: 'attenuato piccolo' }, sc.testo)) : null)), cella(ult ? fmtData(ult.data) : '', 'nonspezza'));
       })))) : h('p', { class: 'attenuato' }, vedi === 'inattivi' ? 'Nessun cliente inattivo.' : 'Nessuna seduta in questo mese.'),
-      h('p', { class: 'attenuato piccolo' }, 'Tocca un cliente per vedere e modificare le sedute del mese, giorno per giorno; con − e + togli l\'ultima seduta o ne aggiungi una oggi. Importo: sedute per euro a seduta, oppure la cifra fissa mensile; per le sedute con prezzo variabile (come le sostituzioni del corso) vale l\'importo scritto nella presenza. Dopo "Registra i conteggi" l\'importo resta fisso e puoi segnarlo come incassato. ✓ vuol dire incassato.'),
+      h('p', { class: 'attenuato piccolo' }, 'Tocca un cliente per vedere e modificare le sedute del mese, giorno per giorno; con − e + togli l\'ultima seduta o ne aggiungi una oggi. Nella colonna Scheda tocca sì o no per cambiarlo. Importo: sedute per euro a seduta, oppure la cifra fissa mensile; per le sedute con prezzo variabile (come le sostituzioni del corso) vale l\'importo scritto nella presenza. Dopo "Registra i conteggi" l\'importo resta fisso e puoi segnarlo come incassato. ✓ vuol dire incassato.'),
       h('div', { class: 'azioni' }, btn('Registra i conteggi del mese', () => registraConteggi(mese, righe), 'piccolo'), h('a', { class: 'btn piccolo', href: '#/a/pt/conteggio' }, 'Conteggi e incassi'), h('a', { class: 'btn piccolo', href: '#/a/pt/presenza' }, 'Tutte le presenze'), h('a', { class: 'btn piccolo', href: '#/a/pt/cliente' }, 'Tutti i clienti'))),
     lezioni.length ? pannello('Corso posturale', h('ul', { class: 'elenco' }, lezioni.map(x => h('li', { class: 'tra' },
       h('span', {}, h('strong', {}, fmtData(x.data) + (x.ora ? ', ' + x.ora : '')), h('span', { class: 'attenuato' }, partecipantiDi(x).length ? ` ${partecipantiDi(x).join(', ')}` : ' presenti da segnare')),
