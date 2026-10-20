@@ -233,7 +233,7 @@ function menu(rotta) {
     gruppo('Lavoro', 'lavoro'),
     v('#/task', 'Task', 'task', quantiOggi('attivita')),
     v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
-    v('#/pt', 'Personal trainer', 'pt', voci('pt', 'presenza').filter(x => x.stato === 'da abbinare').length),
+    v('#/pt', 'Personal trainer', 'pt', voci('pt', 'presenza').filter(x => ['da abbinare', 'da confermare'].includes(x.stato)).length),
     v('#/siti', 'Siti e gestionali', 'siti'),
     gruppo('Personale', 'personale'),
     aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) || AREE_LAVORO.includes(a.id) ? null

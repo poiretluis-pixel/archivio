@@ -1,6 +1,6 @@
 /* ===== 8e. Personal trainer: clienti, presenze del mese e conteggi da fatturare =====
-   Le presenze dei clienti arrivano dal calendario Google "Personal trainer" (le carica Claude ogni sera, origine "calendario")
-   oppure si aggiungono a mano. Le lezioni del corso posturale sono presenze con cliente "Corso posturale": i presenti si spuntano qui.
+   Dal 20/10/2026 le sedute arrivano ogni sera da MioDottore (agenda Poiret, prestazione Poiret) come "da confermare":
+   contano solo dopo la conferma di Luis. Le presenze più vecchie vengono dal calendario iCloud (origine "calendario"); si possono aggiungere a mano. Le lezioni del corso posturale sono presenze con cliente "Corso posturale": i presenti si spuntano qui.
    L'importo del mese è sedute × euro a seduta, oppure la cifra fissa mensile. Un conteggio salvato vale più del calcolo. */
 const CORSO_PT = 'Corso posturale';
 const GIORNI_BREVI = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
@@ -82,6 +82,51 @@ function abbina(x, nome) {
   metti({ ...x, cliente: nome, stato: 'fatta' }); avviso(`Presenza abbinata a ${nome}.`);
 }
 
+/* --- Sedute da MioDottore: arrivano "da confermare" e contano solo dopo la conferma di Luis --- */
+const AGGIORNA_MD = 'https://claude.ai/new?q=' + encodeURIComponent('Avvia subito l\'attività programmata "Presenze PT da MioDottore" (aggiorna le sedute Poiret da MioDottore nel gestionale e nel calendario PERSONAL TRAINER).');
+const daConfermarePt = () => voci('pt', 'presenza').filter(x => x.stato === 'da confermare').sort((a, b) => perData(a, b) || String(a.ora || '').localeCompare(String(b.ora || '')));
+function confermaSeduta(x, silenzioso) {
+  if (x.abbinare) { avviso('Scegli prima il cliente.', 'errore'); return false; }
+  const { abbinare, ...v } = x;
+  metti({ ...v, stato: 'fatta', confermata_il: oggi() }, !silenzioso);
+  if (!silenzioso) avviso(`Seduta di ${x.cliente} del ${fmtData(x.data)} confermata.`);
+  return true;
+}
+function confermaTutte(lista) {
+  const ok = lista.filter(x => !x.abbinare);
+  if (!ok.length) { avviso('Niente da confermare: scegli prima i clienti.', 'errore'); return; }
+  for (const x of ok) confermaSeduta(x, true);
+  disegna(); avviso(`Confermate ${ok.length} sedute.`);
+}
+function scartaSeduta(x) {
+  const { abbinare, ...v } = x;
+  metti({ ...v, stato: 'annullata', a_mano: true }); avviso(`Seduta del ${fmtData(x.data)} scartata.`);
+}
+/* Nome di MioDottore abbinato a un cliente: si ricorda il nome nel campo "Come compare nel calendario", così la volta dopo si abbina da solo. */
+function abbinaMd(x, nome) {
+  if (!nome) return;
+  const c = clientiPt().find(k => k.titolo === nome);
+  if (c && normaNome(x.cliente) !== normaNome(nome)) {
+    const alias = String(c.calendario || '').split(',').map(t => t.trim()).filter(Boolean);
+    if (!alias.some(a => normaNome(a) === normaNome(x.cliente))) metti({ ...c, calendario: [...alias, x.cliente.trim()].join(', ') }, false);
+  }
+  const { abbinare, ...v } = x;
+  metti({ ...v, cliente: nome }); avviso(`${x.cliente} abbinato a ${nome}: ora puoi confermare.`);
+}
+function pannelloDaConfermare(lista, clienti) {
+  const testo = x => h('span', {}, h('strong', {}, x.cliente), h('span', { class: 'attenuato' }, ` ${fmtData(x.data)}${x.ora ? ', ' + x.ora : ''}`),
+    lezioneCorso(x) && partecipantiDi(x).length ? h('span', { class: 'attenuato piccolo' }, `, ${partecipantiDi(x).join(', ')}`) : null,
+    x.abbinare ? h('span', { class: 'attenuato piccolo' }, ', nome di MioDottore da abbinare') : null);
+  return pannello(`Da confermare (${lista.length})`,
+    h('p', { class: 'attenuato piccolo' }, 'Sedute Poiret lette da MioDottore. Contano nei conteggi solo quando le confermi; quelle che scarti non tornano più. Nel calendario PERSONAL TRAINER ci sono comunque tutte.'),
+    h('ul', { class: 'elenco' }, lista.map(x => h('li', { class: 'tra da-confermare' }, testo(x),
+      h('span', { class: 'azioni' },
+        x.abbinare ? h('select', { 'aria-label': 'Cliente per ' + x.cliente, onchange: e => abbinaMd(x, e.target.value) }, h('option', { value: '' }, 'Scegli il cliente…'), [CORSO_PT, ...clienti.map(c => c.titolo)].map(n => h('option', { value: n }, n))) : null,
+        btn('Conferma', () => confermaSeduta(x), 'piccolo primario'), btn('Scarta', () => scartaSeduta(x), 'piccolo'))))),
+    h('div', { class: 'azioni' }, btn(`Conferma tutte (${lista.filter(x => !x.abbinare).length})`, () => confermaTutte(lista), 'primario'),
+      h('a', { class: 'btn', href: AGGIORNA_MD, target: '_blank', rel: 'noopener noreferrer' }, 'Aggiorna da MioDottore')));
+}
+
 /* --- Sedute di un cliente nel mese: aggiungere, spostare, togliere --- */
 const ultimoDelMese = m => new Date(Date.UTC(+m.slice(0, 4), +m.slice(5, 7), 0)).toISOString().slice(0, 10);
 const giornoNelMese = m => (oggi().startsWith(m) ? oggi() : ultimoDelMese(m));
@@ -129,10 +174,10 @@ function vistaPt(meseRotta) {
   const filtro = (chiave, valore, testo, scelto) => h('button', { type: 'button', class: 'filtro' + (scelto ? ' scelto' : ''), 'aria-pressed': scelto ? 'true' : 'false', onclick: () => { S[chiave] = valore; disegna(); } }, testo);
   const nuovaPresenza = () => apriModulo('pt', 'presenza', null, { data: oggi(), stato: 'fatta', origine: 'a mano' });
   if (!clienti.length && !voci('pt', 'presenza').length) return h('div', {}, h('div', { class: 'testa' }, h('h1', {}, 'Personal trainer')),
-    pannello('', vuoto('Nessun cliente. Aggiungi i clienti con il nome che usi nel calendario Personal trainer: le presenze arrivano da sole ogni sera.', btn('Aggiungi un cliente', () => apriModulo('pt', 'cliente', null, { stato: 'attivo', servizio: 'Personal' }), 'primario'))));
+    pannello('', vuoto('Nessun cliente. Aggiungi i clienti con il nome che usi su MioDottore: le sedute arrivano da sole ogni sera, da confermare.', btn('Aggiungi un cliente', () => apriModulo('pt', 'cliente', null, { stato: 'attivo', servizio: 'Personal' }), 'primario'))));
   const totSedute = somma(righe.map(r => r.sedute)), totImporto = somma(righe.map(r => r.importo || 0)), senzaTariffa = righe.filter(r => r.sedute && r.importo == null).length;
   const daRinnovare = attivi.filter(c => c.ha_scheda && ['ritardo', 'vuota'].includes(statoScheda(c).tipo));
-  const daAbbinare = voci('pt', 'presenza').filter(x => x.stato === 'da abbinare').sort(perData);
+  const daAbbinare = voci('pt', 'presenza').filter(x => x.stato === 'da abbinare').sort(perData), daConfermare = daConfermarePt();
   const lezioni = delMese(presenzeFatte().filter(lezioneCorso), mese).sort(perData);
   const incassato = somma(voci('pt', 'conteggio').filter(x => x.data.startsWith(mese) && x.incassato).map(x => x.valore));
   /* Andamento dell'anno: conteggi salvati, e per i mesi senza conteggi il calcolo dalle presenze. */
@@ -141,8 +186,8 @@ function vistaPt(meseRotta) {
   const cella = (txt, cl = '') => h('td', { class: cl }, txt);
   return h('div', {},
     h('div', { class: 'testa' },
-      h('div', {}, h('h1', {}, 'Personal trainer'), h('p', { class: 'sotto largo-testo' }, 'Le presenze arrivano ogni sera dal calendario Personal trainer. Qui vedi sedute e importi del mese, pacchetti, schede e giorni abituali di ogni cliente.')),
-      h('div', { class: 'azioni' }, btn('Aggiungi una presenza', nuovaPresenza, 'primario'), btn('Aggiungi un cliente', () => apriModulo('pt', 'cliente', null, { stato: 'attivo', servizio: 'Personal' })))),
+      h('div', {}, h('h1', {}, 'Personal trainer'), h('p', { class: 'sotto largo-testo' }, 'Le sedute arrivano ogni sera da MioDottore e contano dopo la tua conferma. Qui vedi sedute e importi del mese, pacchetti, schede e giorni abituali di ogni cliente.')),
+      h('div', { class: 'azioni' }, h('a', { class: 'btn', href: AGGIORNA_MD, target: '_blank', rel: 'noopener noreferrer', title: 'Apre Claude e avvia subito il controllo di MioDottore' }, 'Aggiorna da MioDottore'), btn('Aggiungi una presenza', nuovaPresenza, 'primario'), btn('Aggiungi un cliente', () => apriModulo('pt', 'cliente', null, { stato: 'attivo', servizio: 'Personal' })))),
     h('nav', { class: 'mese-nav azioni', 'aria-label': 'Mese' },
       h('a', { class: 'btn piccolo', href: '#/pt/' + meseDopo(mese, -1), 'aria-label': 'Mese precedente' }, '‹'),
       h('strong', { class: 'mese-pt' }, meseLungo(mese)),
@@ -151,6 +196,7 @@ function vistaPt(meseRotta) {
     h('div', { class: 'dati' }, dato('Sedute nel mese', totSedute, lezioni.length ? `${lezioni.length} lezioni del corso` : ''),
       dato('Da fatturare', fmtEuro(totImporto), [`contanti ${fmtEuro(perPag('contanti'))}, carta ${fmtEuro(perPag('carta'))}`, senzaTariffa ? `${senzaTariffa} senza tariffa` : '', incassato ? `incassati ${fmtEuro(incassato)}` : ''].filter(Boolean).join('; '), senzaTariffa ? 'allerta' : ''),
       dato('Clienti attivi', attivi.length, `${inattivi.length} inattivi`), dato('Schede da rinnovare', daRinnovare.length, '', daRinnovare.length ? 'allerta' : '')),
+    daConfermare.length ? pannelloDaConfermare(daConfermare, clienti) : null,
     daAbbinare.length ? pannello('Presenze da abbinare', h('p', { class: 'attenuato piccolo' }, 'Appuntamenti del calendario con un nome che non corrisponde a nessun cliente. Sceglilo una volta: poi aggiungi quel nome nel campo "Come compare nel calendario" del cliente.'),
       h('ul', { class: 'elenco' }, daAbbinare.map(x => h('li', { class: 'tra' }, h('span', {}, h('strong', {}, x.cliente), h('span', { class: 'attenuato' }, ` ${fmtData(x.data)}${x.ora ? ', ' + x.ora : ''}`)),
         h('span', { class: 'azioni' }, h('select', { 'aria-label': 'Cliente per ' + x.cliente, onchange: e => abbina(x, e.target.value) }, h('option', { value: '' }, 'Scegli il cliente…'), [CORSO_PT, ...clienti.map(c => c.titolo)].map(n => h('option', { value: n }, n))),
