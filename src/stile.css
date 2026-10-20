@@ -281,3 +281,5 @@ a.sito-link:hover strong{color:var(--marca)}
   .menu-gruppo::after{display:none}
 }
 .marchio span{white-space:nowrap}
+
+.importo-md { font-weight: 600; font-variant-numeric: tabular-nums; }

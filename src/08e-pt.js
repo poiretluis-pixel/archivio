@@ -16,11 +16,16 @@ function presenzeCliente(c, lista = presenzeFatte()) {
 }
 const delMese = (l, mese) => l.filter(x => (x.data || '').startsWith(mese));
 const attivoPt = c => (c.stato || 'attivo') === 'attivo';
+/* Importo di una seduta: quello scritto nella presenza (per il corso, quello del partecipante), altrimenti la tariffa del cliente. */
+function importoSeduta(x, c) {
+  if (lezioneCorso(x)) { const k = Object.keys(x.importi || {}).find(n => normaNome(n) === normaNome(c.titolo)); return k && typeof x.importi[k] === 'number' ? x.importi[k] : c.tariffa; }
+  return typeof x.importo === 'number' ? x.importo : c.tariffa;
+}
 /* Importo del mese: cifra fissa mensile, altrimenti per ogni seduta il suo importo (quando varia) o la tariffa. Senza tariffa resta da indicare. */
 function importoCalcolato(c, pres) {
   if (c.tariffa_mese) return pres.length ? c.tariffa_mese : 0;
   let tot = 0;
-  for (const x of pres) { const v = typeof x.importo === 'number' && !lezioneCorso(x) ? x.importo : c.tariffa; if (typeof v !== 'number') return null; tot += v; }
+  for (const x of pres) { const v = importoSeduta(x, c); if (typeof v !== 'number') return null; tot += v; }
   return tot;
 }
 const etichettaPagamento = p => (p ? h('span', { class: 'etichetta e-' + (p === 'contanti' ? 'verde' : 'blu') }, p) : h('span', { class: 'attenuato piccolo' }, '?'));
@@ -88,6 +93,8 @@ const daConfermarePt = () => voci('pt', 'presenza').filter(x => x.stato === 'da 
 function confermaSeduta(x, silenzioso) {
   if (x.abbinare) { avviso('Scegli prima il cliente.', 'errore'); return false; }
   const { abbinare, ...v } = x;
+  if (typeof x.md_importo === 'number' && typeof x.importo !== 'number') v.importo = x.md_importo;
+  if (x.md_importi && !x.importi) v.importi = { ...x.md_importi };
   metti({ ...v, stato: 'fatta', confermata_il: oggi() }, !silenzioso);
   if (!silenzioso) avviso(`Seduta di ${x.cliente} del ${fmtData(x.data)} confermata.`);
   return true;
@@ -113,12 +120,25 @@ function abbinaMd(x, nome) {
   const { abbinare, ...v } = x;
   metti({ ...v, cliente: nome }); avviso(`${x.cliente} abbinato a ${nome}: ora puoi confermare.`);
 }
+/* Importo letto da MioDottore, con la tariffa del cliente accanto quando è diversa. */
+function importoMd(x) {
+  const cl = nome => clientiPt().find(k => normaNome(k.titolo) === normaNome(nome));
+  if (lezioneCorso(x)) {
+    const imp = x.md_importi || {};
+    const parti = Object.keys(imp).map(n => { const c = cl(n), t = c && typeof c.tariffa === 'number' && c.tariffa !== imp[n] ? ` (tariffa ${fmtEuro(c.tariffa)})` : ''; return `${n.split(' ')[0]} ${fmtEuro(imp[n])}${t}`; });
+    return parti.length ? parti.join(', ') : '';
+  }
+  if (typeof x.md_importo !== 'number') return '';
+  const c = !x.abbinare && cl(x.cliente);
+  return fmtEuro(x.md_importo) + (c && typeof c.tariffa === 'number' && c.tariffa !== x.md_importo ? ` (tariffa ${fmtEuro(c.tariffa)})` : '');
+}
 function pannelloDaConfermare(lista, clienti) {
   const testo = x => h('span', {}, h('strong', {}, x.cliente), h('span', { class: 'attenuato' }, ` ${fmtData(x.data)}${x.ora ? ', ' + x.ora : ''}`),
     lezioneCorso(x) && partecipantiDi(x).length ? h('span', { class: 'attenuato piccolo' }, `, ${partecipantiDi(x).join(', ')}`) : null,
+    importoMd(x) ? h('span', { class: 'importo-md' }, ' ' + importoMd(x)) : null,
     x.abbinare ? h('span', { class: 'attenuato piccolo' }, ', nome di MioDottore da abbinare') : null);
   return pannello(`Da confermare (${lista.length})`,
-    h('p', { class: 'attenuato piccolo' }, 'Sedute Poiret lette da MioDottore. Contano nei conteggi solo quando le confermi; quelle che scarti non tornano più. Nel calendario PERSONAL TRAINER ci sono comunque tutte.'),
+    h('p', { class: 'attenuato piccolo' }, 'Sedute Poiret lette da MioDottore, con l\'importo scritto nell\'appuntamento: quando confermi diventa l\'importo della seduta (tra parentesi la tariffa del cliente, se è diversa). Contano nei conteggi solo dopo la conferma; quelle che scarti non tornano più. Nel calendario PERSONAL TRAINER ci sono comunque tutte.'),
     h('ul', { class: 'elenco' }, lista.map(x => h('li', { class: 'tra da-confermare' }, testo(x),
       h('span', { class: 'azioni' },
         x.abbinare ? h('select', { 'aria-label': 'Cliente per ' + x.cliente, onchange: e => abbinaMd(x, e.target.value) }, h('option', { value: '' }, 'Scegli il cliente…'), [CORSO_PT, ...clienti.map(c => c.titolo)].map(n => h('option', { value: n }, n))) : null,
