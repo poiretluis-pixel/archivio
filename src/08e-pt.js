@@ -1,5 +1,5 @@
 /* ===== 8e. Personal trainer: clienti, presenze del mese e conteggi da fatturare =====
-   Dal 20/10/2026 le sedute arrivano ogni sera da MioDottore (agenda Poiret, prestazione Poiret) come "da confermare":
+   Dal 20/10/2026 le sedute arrivano ogni domenica sera (o con il tasto) da MioDottore (agenda Poiret, prestazione Poiret) come "da confermare":
    contano solo dopo la conferma di Luis. Le presenze più vecchie vengono dal calendario iCloud (origine "calendario"); si possono aggiungere a mano. Le lezioni del corso posturale sono presenze con cliente "Corso posturale": i presenti si spuntano qui.
    L'importo del mese è sedute × euro a seduta, oppure la cifra fissa mensile. Un conteggio salvato vale più del calcolo. */
 const CORSO_PT = 'Corso posturale';
@@ -174,7 +174,7 @@ function vistaPt(meseRotta) {
   const filtro = (chiave, valore, testo, scelto) => h('button', { type: 'button', class: 'filtro' + (scelto ? ' scelto' : ''), 'aria-pressed': scelto ? 'true' : 'false', onclick: () => { S[chiave] = valore; disegna(); } }, testo);
   const nuovaPresenza = () => apriModulo('pt', 'presenza', null, { data: oggi(), stato: 'fatta', origine: 'a mano' });
   if (!clienti.length && !voci('pt', 'presenza').length) return h('div', {}, h('div', { class: 'testa' }, h('h1', {}, 'Personal trainer')),
-    pannello('', vuoto('Nessun cliente. Aggiungi i clienti con il nome che usi su MioDottore: le sedute arrivano da sole ogni sera, da confermare.', btn('Aggiungi un cliente', () => apriModulo('pt', 'cliente', null, { stato: 'attivo', servizio: 'Personal' }), 'primario'))));
+    pannello('', vuoto('Nessun cliente. Aggiungi i clienti con il nome che usi su MioDottore: le sedute arrivano da sole ogni domenica sera, da confermare.', btn('Aggiungi un cliente', () => apriModulo('pt', 'cliente', null, { stato: 'attivo', servizio: 'Personal' }), 'primario'))));
   const totSedute = somma(righe.map(r => r.sedute)), totImporto = somma(righe.map(r => r.importo || 0)), senzaTariffa = righe.filter(r => r.sedute && r.importo == null).length;
   const daRinnovare = attivi.filter(c => c.ha_scheda && ['ritardo', 'vuota'].includes(statoScheda(c).tipo));
   const daAbbinare = voci('pt', 'presenza').filter(x => x.stato === 'da abbinare').sort(perData), daConfermare = daConfermarePt();
@@ -186,7 +186,7 @@ function vistaPt(meseRotta) {
   const cella = (txt, cl = '') => h('td', { class: cl }, txt);
   return h('div', {},
     h('div', { class: 'testa' },
-      h('div', {}, h('h1', {}, 'Personal trainer'), h('p', { class: 'sotto largo-testo' }, 'Le sedute arrivano ogni sera da MioDottore e contano dopo la tua conferma. Qui vedi sedute e importi del mese, pacchetti, schede e giorni abituali di ogni cliente.')),
+      h('div', {}, h('h1', {}, 'Personal trainer'), h('p', { class: 'sotto largo-testo' }, 'Le sedute arrivano ogni domenica sera da MioDottore, o quando premi Aggiorna da MioDottore, e contano dopo la tua conferma. Qui vedi sedute e importi del mese, pacchetti, schede e giorni abituali di ogni cliente.')),
       h('div', { class: 'azioni' }, h('a', { class: 'btn', href: AGGIORNA_MD, target: '_blank', rel: 'noopener noreferrer', title: 'Apre Claude e avvia subito il controllo di MioDottore' }, 'Aggiorna da MioDottore'), btn('Aggiungi una presenza', nuovaPresenza, 'primario'), btn('Aggiungi un cliente', () => apriModulo('pt', 'cliente', null, { stato: 'attivo', servizio: 'Personal' })))),
     h('nav', { class: 'mese-nav azioni', 'aria-label': 'Mese' },
       h('a', { class: 'btn piccolo', href: '#/pt/' + meseDopo(mese, -1), 'aria-label': 'Mese precedente' }, '‹'),
