@@ -2512,7 +2512,7 @@ function abbina(x, nome) {
 }
 
 /* --- Sedute da MioDottore: arrivano "da confermare" e contano solo dopo la conferma di Luis --- */
-const AGGIORNA_MD = 'https://claude.ai/new?q=' + encodeURIComponent('Avvia subito l\'attività programmata "Presenze PT da MioDottore" (aggiorna le sedute Poiret da MioDottore nel gestionale e nel calendario PERSONAL TRAINER).');
+const AGGIORNA_MD = 'https://claude.ai/new?q=' + encodeURIComponent('Avvia subito l\'attività programmata "Presenze PT da MioDottore, mese in corso" (aggiorna le sedute Poiret di tutto il mese da MioDottore nel gestionale e nel calendario PERSONAL TRAINER).');
 const daConfermarePt = () => voci('pt', 'presenza').filter(x => x.stato === 'da confermare').sort((a, b) => perData(a, b) || String(a.ora || '').localeCompare(String(b.ora || '')));
 function confermaSeduta(x, silenzioso) {
   if (x.abbinare) { avviso('Scegli prima il cliente.', 'errore'); return false; }
@@ -2616,7 +2616,7 @@ function vistaPt(meseRotta) {
   return h('div', {},
     h('div', { class: 'testa' },
       h('div', {}, h('h1', {}, 'Personal trainer'), h('p', { class: 'sotto largo-testo' }, 'Le sedute arrivano ogni domenica sera da MioDottore, o quando premi Aggiorna da MioDottore, e contano dopo la tua conferma. Qui vedi sedute e importi del mese, pacchetti, schede e giorni abituali di ogni cliente.')),
-      h('div', { class: 'azioni' }, h('a', { class: 'btn', href: AGGIORNA_MD, target: '_blank', rel: 'noopener noreferrer', title: 'Apre Claude e avvia subito il controllo di MioDottore' }, 'Aggiorna da MioDottore'), btn('Aggiungi una presenza', nuovaPresenza, 'primario'), btn('Aggiungi un cliente', () => apriModulo('pt', 'cliente', null, { stato: 'attivo', servizio: 'Personal' })))),
+      h('div', { class: 'azioni' }, h('a', { class: 'btn', href: AGGIORNA_MD, target: '_blank', rel: 'noopener noreferrer', title: 'Apre Claude e aggiorna subito da MioDottore tutto il mese in corso' }, 'Aggiorna da MioDottore'), btn('Aggiungi una presenza', nuovaPresenza, 'primario'), btn('Aggiungi un cliente', () => apriModulo('pt', 'cliente', null, { stato: 'attivo', servizio: 'Personal' })))),
     h('nav', { class: 'mese-nav azioni', 'aria-label': 'Mese' },
       h('a', { class: 'btn piccolo', href: '#/pt/' + meseDopo(mese, -1), 'aria-label': 'Mese precedente' }, '‹'),
       h('strong', { class: 'mese-pt' }, meseLungo(mese)),
