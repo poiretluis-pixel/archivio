@@ -184,6 +184,22 @@ function dettaglioMesePt(c, mese) {
     h('div', { class: 'azioni' }, btn('Modifica i dati del cliente', () => { chiudiModale(); apriModulo('pt', 'cliente', voce(c.id) || c); }), btn('Chiudi', chiudiModale))), true);
 }
 
+/* Dettaglio del mese: per ogni cliente con sedute, giorni e ore in cui è venuto (con l'importo quando non è la tariffa). */
+const giornoBreve = d => { const x = new Date(tempo(d)); return `${GIORNI_BREVI[x.getUTCDay()]} ${x.getUTCDate()}`; };
+function pannelloDettaglioMese(righe, mese) {
+  const con = righe.filter(r => r.sedute).sort((a, b) => a.c.titolo.localeCompare(b.c.titolo, 'it'));
+  if (!con.length) return null;
+  const voce = (r, x) => {
+    const v = importoSeduta(x, r.c), diverso = typeof v === 'number' && v !== r.c.tariffa && !r.c.tariffa_mese;
+    return h('li', { class: 'giorno-pt' }, h('strong', {}, giornoBreve(x.data)), x.ora ? h('span', {}, ' ' + x.ora) : null,
+      lezioneCorso(x) ? h('span', { class: 'attenuato piccolo' }, ' corso') : null, diverso ? h('span', { class: 'attenuato piccolo' }, ' ' + fmtEuro(v)) : null);
+  };
+  return pannello(`Dettaglio di ${meseLungo(mese)}`,
+    h('p', { class: 'attenuato piccolo' }, 'Giorni e ore in cui è venuto ogni cliente, sedute confermate. Accanto, l\'importo quando è diverso dalla tariffa.'),
+    h('ul', { class: 'elenco dettaglio-pt' }, con.map(r => { const l = delMese(r.pres, mese).sort((a, b) => perData(a, b) || String(a.ora || '').localeCompare(String(b.ora || '')));
+      return h('li', {}, h('div', { class: 'tra' }, h('strong', {}, r.c.titolo), h('span', { class: 'attenuato piccolo' }, `${l.length} ${l.length === 1 ? 'seduta' : 'sedute'}${r.importo != null ? ', ' + fmtEuro(r.importo) : ''}`)),
+        h('ul', { class: 'giorni-pt' }, l.map(x => voce(r, x)))); })));
+}
 function vistaPt(meseRotta) {
   const mese = /^\d{4}-\d{2}$/.test(meseRotta || '') ? meseRotta : oggi().slice(0, 7);
   const tutte = righeMesePt(mese), righe = tutte.filter(r => r.sedute || r.salvato || attivoPt(r.c));
@@ -241,6 +257,7 @@ function vistaPt(meseRotta) {
       })))) : h('p', { class: 'attenuato' }, vedi === 'inattivi' ? 'Nessun cliente inattivo.' : 'Nessuna seduta in questo mese.'),
       h('p', { class: 'attenuato piccolo' }, 'Tocca un cliente per vedere e modificare le sedute del mese, giorno per giorno; con − e + togli l\'ultima seduta o ne aggiungi una oggi. Nella colonna Scheda tocca sì o no per cambiarlo. Importo: sedute per euro a seduta, oppure la cifra fissa mensile; per le sedute con prezzo variabile (come le sostituzioni del corso) vale l\'importo scritto nella presenza. Dopo "Registra i conteggi" l\'importo resta fisso e puoi segnarlo come incassato. ✓ vuol dire incassato.'),
       h('div', { class: 'azioni' }, btn('Registra i conteggi del mese', () => registraConteggi(mese, righe), 'piccolo'), h('a', { class: 'btn piccolo', href: '#/a/pt/conteggio' }, 'Conteggi e incassi'), h('a', { class: 'btn piccolo', href: '#/a/pt/presenza' }, 'Tutte le presenze'), h('a', { class: 'btn piccolo', href: '#/a/pt/cliente' }, 'Tutti i clienti'))),
+    pannelloDettaglioMese(tutte, mese),
     lezioni.length ? pannello('Corso posturale', h('ul', { class: 'elenco' }, lezioni.map(x => h('li', { class: 'tra' },
       h('span', {}, h('strong', {}, fmtData(x.data) + (x.ora ? ', ' + x.ora : '')), h('span', { class: 'attenuato' }, partecipantiDi(x).length ? ` ${partecipantiDi(x).join(', ')}` : ' presenti da segnare')),
       btn(partecipantiDi(x).length ? `Presenti (${partecipantiDi(x).length})` : 'Segna i presenti', () => segnaPresenti(x), 'piccolo'))))) : null,

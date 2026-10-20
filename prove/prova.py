@@ -494,6 +494,7 @@ async def main():
         await A.click("#modale .seduta-pt >> nth=2 >> button:has-text('Togli')")
         controlla(await A.locator("#modale .seduta-pt").count() == 2 and await conta("Anna Prova") == "2", "seduta tolta dal dettaglio")
         await A.evaluate("chiudiModale()")
+        controlla(await A.locator(".dettaglio-pt > li:has-text('Anna Prova') .giorno-pt").count() == 2 and "08:00" in await A.locator(".dettaglio-pt > li:has-text('Anna Prova')").inner_text(), "dettaglio del mese con giorni e ore per cliente")
         await A.click("button:has-text('Registra i conteggi del mese')")
         n = await A.evaluate("S.A.voci.filter(v => v.tipo === 'conteggio' && v.data.startsWith(oggi().slice(0, 7))).length")
         controlla(n == 3, f"conteggi del mese registrati {n}")

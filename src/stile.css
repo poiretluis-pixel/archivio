@@ -283,3 +283,6 @@ a.sito-link:hover strong{color:var(--marca)}
 .marchio span{white-space:nowrap}
 
 .importo-md { font-weight: 600; font-variant-numeric: tabular-nums; }
+.giorni-pt { list-style: none; margin: .35rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem; }
+.giorno-pt { border: 1px solid var(--linea); border-radius: 6px; padding: .15rem .45rem; font-size: .85rem; white-space: nowrap; }
+.dettaglio-pt > li { padding: .55rem 0; }
