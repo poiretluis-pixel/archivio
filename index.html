@@ -10,7 +10,7 @@
 <title>Life Planning</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2231%22 fill=%22%2326321f%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2227%22 fill=%22none%22 stroke=%22%23c9a54e%22 stroke-width=%221.6%22/%3E%3Cpath d=%22M22 18v28h12M28.5 46V22h7.5a6.8 6.8 0 0 1 0 13.6h-7.5%22 fill=%22none%22 stroke=%22%23c9a54e%22 stroke-width=%224.2%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3Ccircle cx=%2241.5%22 cy=%2246%22 r=%222.6%22 fill=%22%23c9a54e%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="icone/apple-touch-icon.png">
-<!-- Versione costruita il 2026-10-20. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
+<!-- Versione costruita il 2026-11-04. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
 <style>
 :root{
   --fondo:#ece6d9; --carta:#fbf9f4; --inchiostro:#2a2620; --inchiostro2:#5a5348; --tenue:#7d7466; --linea:#ddd5c6; --linea2:#ebe5d8;
@@ -592,16 +592,53 @@ async function apriBusta(busta, segreto, tipo) {
   throw new Error(tipo === 'recupero' ? 'Codice di recupero non valido.' : 'Frase segreta non corretta.');
 }
 async function sblocca(busta, segreto, tipo) {
-  const r = await apriBusta(busta, segreto, tipo);
+  entra(busta, await apriBusta(busta, segreto, tipo));
+  S.sporco = !!(await kvLeggi('sporco'));
+}
+function entra(busta, r) {
   S.chiaveGrezza = r.grezza; S.chiave = r.chiave; S.A = r.A; S.est = r.est; S.disp = r.disp;
   ricostruisciEsterni();
   S.testata = { promemoria: busta.promemoria || '', slot: busta.slot, slot_agg: busta.slot_agg };
   S.sbloccato = true; S.ultimaAttivita = Date.now();
-  S.sporco = !!(await kvLeggi('sporco'));
   const p = S.A.persone.filter(x => !x.canc);
   S.persona = p.length === 1 ? p[0].id : '';
 }
+/* --- Sessione della scheda ---
+   Il browser può congelare e ricaricare una scheda rimasta in secondo piano. Per non chiedere di nuovo la frase,
+   la chiave dati resta nella memoria di sessione di quella scheda (sessionStorage, cancellata alla chiusura)
+   insieme all'ora di scadenza; dopo i minuti di inattività impostati non vale più e la pagina si blocca. */
+const SESSIONE = 'lp-sessione';
+const minutiBlocco = () => Math.max(1, +((S.A && S.A.impostazioni && S.A.impostazioni.blocco_min) || 15));
+const inattivitaScaduta = () => Date.now() - S.ultimaAttivita > minutiBlocco() * 60000;
+let _tSessione = 0;
+function ricordaSessione(subito) {
+  if (!S.sbloccato || !S.chiaveGrezza) return;
+  const ora = Date.now();
+  if (!subito && ora - _tSessione < 10000) return;
+  _tSessione = ora;
+  try { sessionStorage.setItem(SESSIONE, JSON.stringify({ k: b64(S.chiaveGrezza), ultima: S.ultimaAttivita, scade: S.ultimaAttivita + minutiBlocco() * 60000 })); } catch (e) { /* memoria di sessione non disponibile */ }
+}
+function dimenticaSessione() {
+  _tSessione = 0;
+  try { sessionStorage.removeItem(SESSIONE); } catch (e) { /* niente da togliere */ }
+}
+async function riprendiSessione() {
+  let x = null;
+  try { x = JSON.parse(sessionStorage.getItem(SESSIONE) || 'null'); } catch (e) { return false; }
+  if (!x || !x.k || !(x.scade > Date.now())) { dimenticaSessione(); return false; }
+  try {
+    const busta = await kvLeggi('busta');
+    if (!busta || busta.formato !== 'archivio-vita') throw new Error('nessuna busta');
+    const grezza = daB64(x.k), chiave = await importaChiaveDati(grezza);
+    entra(busta, { grezza, chiave, ...apriContenuto(await dissigilla(busta, chiave)) });
+    S.sporco = !!(await kvLeggi('sporco'));
+    S.ultimaAttivita = Math.min(Date.now(), +x.ultima || Date.now());
+    if (inattivitaScaduta()) { blocca(); return false; }
+    return true;
+  } catch (e) { dimenticaSessione(); S.sbloccato = false; return false; }
+}
 function blocca() {
+  dimenticaSessione();
   if (S.chiaveGrezza) S.chiaveGrezza.fill(0);
   Object.assign(S, { sbloccato: false, chiave: null, chiaveGrezza: null, A: null, est: {}, disp: {}, estVoci: [], persona: '' });
   chiudiModale();
@@ -3034,7 +3071,7 @@ function vistaImpostazioni() {
       h('div', { class: 'azioni' }, btn('Importa un file dati (.json)', () => scegliFile('.json,application/json', scegliImportaDati))),
       h('p', { class: 'attenuato piccolo' }, 'Per caricare dati preparati altrove nello stesso formato. Al termine vedi quante voci sono entrate e quali no.')),
     pannello('Sicurezza di questo dispositivo', formFrase,
-      h('label', { class: 'campo stretto' }, h('span', {}, 'Blocco automatico dopo minuti di inattività'), h('input', { type: 'number', min: 1, max: 240, value: S.A.impostazioni.blocco_min || 15, onchange: e => { S.A.impostazioni.blocco_min = Math.max(1, +e.target.value || 15); toccaImpostazioni(); salva(false); } }))),
+      h('label', { class: 'campo stretto' }, h('span', {}, 'Blocco automatico dopo minuti di inattività'), h('input', { type: 'number', min: 1, max: 240, value: S.A.impostazioni.blocco_min || 15, onchange: e => { S.A.impostazioni.blocco_min = Math.max(1, +e.target.value || 15); toccaImpostazioni(); salva(false); ricordaSessione(true); } }))),
     pannello('Questo dispositivo', h('p', { class: 'attenuato piccolo' }, 'Rimuove l\'archivio solo da questo browser. Il repository dei dati non viene toccato.'),
       h('div', { class: 'azioni' }, btn('Rimuovi l\'archivio da questo dispositivo', async () => { if (!confirm(ghPronto() && !S.sporco ? 'Rimuovere l\'archivio da questo dispositivo?' : 'ATTENZIONE: ci sono dati che esistono solo qui e andranno persi. Rimuovere comunque?')) return; await kvTogli('busta'); await kvTogli('sporco'); for (const k of await blobChiavi()) await blobTogli(k); blocca(); }, 'pericolo'))));
 }
@@ -3044,6 +3081,7 @@ let _modoBlocco = '';
 async function dopoSblocco() {
   _modoBlocco = '';
   S.ultimaAttivita = Date.now();
+  ricordaSessione(true);
   disegna();
   if (ghPronto()) sincronizza(false);
 }
@@ -3127,17 +3165,22 @@ async function schermataBlocco() {
     h('p', { class: 'sotto' }, 'Servono il tuo utente GitHub, il nome del repository dei dati e un token di accesso. La guida per il token è nel LEGGIMI.'), form);
 }
 
-['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => { S.ultimaAttivita = Date.now(); }, { passive: true }));
-setInterval(() => { if (S.sbloccato && Date.now() - S.ultimaAttivita > (S.A.impostazioni.blocco_min || 15) * 60000) { salvaSubito().finally(blocca); } }, 20000);
+/* Attività: tocchi, clic, tasti, rotella e scorrimento. */
+const segnaAttivita = () => { if (!S.sbloccato) return; S.ultimaAttivita = Date.now(); ricordaSessione(false); };
+['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(ev => document.addEventListener(ev, segnaAttivita, { passive: true }));
+window.addEventListener('scroll', segnaAttivita, { passive: true, capture: true });
+const controllaBlocco = () => { if (S.sbloccato && inattivitaScaduta()) { salvaSubito().finally(blocca); return true; } return false; };
+setInterval(() => { if (!controllaBlocco()) ricordaSessione(true); }, 20000);
 window.addEventListener('online', programmaSync);
 document.addEventListener('visibilitychange', () => {
   if (!S.sbloccato) return;
-  if (document.hidden) salvaSubito().catch(() => {});
-  else if (ghPronto()) programmaSync();
+  if (document.hidden) { ricordaSessione(true); salvaSubito().catch(() => {}); }
+  else if (!controllaBlocco() && ghPronto()) programmaSync();
 });
+window.addEventListener('pagehide', () => { if (S.sbloccato) ricordaSessione(true); });
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 if (!window.isSecureContext || !crypto.subtle) document.getElementById('app').textContent = 'Questa pagina va aperta da un indirizzo https (o da localhost): senza, il browser non permette la cifratura.';
-else disegna();
+else riprendiSessione().then(ok => { disegna(); if (ok && ghPronto()) sincronizza(false); });
 
 </script>
 </body>

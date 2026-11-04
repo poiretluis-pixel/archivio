@@ -3,6 +3,7 @@ let _modoBlocco = '';
 async function dopoSblocco() {
   _modoBlocco = '';
   S.ultimaAttivita = Date.now();
+  ricordaSessione(true);
   disegna();
   if (ghPronto()) sincronizza(false);
 }
@@ -86,14 +87,19 @@ async function schermataBlocco() {
     h('p', { class: 'sotto' }, 'Servono il tuo utente GitHub, il nome del repository dei dati e un token di accesso. La guida per il token è nel LEGGIMI.'), form);
 }
 
-['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => { S.ultimaAttivita = Date.now(); }, { passive: true }));
-setInterval(() => { if (S.sbloccato && Date.now() - S.ultimaAttivita > (S.A.impostazioni.blocco_min || 15) * 60000) { salvaSubito().finally(blocca); } }, 20000);
+/* Attività: tocchi, clic, tasti, rotella e scorrimento. */
+const segnaAttivita = () => { if (!S.sbloccato) return; S.ultimaAttivita = Date.now(); ricordaSessione(false); };
+['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(ev => document.addEventListener(ev, segnaAttivita, { passive: true }));
+window.addEventListener('scroll', segnaAttivita, { passive: true, capture: true });
+const controllaBlocco = () => { if (S.sbloccato && inattivitaScaduta()) { salvaSubito().finally(blocca); return true; } return false; };
+setInterval(() => { if (!controllaBlocco()) ricordaSessione(true); }, 20000);
 window.addEventListener('online', programmaSync);
 document.addEventListener('visibilitychange', () => {
   if (!S.sbloccato) return;
-  if (document.hidden) salvaSubito().catch(() => {});
-  else if (ghPronto()) programmaSync();
+  if (document.hidden) { ricordaSessione(true); salvaSubito().catch(() => {}); }
+  else if (!controllaBlocco() && ghPronto()) programmaSync();
 });
+window.addEventListener('pagehide', () => { if (S.sbloccato) ricordaSessione(true); });
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 if (!window.isSecureContext || !crypto.subtle) document.getElementById('app').textContent = 'Questa pagina va aperta da un indirizzo https (o da localhost): senza, il browser non permette la cifratura.';
-else disegna();
+else riprendiSessione().then(ok => { disegna(); if (ok && ghPronto()) sincronizza(false); });

@@ -77,16 +77,53 @@ async function apriBusta(busta, segreto, tipo) {
   throw new Error(tipo === 'recupero' ? 'Codice di recupero non valido.' : 'Frase segreta non corretta.');
 }
 async function sblocca(busta, segreto, tipo) {
-  const r = await apriBusta(busta, segreto, tipo);
+  entra(busta, await apriBusta(busta, segreto, tipo));
+  S.sporco = !!(await kvLeggi('sporco'));
+}
+function entra(busta, r) {
   S.chiaveGrezza = r.grezza; S.chiave = r.chiave; S.A = r.A; S.est = r.est; S.disp = r.disp;
   ricostruisciEsterni();
   S.testata = { promemoria: busta.promemoria || '', slot: busta.slot, slot_agg: busta.slot_agg };
   S.sbloccato = true; S.ultimaAttivita = Date.now();
-  S.sporco = !!(await kvLeggi('sporco'));
   const p = S.A.persone.filter(x => !x.canc);
   S.persona = p.length === 1 ? p[0].id : '';
 }
+/* --- Sessione della scheda ---
+   Il browser può congelare e ricaricare una scheda rimasta in secondo piano. Per non chiedere di nuovo la frase,
+   la chiave dati resta nella memoria di sessione di quella scheda (sessionStorage, cancellata alla chiusura)
+   insieme all'ora di scadenza; dopo i minuti di inattività impostati non vale più e la pagina si blocca. */
+const SESSIONE = 'lp-sessione';
+const minutiBlocco = () => Math.max(1, +((S.A && S.A.impostazioni && S.A.impostazioni.blocco_min) || 15));
+const inattivitaScaduta = () => Date.now() - S.ultimaAttivita > minutiBlocco() * 60000;
+let _tSessione = 0;
+function ricordaSessione(subito) {
+  if (!S.sbloccato || !S.chiaveGrezza) return;
+  const ora = Date.now();
+  if (!subito && ora - _tSessione < 10000) return;
+  _tSessione = ora;
+  try { sessionStorage.setItem(SESSIONE, JSON.stringify({ k: b64(S.chiaveGrezza), ultima: S.ultimaAttivita, scade: S.ultimaAttivita + minutiBlocco() * 60000 })); } catch (e) { /* memoria di sessione non disponibile */ }
+}
+function dimenticaSessione() {
+  _tSessione = 0;
+  try { sessionStorage.removeItem(SESSIONE); } catch (e) { /* niente da togliere */ }
+}
+async function riprendiSessione() {
+  let x = null;
+  try { x = JSON.parse(sessionStorage.getItem(SESSIONE) || 'null'); } catch (e) { return false; }
+  if (!x || !x.k || !(x.scade > Date.now())) { dimenticaSessione(); return false; }
+  try {
+    const busta = await kvLeggi('busta');
+    if (!busta || busta.formato !== 'archivio-vita') throw new Error('nessuna busta');
+    const grezza = daB64(x.k), chiave = await importaChiaveDati(grezza);
+    entra(busta, { grezza, chiave, ...apriContenuto(await dissigilla(busta, chiave)) });
+    S.sporco = !!(await kvLeggi('sporco'));
+    S.ultimaAttivita = Math.min(Date.now(), +x.ultima || Date.now());
+    if (inattivitaScaduta()) { blocca(); return false; }
+    return true;
+  } catch (e) { dimenticaSessione(); S.sbloccato = false; return false; }
+}
 function blocca() {
+  dimenticaSessione();
   if (S.chiaveGrezza) S.chiaveGrezza.fill(0);
   Object.assign(S, { sbloccato: false, chiave: null, chiaveGrezza: null, A: null, est: {}, disp: {}, estVoci: [], persona: '' });
   chiudiModale();

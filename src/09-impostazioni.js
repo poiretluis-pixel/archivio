@@ -109,7 +109,7 @@ function vistaImpostazioni() {
       h('div', { class: 'azioni' }, btn('Importa un file dati (.json)', () => scegliFile('.json,application/json', scegliImportaDati))),
       h('p', { class: 'attenuato piccolo' }, 'Per caricare dati preparati altrove nello stesso formato. Al termine vedi quante voci sono entrate e quali no.')),
     pannello('Sicurezza di questo dispositivo', formFrase,
-      h('label', { class: 'campo stretto' }, h('span', {}, 'Blocco automatico dopo minuti di inattività'), h('input', { type: 'number', min: 1, max: 240, value: S.A.impostazioni.blocco_min || 15, onchange: e => { S.A.impostazioni.blocco_min = Math.max(1, +e.target.value || 15); toccaImpostazioni(); salva(false); } }))),
+      h('label', { class: 'campo stretto' }, h('span', {}, 'Blocco automatico dopo minuti di inattività'), h('input', { type: 'number', min: 1, max: 240, value: S.A.impostazioni.blocco_min || 15, onchange: e => { S.A.impostazioni.blocco_min = Math.max(1, +e.target.value || 15); toccaImpostazioni(); salva(false); ricordaSessione(true); } }))),
     pannello('Questo dispositivo', h('p', { class: 'attenuato piccolo' }, 'Rimuove l\'archivio solo da questo browser. Il repository dei dati non viene toccato.'),
       h('div', { class: 'azioni' }, btn('Rimuovi l\'archivio da questo dispositivo', async () => { if (!confirm(ghPronto() && !S.sporco ? 'Rimuovere l\'archivio da questo dispositivo?' : 'ATTENZIONE: ci sono dati che esistono solo qui e andranno persi. Rimuovere comunque?')) return; await kvTogli('busta'); await kvTogli('sporco'); for (const k of await blobChiavi()) await blobTogli(k); blocca(); }, 'pericolo'))));
 }
