@@ -4,6 +4,8 @@ async function dopoSblocco() {
   _modoBlocco = '';
   S.ultimaAttivita = Date.now();
   ricordaSessione(true);
+  scegliAmbito('');
+  if (TELEFONO.matches && leggiRotta().length) location.hash = '#/';
   disegna();
   if (ghPronto()) sincronizza(false);
 }

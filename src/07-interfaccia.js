@@ -221,6 +221,30 @@ function spiaSync() {
   const testo = !pronto ? 'Solo su questo dispositivo' : st.stato === 'in corso' ? 'Sincronizzo…' : st.stato === 'errore' ? 'Non sincronizzato' : S.sporco ? 'Modifiche da inviare' : st.ultimo ? 'Sincronizzato ' + new Date(st.ultimo).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : 'Sincronizzazione attiva';
   return h('button', { id: 'stato-sync', class: 'btn piatto spia ' + (!pronto ? 'spenta' : st.stato === 'errore' ? 'ko' : 'ok'), title: st.errore || (pronto ? 'Sincronizza adesso' : 'Configura la sincronizzazione'), 'aria-label': testo, onclick: () => (pronto ? sincronizza(true) : (location.hash = '#/impostazioni')) }, h('span', { class: 'spia-testo' }, testo));
 }
+/* Sul telefono si sceglie prima l'ambito, lavoro o vita privata: il menu mostra solo le voci di quell'ambito, più l'archivio.
+   La scelta vale per la sessione (resta se la scheda si ricarica) e si ripropone a ogni sblocco. Sul computer il menu resta completo. */
+const TELEFONO = window.matchMedia('(max-width:820px)');
+const AMBITI_VITA = { lavoro: 'Lavoro', privata: 'Vita privata' };
+const PRIMA_PAGINA = { lavoro: '#/task', privata: '#/' };
+function ambito() { try { const a = sessionStorage.getItem('lp-ambito'); return AMBITI_VITA[a] ? a : ''; } catch (e) { return S.ambito || ''; } }
+function scegliAmbito(a) { S.ambito = a || ''; try { a ? sessionStorage.setItem('lp-ambito', a) : sessionStorage.removeItem('lp-ambito'); } catch (e) { /* vale solo per questa visita */ } }
+function ambitoDi(r) {
+  if (['task', 'da-fare', 'mail', 'pt', 'siti'].includes(r[0]) || (r[0] === 'a' && AREE_LAVORO.includes(r[1]))) return 'lavoro';
+  if (!r.length || r[0] === 'a' || r[0] === 'passioni' || r[0] === 'spese') return 'privata';
+  return '';
+}
+const contaLavoro = () => quantiOggi('attivita') + quantiOggi('mail');
+const contaPt = () => voci('pt', 'presenza').filter(x => ['da abbinare', 'da confermare'].includes(x.stato)).length;
+function vistaSceltaAmbito() {
+  const scheda = (a, descr, n) => h('button', { type: 'button', class: 'ambito-scelta ambito-' + a, onclick: () => { scegliAmbito(a); location.hash === PRIMA_PAGINA[a] || (a === 'privata' && !leggiRotta().length) ? disegna() : (location.hash = PRIMA_PAGINA[a]); } },
+    h('span', { class: 'ambito-nome' }, AMBITI_VITA[a]), h('span', { class: 'ambito-descr' }, descr), n ? h('span', { class: 'conta' }, n + ' per oggi') : null);
+  return h('div', { class: 'ambito-pagina' },
+    h('h1', {}, 'Cosa vuoi aprire?'),
+    h('div', { class: 'ambito-griglia' },
+      scheda('lavoro', 'Task, gestione mail, personal trainer, siti e gestionali', contaLavoro()),
+      scheda('privata', 'Quadro generale, organizzazione, finanze e spese, salute, passioni', quantiOggi('personale') + speseDaPagareOggi())),
+    h('p', { class: 'sotto' }, 'Puoi cambiare in ogni momento dalle linguette in alto. Rapporti, scadenze, documenti e impostazioni sono in entrambi.'));
+}
 /* Il menu ha tre sezioni riconoscibili: Lavoro (blu scuro), Personale (verde) e Archivio (grigio). Ogni voce porta il colore della sua sezione. */
 function menu(rotta) {
   const attiva = r => (rotta.join('/') || 'casa').startsWith(r) || (r === 'passioni' && rotta[0] === 'a' && PASSIONI.includes(rotta[1])) || (r === 'pt' && rotta[0] === 'a' && rotta[1] === 'pt') || (r === 'spese' && rotta[0] === 'a' && rotta[1] === 'finanze' && rotta[2] === 'spesa');
@@ -228,23 +252,31 @@ function menu(rotta) {
   const v = (href, testo, chiave, n) => h('a', { href, class: [sez ? 'm-' + sez : '', attiva(chiave) ? 'attiva' : ''].filter(Boolean).join(' '), 'aria-current': attiva(chiave) ? 'page' : null }, h('span', { class: 'm-testo' }, testo), n ? h('span', { class: 'conta' }, n) : null);
   const gruppo = (nome, chiave) => { sez = chiave; return h('div', { class: 'menu-gruppo g-' + chiave }, nome); };
   const scadute = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta' && x.data <= oggi()).length;
-  return h('nav', { class: 'menu', 'aria-label': 'Cartelle' },
-    v('#/', 'Quadro generale', 'casa'),
-    gruppo('Lavoro', 'lavoro'),
-    v('#/task', 'Task', 'task', quantiOggi('attivita')),
-    v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
-    v('#/pt', 'Personal trainer', 'pt', voci('pt', 'presenza').filter(x => ['da abbinare', 'da confermare'].includes(x.stato)).length),
-    v('#/siti', 'Siti e gestionali', 'siti'),
-    gruppo('Personale', 'personale'),
-    aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) || AREE_LAVORO.includes(a.id) ? null
-      : [v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0), a.id === 'finanze' ? v('#/spese', 'Spese', 'spese', speseDaPagareOggi()) : null])),
+  const tel = TELEFONO.matches, amb = ambito();
+  const lavoro = !tel || amb !== 'privata', privata = !tel || amb !== 'lavoro';
+  return h('nav', { class: 'menu' + (tel ? ' menu-' + (amb || 'tutto') : ''), 'aria-label': 'Cartelle' },
+    privata ? v('#/', 'Quadro generale', 'casa') : null,
+    lavoro ? [gruppo('Lavoro', 'lavoro'),
+      v('#/task', 'Task', 'task', quantiOggi('attivita')),
+      v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
+      v('#/pt', 'Personal trainer', 'pt', contaPt()),
+      v('#/siti', 'Siti e gestionali', 'siti')] : null,
+    privata ? [gruppo('Personale', 'personale'),
+      aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) || AREE_LAVORO.includes(a.id) ? null
+        : [v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0), a.id === 'finanze' ? v('#/spese', 'Spese', 'spese', speseDaPagareOggi()) : null]))] : null,
     gruppo('Archivio', 'archivio'),
     v('#/rapporti', 'Rapporti', 'rapporti'), v('#/scadenze', 'Scadenze', 'scadenze', scadute), v('#/documenti', 'Documenti', 'documenti', allegati().filter(a => a.stato === 'da elaborare').length), v('#/impostazioni', 'Impostazioni', 'impostazioni'));
 }
+function linguetteAmbito() {
+  if (!TELEFONO.matches) return null;
+  const amb = ambito();
+  return h('div', { class: 'ambiti', role: 'tablist', 'aria-label': 'Ambito' }, Object.keys(AMBITI_VITA).map(a => h('a', { href: PRIMA_PAGINA[a], role: 'tab', class: 'ambito-tab ambito-' + a + (amb === a ? ' scelto' : ''), 'aria-selected': amb === a ? 'true' : 'false', onclick: e => { scegliAmbito(a); if (location.hash === PRIMA_PAGINA[a] || (!location.hash && a === 'privata')) { e.preventDefault(); disegna(); } } }, AMBITI_VITA[a], a === 'lavoro' && amb !== 'lavoro' && contaLavoro() ? h('span', { class: 'conta' }, contaLavoro()) : null)));
+}
+TELEFONO.addEventListener && TELEFONO.addEventListener('change', () => { if (S.sbloccato) disegna(); });
 function barra() {
   const pp = persone();
   return h('header', { class: 'barra' },
-    h('a', { class: 'marchio', href: '#/' }, logoLp(), h('span', {}, 'Life Planning')),
+    h('a', { class: 'marchio', href: '#/', onclick: () => { if (TELEFONO.matches) { scegliAmbito(''); if (!leggiRotta().length) setTimeout(disegna); } } }, logoLp(), h('span', {}, 'Life Planning')),
     pp.length > 1 ? h('select', { class: 'chi', 'aria-label': 'Persona', onchange: e => { S.persona = e.target.value; disegna(); } }, h('option', { value: '' }, 'Tutta la famiglia'), pp.map(p => h('option', { value: p.id, selected: p.id === S.persona }, p.nome))) : h('span', { class: 'chi-solo' }, (pp[0] || {}).nome || ''),
     h('span', { class: 'spazio' }), spiaSync(), btn('Blocca', blocca, 'piatto'));
 }
@@ -254,8 +286,18 @@ function disegna() {
   const rotta = leggiRotta();
   const vecchia = $('#vista'), scroll = vecchia && vecchia.dataset.rotta === rotta.join('/') ? window.scrollY : 0;
   const vista = h('main', { id: 'vista', 'data-rotta': rotta.join('/') });
+  if (TELEFONO.matches) {
+    const da = ambitoDi(rotta);
+    if (!ambito() && !rotta.length) {
+      vista.append(vistaSceltaAmbito());
+      app.replaceChildren(h('div', { class: 'guscio solo-scelta' }, barra(), vista));
+      window.scrollTo(0, 0);
+      return;
+    }
+    if (da && da !== ambito()) scegliAmbito(da);
+  }
   try { vista.append(vistaPer(rotta)); } catch (e) { console.error(e); vista.append(h('div', { class: 'errore' }, 'Errore nel mostrare questa pagina: ' + e.message)); }
-  app.replaceChildren(h('div', { class: 'guscio' }, barra(), menu(rotta), vista));
+  app.replaceChildren(h('div', { class: 'guscio' }, barra(), linguetteAmbito(), menu(rotta), vista));
   window.scrollTo(0, scroll);
 }
 function vistaPer(r) {
