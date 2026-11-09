@@ -10,7 +10,7 @@
 <title>Life Planning</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2231%22 fill=%22%2326321f%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2227%22 fill=%22none%22 stroke=%22%23c9a54e%22 stroke-width=%221.6%22/%3E%3Cpath d=%22M22 18v28h12M28.5 46V22h7.5a6.8 6.8 0 0 1 0 13.6h-7.5%22 fill=%22none%22 stroke=%22%23c9a54e%22 stroke-width=%224.2%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3Ccircle cx=%2241.5%22 cy=%2246%22 r=%222.6%22 fill=%22%23c9a54e%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="icone/apple-touch-icon.png">
-<!-- Versione costruita il 2026-11-06. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
+<!-- Versione costruita il 2026-11-09. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
 <style>
 :root{
   --fondo:#ece6d9; --carta:#fbf9f4; --inchiostro:#2a2620; --inchiostro2:#5a5348; --tenue:#7d7466; --linea:#ddd5c6; --linea2:#ebe5d8;
@@ -61,6 +61,10 @@ a{color:var(--marca)}
 .menu a{display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.55rem .9rem;color:var(--inchiostro2);text-decoration:none;border-radius:10px 0 0 10px;border:1px solid transparent;border-right:0}
 .menu a:hover{color:var(--inchiostro);background:var(--linea2)}
 .menu a.attiva{background:var(--carta);color:var(--inchiostro);font-weight:600;border-color:var(--linea);box-shadow:inset 4px 0 0 var(--marca);position:relative;z-index:1;margin-right:-1px}
+/* sottomenu di Finanze: voci rientrate sotto la voce madre, che resta segnata finché la cartella è aperta */
+.menu a.m-sotto{margin-left:1.1rem;padding:.38rem .9rem;font-size:.9rem;border-left:2px solid var(--linea)}
+.menu a.m-sotto:not(.attiva){border-radius:0}
+.menu a.aperta:not(.attiva){color:var(--inchiostro);font-weight:600}
 .menu-gruppo{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tenue);padding:1rem .9rem .25rem}
 .conta{background:var(--marca);color:var(--marca-su);border-radius:99px;font-size:.75rem;font-weight:600;padding:0 .5rem;line-height:1.4rem;min-width:1.4rem;text-align:center}
 #vista{background:var(--carta);border:1px solid var(--linea);border-radius:0 14px 14px 14px;padding:1.6rem 1.8rem 3rem;margin:0 1rem 1.5rem 0;min-width:0}
@@ -216,6 +220,7 @@ i.g-barra1{background:var(--serie)} i.g-barra2{background:var(--serie2)}
   .menu a.attiva{box-shadow:none;background:var(--marca);border-color:var(--marca);color:var(--marca-su);margin-right:0}
   .menu a.attiva .conta{background:var(--marca-su);color:var(--marca)}
   .menu-gruppo{display:none}
+  .menu a.m-sotto{display:none}
   #vista{border-radius:14px;margin:0 8px 16px;padding:1.1rem 16px 2.5rem}
   h1{font-size:1.55rem}
   .solo-largo{display:none}
@@ -1015,7 +1020,7 @@ const RIPETI_TASK = ['ogni giorno', 'nei giorni lavorativi', 'ogni settimana', '
 const CASELLE = ['Personale', '3MEDical Pioltello', '3MEDical Porta Romana'];
 const CAT_SITI = ['Gestionali', 'Banche e pagamenti', 'Personale e paghe', 'Google e comunicazione', 'Sito e social', 'Altro'];
 const RIGUARDA = ['3MEDical', '3MEDical Pioltello', '3MEDical Porta Romana', 'Psiche e Soma', 'Personal trainer', 'Personale'];
-/* Etichette dei task personali: un task con una di queste etichette sta in Organizzazione, non nella pagina Task di lavoro. */
+/* Etichette dei task personali: un task con una di queste etichette sta nei task personali, non nella pagina Task di lavoro. */
 const ETICHETTE_PERSONALI = ['CASA', 'GIARDINO', 'PROGETTI'];
 const SERVIZI_PT = ['Personal', 'Corso posturale', 'Sostituzione corso'];
 const PAGAMENTI_PT = ['contanti', 'carta'];
@@ -1023,6 +1028,10 @@ const PAGAMENTI_PT = ['contanti', 'carta'];
 const AREE_LAVORO = ['pt'];
 /* Cartelle raccolte nel menu sotto l'unica voce Passioni. */
 const PASSIONI = ['sport', 'mindfulness', 'lettura', 'viaggi'];
+/* Il patrimonio sta dentro Finanze come sezione: niente voce di menu né scheda propria (i dati restano nella cartella patrimonio). */
+const DENTRO_FINANZE = ['patrimonio'];
+/* Sezioni della pagina Finanze, raggiungibili da #/a/finanze/<sezione> e come sottomenu. */
+const SEZIONI_FINANZE = { '': 'Panoramica', conti: 'Conti', movimenti: 'Entrate e uscite', patrimonio: 'Patrimonio', tetti: 'Tetti di spesa' };
 
 const AREE_BASE = [
   { id: 'finanze', nome: 'Finanze', tipi: {
@@ -1050,14 +1059,14 @@ const AREE_BASE = [
       c('titolo', 'Nome', 'testo', { obbl: true }), c('categoria', 'Tipo', 'scelta', { opzioni: ['Mutuo', 'Finanziamento', 'Leasing', 'Altro'] }), c('valore', 'Residuo in euro', 'numero', { obbl: true, euro: true }),
       c('data', 'Data del residuo', 'data'), c('rata', 'Rata mensile in euro', 'numero', { euro: true }), c('scadenza', 'Fine prevista', 'data'), c('nota', 'Nota', 'lungo')] },
   } },
-  { id: 'organizzazione', nome: 'Organizzazione', tipi: {
+  { id: 'organizzazione', nome: 'Task', tipi: {
     obiettivo: { nome: 'Obiettivo', plur: 'Obiettivi', titolo: v => v.titolo, colonne: ['titolo', 'ambito', 'avanzamento', 'scadenza', 'stato'], campi: [
       c('titolo', 'Obiettivo', 'testo', { obbl: true }), c('ambito', 'Ambito', 'scelta', { opzioni: AMBITI }), c('data', 'Fissato il', 'data', { obbl: true }), c('scadenza', 'Da raggiungere entro', 'data'),
       c('misura', 'Come si misura (es. 10 kg in meno, 20.000 € di riserva)', 'lungo'), c('avanzamento', 'Avanzamento in %', 'numero'), c('stato', 'Stato', 'scelta', { opzioni: ['attivo', 'raggiunto', 'in pausa', 'abbandonato'] }), c('nota', 'Nota', 'lungo')] },
     attivita: { nome: 'Cosa da fare', plur: 'Cose da fare', titolo: v => v.titolo, colonne: ['data', 'titolo', 'ambito', 'lista', 'priorita', 'stato'], campi: [
       c('titolo', 'Cosa', 'testo', { obbl: true }), c('ambito', 'Ambito', 'scelta', { opzioni: AMBITI }), c('data', 'Entro il (facoltativo)', 'data'),
       c('ripeti', 'Si ripete (serve la scadenza)', 'scelta', { opzioni: RIPETI_TASK }),
-      c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }), c('casella', 'Riguarda (CASA, GIARDINO e PROGETTI stanno in Organizzazione)', 'scelta', { opzioni: [...RIGUARDA, ...ETICHETTE_PERSONALI], maiuscolo: true }),
+      c('lista', 'Lista', 'scelta', { opzioni: LISTE_LAVORO }), c('casella', 'Riguarda (CASA, GIARDINO e PROGETTI sono task personali)', 'scelta', { opzioni: [...RIGUARDA, ...ETICHETTE_PERSONALI], maiuscolo: true }),
       c('priorita', 'Priorità', 'scelta', { opzioni: PRIORITA }), c('stato', 'Stato', 'scelta', { opzioni: ['da fare', 'in corso', 'fatta'] }), c('nota', 'Nota', 'lungo')] },
     mail: { nome: 'Mail da gestire', plur: 'Mail da gestire', titolo: v => v.titolo, colonne: ['data', 'titolo', 'mittente', 'casella', 'lista', 'stato'], campi: [
       c('titolo', 'Oggetto', 'testo', { obbl: true }), c('mittente', 'Da chi', 'testo', { suggerisci: true }), c('casella', 'Casella', 'scelta', { opzioni: CASELLE, maiuscolo: true }),
@@ -1436,7 +1445,7 @@ function vistaTipo(idArea, idTipo) {
   if (!def) return vuoto('Questa sezione non esiste.');
   const l = voci(idArea, idTipo);
   return h('div', {},
-    h('p', { class: 'briciole' }, h('a', { href: '#/a/' + idArea }, a.nome), ' / ', def.plur),
+    h('p', { class: 'briciole' }, DENTRO_FINANZE.includes(idArea) ? [h('a', { href: '#/a/finanze' }, 'Finanze'), ' / ', h('a', { href: '#/a/finanze/' + idArea }, a.nome)] : h('a', { href: '#/a/' + idArea }, a.nome), ' / ', def.plur),
     h('div', { class: 'testa' }, h('h1', {}, def.plur), h('div', { class: 'azioni' },
       btn('Aggiungi', () => apriModulo(idArea, idTipo), 'primario'), btn('Importa CSV', () => apriImportaCsv(idArea, idTipo)), l.length ? btn('Esporta CSV', () => esportaCsvTipo(idArea, idTipo)) : null)),
     l.length ? tabella(idArea, idTipo, l) : vuoto(`Ancora nessun dato in "${def.plur}".`, btn('Aggiungi', () => apriModulo(idArea, idTipo), 'primario'), btn('Importa CSV', () => apriImportaCsv(idArea, idTipo))));
@@ -1566,14 +1575,19 @@ function vistaSceltaAmbito() {
     h('h1', {}, 'Cosa vuoi aprire?'),
     h('div', { class: 'ambito-griglia' },
       scheda('lavoro', 'Task, gestione mail, personal trainer, siti e gestionali', contaLavoro()),
-      scheda('privata', 'Quadro generale, organizzazione, finanze e spese, salute, passioni', quantiOggi('personale') + speseDaPagareOggi())),
+      scheda('privata', 'Quadro generale, task personali, spese e finanze, salute, passioni', quantiOggi('personale') + speseDaPagareOggi())),
     h('p', { class: 'sotto' }, 'Puoi cambiare in ogni momento dalle linguette in alto. Rapporti, scadenze, documenti e impostazioni sono in entrambi.'));
 }
 /* Il menu ha tre sezioni riconoscibili: Lavoro (blu scuro), Personale (verde) e Archivio (grigio). Ogni voce porta il colore della sua sezione. */
 function menu(rotta) {
-  const attiva = r => (rotta.join('/') || 'casa').startsWith(r) || (r === 'passioni' && rotta[0] === 'a' && PASSIONI.includes(rotta[1])) || (r === 'pt' && rotta[0] === 'a' && rotta[1] === 'pt') || (r === 'spese' && rotta[0] === 'a' && rotta[1] === 'finanze' && rotta[2] === 'spesa');
+  const rt = rotta.join('/') || 'casa', sezFin = sezioneFinanze(rotta);
+  const attiva = r => r === 'spese' ? rotta[0] === 'spese' || rt === 'a/finanze/spesa'
+    : r === 'finanze' ? sezFin === ''
+    : r.startsWith('fin:') ? sezFin === r.slice(4)
+    : rt.startsWith(r) || (r === 'passioni' && rotta[0] === 'a' && PASSIONI.includes(rotta[1])) || (r === 'pt' && rotta[0] === 'a' && rotta[1] === 'pt');
+  const finAperta = sezFin != null || (rotta[0] === 'a' && ['finanze', ...DENTRO_FINANZE].includes(rotta[1]) && rt !== 'a/finanze/spesa');
   let sez = '';
-  const v = (href, testo, chiave, n) => h('a', { href, class: [sez ? 'm-' + sez : '', attiva(chiave) ? 'attiva' : ''].filter(Boolean).join(' '), 'aria-current': attiva(chiave) ? 'page' : null }, h('span', { class: 'm-testo' }, testo), n ? h('span', { class: 'conta' }, n) : null);
+  const v = (href, testo, chiave, n, sotto) => h('a', { href, class: [sez ? 'm-' + sez : '', sotto ? 'm-sotto' : '', attiva(chiave) ? 'attiva' : ''].filter(Boolean).join(' '), 'aria-current': attiva(chiave) ? 'page' : null }, h('span', { class: 'm-testo' }, testo), n ? h('span', { class: 'conta' }, n) : null);
   const gruppo = (nome, chiave) => { sez = chiave; return h('div', { class: 'menu-gruppo g-' + chiave }, nome); };
   const scadute = voci('sistema', 'scadenza').filter(x => x.stato !== 'fatta' && x.data <= oggi()).length;
   const tel = TELEFONO.matches, amb = ambito();
@@ -1586,8 +1600,13 @@ function menu(rotta) {
       v('#/pt', 'Personal trainer', 'pt', contaPt()),
       v('#/siti', 'Siti e gestionali', 'siti')] : null,
     privata ? [gruppo('Personale', 'personale'),
-      aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) || AREE_LAVORO.includes(a.id) ? null
-        : [v('#/a/' + a.id, a.nome, 'a/' + a.id, a.id === 'organizzazione' ? quantiOggi('personale') : 0), a.id === 'finanze' ? v('#/spese', 'Spese', 'spese', speseDaPagareOggi()) : null]))] : null,
+      /* In testa Task (i task personali) e Spese, poi Finanze con il patrimonio dentro e, quando è aperta, le sue sezioni come sottomenu. */
+      area('organizzazione') ? v('#/a/organizzazione', 'Task', 'a/organizzazione', quantiOggi('personale')) : null,
+      area('finanze') ? v('#/spese', 'Spese', 'spese', speseDaPagareOggi()) : null,
+      area('finanze') ? (el => (finAperta && el.classList.add('aperta'), el))(v('#/a/finanze', 'Finanze', 'finanze')) : null,
+      area('finanze') && finAperta ? Object.entries(SEZIONI_FINANZE).filter(([k]) => k).map(([k, nome]) => v('#/a/finanze/' + k, nome, 'fin:' + k, 0, true)) : null,
+      aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) || AREE_LAVORO.includes(a.id) || DENTRO_FINANZE.includes(a.id) || ['organizzazione', 'finanze'].includes(a.id) ? null
+        : v('#/a/' + a.id, a.nome, 'a/' + a.id)))] : null,
     gruppo('Archivio', 'archivio'),
     v('#/rapporti', 'Rapporti', 'rapporti'), v('#/scadenze', 'Scadenze', 'scadenze', scadute), v('#/documenti', 'Documenti', 'documenti', allegati().filter(a => a.stato === 'da elaborare').length), v('#/impostazioni', 'Impostazioni', 'impostazioni'));
 }
@@ -1629,6 +1648,7 @@ function vistaPer(r) {
   if (r[0] === 'a' && r[1]) {
     const a = area(r[1]); if (!a) return vuoto('Questa cartella non esiste più.');
     if (r[2] === 'p' && r[3]) return vistaProgetto(r[3]);
+    if (sezioneFinanze(r) != null) return vistaFinanze(sezioneFinanze(r));
     if (r[1] === 'organizzazione' && SCHEDE_LAVORO[r[2]]) return vistaArea(a, r[2]);
     if (r[1] === 'pt' && !r[2]) return vistaPt();
     if (r[2]) return vistaTipo(r[1], r[2]);
@@ -1675,7 +1695,7 @@ function riassuntiAree() {
   const prog = voci('progetti', 'progetto');
   return {
     salute: mis.length || S.estVoci.length ? [(ind => (ind ? dato('Indice di salute', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceSalute()), mis.length ? dato('Fuori intervallo all\'ultima misura', nFuori, `su ${perPar.length} parametri seguiti`, nFuori ? 'allerta' : '') : null] : null,
-    finanze: voci('finanze').length ? [(ind => (ind ? dato('Indice finanziario', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceFinanze()), voci('finanze', 'saldo').length ? dato('Disponibilità finanziaria', fmtEuro(totaleFinanze(voci('finanze', 'saldo')))) : null] : null,
+    finanze: voci('finanze').length ? [(ind => (ind ? dato('Indice finanziario', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceFinanze()), voci('finanze', 'saldo').length ? dato('Disponibilità finanziaria', fmtEuro(totaleFinanze(voci('finanze', 'saldo')))) : null, voci('patrimonio').length ? dato('Patrimonio netto', fmtEuro(patrimonioNetto())) : null] : null,
     organizzazione: voci('organizzazione').length ? [dato('Obiettivi attivi', voci('organizzazione', 'obiettivo').filter(o => o.stato === 'attivo' || !o.stato).length), dato('Task personali aperti', voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta' && taskPersonale(x)).length)] : null,
     sport: voci('sport').length ? [dato('Sedute nelle ultime 4 settimane', [...voci('sport', 'allenamento'), ...voci('sport', 'attivita')].filter(v => giorniDa(v.data) < 28).length)] : null,
     mindfulness: voci('mindfulness').length ? [dato('Giorni di pratica negli ultimi 30', new Set(voci('mindfulness', 'pratica').filter(v => giorniDa(v.data) < 30).map(v => v.data)).size)] : null,
@@ -1696,7 +1716,7 @@ function vistaCasa() {
     daFare.push({ tipo: x.priorita === 'alta' || g < 0 ? 'ritardo' : 'vuota', testo: (mail ? 'Mail: ' : '') + x.titolo,
       nota: [mail ? x.casella : (x.casella || x.ambito), mail ? (x.mittente ? 'da ' + x.mittente : '') : !x.data ? '' : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`].filter(Boolean).join(', '), href: mail ? '#/mail' : taskPersonale(x) ? '#/a/organizzazione' : '#/task' });
   }
-  if (lav.length > 6) daFare.push({ tipo: 'vuota', testo: `Altre ${lav.length - 6} cose per oggi`, nota: 'Tutte nelle pagine Task, Gestione mail e Organizzazione.', href: '#/task' });
+  if (lav.length > 6) daFare.push({ tipo: 'vuota', testo: `Altre ${lav.length - 6} cose per oggi`, nota: 'Tutte nelle pagine Task, Gestione mail e Task personali.', href: '#/task' });
   const daElab = allegati().filter(a => a.stato === 'da elaborare').length;
   if (daElab) daFare.push({ tipo: 'vuota', testo: daElab === 1 ? '1 documento in attesa che Claude ne inserisca i valori' : `${daElab} documenti in attesa che Claude ne inserisca i valori`, nota: 'Sono al sicuro. Li elabora alla verifica del lunedì, oppure subito se glielo chiedi in chat.', href: '#/documenti' });
   if (!ghPronto()) daFare.push({ tipo: 'ritardo', testo: 'I dati sono solo su questo dispositivo', nota: 'Collega il repository dei dati in Impostazioni.', href: '#/impostazioni' });
@@ -1708,7 +1728,7 @@ function vistaCasa() {
     h('div', { class: 'testa' }, h('div', {}, h('h1', {}, 'Quadro generale'), h('p', { class: 'sotto' }, new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })))),
     pannello('Da fare', daFare.length ? h('ul', { class: 'elenco' }, daFare.map(x => h('li', {}, h('a', { href: x.href }, stato(x.tipo, x.testo)), h('div', { class: 'elenco-nota' }, x.nota)))) : h('p', { class: 'attenuato' }, 'Niente in sospeso.')),
     consigliPrincipali(),
-    h('div', { class: 'griglia' }, aree().filter(a => !PASSIONI.includes(a.id) && !AREE_LAVORO.includes(a.id)).map(a => schedaArea(a, schede)),
+    h('div', { class: 'griglia' }, aree().filter(a => !PASSIONI.includes(a.id) && !AREE_LAVORO.includes(a.id) && !DENTRO_FINANZE.includes(a.id)).map(a => schedaArea(a, schede)),
       h('a', { class: 'scheda', href: '#/passioni' }, h('h3', {}, 'Passioni'), h('p', { class: 'attenuato' }, PASSIONI.map(area).filter(Boolean).map(a => a.nome).join(', ')))),
     pannello('Stato dei caricamenti', h('ul', { class: 'elenco' }, FONTI.map(f => { const st = statoFonte(f); return h('li', {}, h('div', { class: 'tra' }, h('strong', {}, f.nome), stato(st.stato, st.stato === 'ok' ? 'In regola' : st.stato === 'ritardo' ? 'In ritardo' : 'Mai caricati')), h('div', { class: 'elenco-nota' }, st.stato === 'ok' ? st.testo : (st.stato === 'ritardo' ? st.testo + '. ' : '') + f.come)); }))),
     ultimoRapporto(),
@@ -1805,11 +1825,11 @@ function vistaPassioni() {
 }
 
 function vistaArea(a, scheda) {
-  const cr = { salute: cruscottoSalute, finanze: cruscottoFinanze, patrimonio: cruscottoPatrimonio, organizzazione: cruscottoOrganizzazione, sport: cruscottoSport, mindfulness: cruscottoMindfulness, lettura: cruscottoLettura, viaggi: cruscottoViaggi, progetti: cruscottoProgetti }[a.id] || cruscottoLibero;
+  const cr = { salute: cruscottoSalute, organizzazione: cruscottoOrganizzazione, sport: cruscottoSport, mindfulness: cruscottoMindfulness, lettura: cruscottoLettura, viaggi: cruscottoViaggi, progetti: cruscottoProgetti }[a.id] || cruscottoLibero;
   return h('div', {},
     PASSIONI.includes(a.id) ? h('p', { class: 'briciole' }, h('a', { href: '#/passioni' }, '← Passioni')) : null,
     a.id === 'organizzazione' ? vistaLavoro('personale', scheda) : h('div', { class: 'testa' }, h('h1', {}, a.nome)),
-    a.id === 'salute' ? pannelloIndice() : a.id === 'finanze' ? pannelloIndiceFinanze() : null,
+    a.id === 'salute' ? pannelloIndice() : null,
     pannelloConsigli(a.id),
     cr(a),
     a.id === 'progetti' ? null : pannello('Sezioni di questa cartella', h('div', { class: 'sezioni' }, Object.entries(a.tipi).map(([k, d]) => h('div', { class: 'sezione' },
@@ -1888,30 +1908,6 @@ function cruscottoSalute() {
   ];
 }
 
-/* --- Finanze --- */
-function cruscottoFinanze() {
-  const saldi = voci('finanze', 'saldo').sort(perData), mov = movimentiReali();
-  if (!saldi.length && !mov.length) return pannello('', vuoto('Cartella vuota. Il modo più rapido: carica in Documenti i movimenti BPM degli ultimi mesi (Excel o CSV) oppure mandali a Claude in chat. Li classifica lui e da lì si calcolano entrate, uscite, risparmio e indice finanziario.', btn('Aggiungi un saldo', () => apriModulo('finanze', 'saldo'), 'primario'), btn('Importa movimenti', () => apriImportaCsv('finanze', 'movimento'))));
-  const date = [...new Set(saldi.map(v => v.data))];
-  const serie = date.map(d => ({ data: d, y: totaleFinanze(saldi.filter(v => v.data <= d)) }));
-  const ultimi = new Map(); for (const v of saldi) ultimi.set(v.conto, v);
-  const mesi = []; { const o = oggi(); let y = +o.slice(0, 4), m = +o.slice(5, 7); for (let i = 0; i < 12; i++) { mesi.unshift(`${y}-${String(m).padStart(2, '0')}`); if (--m < 1) { m = 12; y--; } } }
-  const entrate = mesi.map(k => somma(mov.filter(v => v.data.startsWith(k) && v.valore > 0).map(v => v.valore)));
-  const uscite = mesi.map(k => -somma(mov.filter(v => v.data.startsWith(k) && v.valore < 0).map(v => v.valore)));
-  const perCat = [...raggruppa(mov.filter(v => v.valore < 0 && v.data >= mesi[0]), v => v.categoria || 'Senza categoria')].map(([nome, l]) => ({ nome, valore: -somma(l.map(v => v.valore)) })).sort((a, b) => b.valore - a.valore).slice(0, 8);
-  const serieBarre = [{ nome: 'Entrate', classe: 'g-barra1', valori: entrate }, { nome: 'Uscite', classe: 'g-barra2', valori: uscite }];
-  return [
-    h('div', { class: 'dati' },
-      saldi.length ? dato('Disponibilità finanziaria', fmtEuro(serie[serie.length - 1].y), serie.length > 1 ? `${serie[serie.length - 1].y >= serie[0].y ? '+' : ''}${fmtEuro(serie[serie.length - 1].y - serie[0].y)} dal ${fmtData(serie[0].data)}` : `al ${fmtData(serie[0].data)}`) : null,
-      mov.length ? dato('Entrate negli ultimi 12 mesi', fmtEuro(somma(entrate))) : null, mov.length ? dato('Uscite negli ultimi 12 mesi', fmtEuro(somma(uscite)), `risparmio ${fmtEuro(somma(entrate) - somma(uscite))}`) : null),
-    saldi.length ? pannello('Disponibilità nel tempo', grafico('Disponibilità finanziaria nel tempo', w => graficoLinea(w, { punti: serie, unita: '€', fmt: v => fmtNum(v, 0) })), h('p', { class: 'attenuato piccolo' }, 'Somma dell\'ultimo saldo noto di ogni conto a ciascuna data. I conti di tipo Debito sono sottratti.')) : null,
-    saldi.length ? pannello('Dove sono i soldi oggi', barreOrizzontali([...ultimi.values()].map(v => ({ nome: v.conto, valore: segnoSaldo(v) })).sort((a, b) => b.valore - a.valore), fmtEuro)) : null,
-    mov.length ? pannello('Entrate e uscite per mese', legenda(serieBarre), grafico('Entrate e uscite per mese', w => graficoBarre(w, { categorie: mesi.map(fmtMese), serie: serieBarre, fmt: v => fmtNum(v, 0) }))) : null,
-    perCat.length ? pannello('Uscite per categoria negli ultimi 12 mesi', barreOrizzontali(perCat, fmtEuro)) : null,
-    pannelloTetti(mov),
-    mov.length ? pannello('Ultimi movimenti', tabella('finanze', 'movimento', voci('finanze', 'movimento'), { limite: 12, filtro: false })) : null,
-  ];
-}
 /* Tetti di spesa: spesa del mese in corso e dell'ultimo mese completo per ogni categoria con un tetto. */
 function pannelloTetti(mov) {
   const tetti = new Map(); for (const b of voci('finanze', 'budget').sort(perData)) tetti.set(b.categoria, b);
@@ -1927,7 +1923,7 @@ function pannelloTetti(mov) {
   })));
 }
 
-/* --- Organizzazione: sopra i task personali (vistaLavoro), qui sotto obiettivi e revisione settimanale --- */
+/* --- Task personali (cartella organizzazione): sopra i task (vistaLavoro), qui sotto obiettivi e revisione settimanale --- */
 function cruscottoOrganizzazione() {
   const ob = voci('organizzazione', 'obiettivo'), rev = voci('organizzazione', 'revisione').sort(perData);
   const attivi = ob.filter(o => o.stato === 'attivo' || !o.stato);
@@ -2390,7 +2386,7 @@ function consigliPrincipali() {
 
 /* ===== 8c. Task, Gestione mail e task personali: liste Oggi, Coda e Archivio =====
    Le cose da fare sono le voci organizzazione/attivita, le mail sono organizzazione/mail (le carica Claude da Gmail).
-   I task con etichetta CASA, GIARDINO o PROGETTI sono personali: stanno nella cartella Organizzazione, non nella pagina Task.
+   I task con etichetta CASA, GIARDINO o PROGETTI sono personali: stanno nella pagina Task personali (cartella organizzazione), non nella pagina Task di lavoro.
    Per i task la scadenza si mette con il calendario della riga; il calendario Google TASK lo aggiorna Claude. */
 const listaSalvata = x => (x.lista === 'Domani' ? 'Coda' : x.lista);
 /* Un task in Coda o in Archivio passa da solo in Oggi quando arriva la scadenza, a meno che sia stato spostato dopo la scadenza. Le mail restano dove sono. */
@@ -2405,7 +2401,7 @@ const apertaLavoro = x => (x.tipo === 'mail' ? x.stato !== 'gestita' : x.stato !
 function lavoriAperti() {
   return [...voci('organizzazione', 'attivita'), ...voci('organizzazione', 'mail')].filter(apertaLavoro);
 }
-/* Tipo di pagina: 'attivita' (task di lavoro), 'personale' (task di Organizzazione) o 'mail'. */
+/* Tipo di pagina: 'attivita' (task di lavoro), 'personale' (task personali) o 'mail'. */
 const taskPersonale = x => x.tipo === 'attivita' && ETICHETTE_PERSONALI.includes(x.casella);
 const tipoPagina = x => (taskPersonale(x) ? 'personale' : x.tipo);
 const ordinePriorita = x => (PRIORITA.includes(x.priorita) ? PRIORITA.indexOf(x.priorita) : 1);
@@ -2477,7 +2473,7 @@ function rigaLavoro(x) {
       btn('Modifica', () => apriModulo('organizzazione', x.tipo, x), 'piccolo')));
 }
 
-/* Tre pagine: Task (lavoro), Gestione mail e la cartella Organizzazione (task personali). Stesse liste, stesso comportamento. */
+/* Tre pagine: Task (lavoro), Gestione mail e Task personali (cartella organizzazione). Stesse liste, stesso comportamento. */
 const fonteDi = x => (x.tipo === 'mail' ? x.casella : (x.casella || x.ambito));
 const SCHEDE_LAVORO = { oggi: 'Oggi', coda: 'Coda', archivio: 'Archivio', tutti: 'Tutti' };
 function vistaLavoro(tipo, scheda) {
@@ -2494,7 +2490,7 @@ function vistaLavoro(tipo, scheda) {
   const alte = l.filter(x => listaDi(x) === 'Oggi' && x.priorita === 'alta').length;
   return h('div', {},
     h('div', { class: 'testa' },
-      h('div', {}, h('h1', {}, mail ? 'Gestione mail' : pers ? 'Organizzazione' : 'Task'), h('p', { class: 'sotto largo-testo' }, mail
+      h('div', {}, h('h1', {}, mail ? 'Gestione mail' : pers ? 'Task personali' : 'Task'), h('p', { class: 'sotto largo-testo' }, mail
         ? 'Le mail delle tre caselle che chiedono una risposta o un\'azione. Le porta qui Claude da Gmail ogni mattina.'
         : pers ? 'Le tue cose personali, divise tra CASA, GIARDINO e PROGETTI. Funziona come Task: con la scadenza il task passa da solo in Oggi, con "Aggiungi al calendario" lo metti nel calendario Google TASK.'
         : 'Le tue cose da fare, come in Google Task. Metti la scadenza con il calendario: quando arriva, il task passa da solo in Oggi. Con "Aggiungi al calendario" lo metti nel calendario Google TASK.')),
@@ -3023,6 +3019,128 @@ function pannelloGoogle() {
       h('li', {}, 'Credenziali, Crea credenziali, ID client OAuth, tipo "Applicazione web". Origine JavaScript: https://poiretluis-pixel.github.io. URI di reindirizzamento: https://poiretluis-pixel.github.io/archivio/google.html.'),
       h('li', {}, 'Copia l\'ID client e incollalo qui sopra.')),
       h('p', { class: 'attenuato piccolo' }, 'L\'accesso vale circa un\'ora e resta solo in memoria: dopo, al primo clic Google te lo richiede. Senza collegamento gli eventi li crea Claude al prossimo aggiornamento.')));
+}
+
+/* ===== 8h. Finanze: una pagina sola con il patrimonio dentro, divisa in sezioni =====
+   Panoramica, Conti, Entrate e uscite, Patrimonio, Tetti di spesa. Le sezioni sono linguette in testa alla pagina
+   e, sul computer, un sottomenu sotto la voce Finanze. Le spese ricorrenti hanno la loro pagina (#/spese). */
+
+/* Sezione di Finanze indicata dalla rotta: '' per la panoramica, null se la rotta non è una sezione di Finanze. */
+function sezioneFinanze(r) {
+  if (r[0] !== 'a') return null;
+  if (r[1] === 'finanze' && Object.prototype.hasOwnProperty.call(SEZIONI_FINANZE, r[2] || '')) return r[2] || '';
+  if (r[1] === 'patrimonio' && !r[2]) return 'patrimonio';
+  return null;
+}
+
+/* Gli ultimi 12 mesi, dal più vecchio al corrente, nella forma AAAA-MM. */
+function ultimi12Mesi() {
+  const mesi = []; const o = oggi(); let y = +o.slice(0, 4), m = +o.slice(5, 7);
+  for (let i = 0; i < 12; i++) { mesi.unshift(`${y}-${String(m).padStart(2, '0')}`); if (--m < 1) { m = 12; y--; } }
+  return mesi;
+}
+function contiFinanze() {
+  const saldi = voci('finanze', 'saldo').sort(perData), mov = movimentiReali(), mesi = ultimi12Mesi();
+  const date = [...new Set(saldi.map(v => v.data))];
+  const serie = date.map(d => ({ data: d, y: totaleFinanze(saldi.filter(v => v.data <= d)) }));
+  const ultimi = new Map(); for (const v of saldi) ultimi.set(v.conto, v);
+  const entrate = mesi.map(k => somma(mov.filter(v => v.data.startsWith(k) && v.valore > 0).map(v => v.valore)));
+  const uscite = mesi.map(k => -somma(mov.filter(v => v.data.startsWith(k) && v.valore < 0).map(v => v.valore)));
+  return { saldi, mov, mesi, serie, ultimi, entrate, uscite };
+}
+
+const azioniFinanze = (...el) => h('div', { class: 'azioni' }, el);
+const linkTabella = (idArea, idTipo, testo) => h('a', { class: 'btn piccolo', href: `#/a/${idArea}/${idTipo}` }, testo);
+
+function vistaFinanze(sez) {
+  const k = contiFinanze();
+  const corpo = { '': finPanoramica, conti: finConti, movimenti: finMovimenti, patrimonio: finPatrimonio, tetti: finTetti }[sez] || finPanoramica;
+  return h('div', {},
+    h('div', { class: 'testa' },
+      h('div', {}, h('h1', {}, 'Finanze'), h('p', { class: 'sotto largo-testo' }, 'Conti, entrate e uscite, patrimonio e tetti di spesa. Le spese ricorrenti del mese sono nella pagina Spese.')),
+      h('div', { class: 'azioni' }, h('a', { class: 'btn', href: '#/spese' }, 'Vai alle spese'))),
+    h('nav', { class: 'schede', 'aria-label': 'Sezioni di Finanze' }, Object.entries(SEZIONI_FINANZE).map(([c, nome]) =>
+      h('a', { href: '#/a/finanze' + (c ? '/' + c : ''), class: c === sez ? 'attiva' : '', 'aria-current': c === sez ? 'page' : null }, nome))),
+    corpo(k));
+}
+
+/* Panoramica: i numeri che contano, l'indice finanziario, i consigli e l'andamento. */
+function finPanoramica(k) {
+  const { saldi, mov, serie, entrate, uscite, mesi } = k;
+  const haPatrimonio = voci('patrimonio', 'bene').length || voci('patrimonio', 'debito').length;
+  if (!saldi.length && !mov.length && !haPatrimonio) return pannello('', vuoto('Ancora nessun dato. Il modo più rapido: carica in Documenti i movimenti BPM degli ultimi mesi (Excel o CSV) oppure mandali a Claude in chat. Li classifica lui e da lì si calcolano entrate, uscite, risparmio e indice finanziario.', btn('Aggiungi un saldo', () => apriModulo('finanze', 'saldo'), 'primario'), btn('Importa movimenti', () => apriImportaCsv('finanze', 'movimento'))));
+  const ult = serie[serie.length - 1];
+  const serieBarre = [{ nome: 'Entrate', classe: 'g-barra1', valori: entrate }, { nome: 'Uscite', classe: 'g-barra2', valori: uscite }];
+  const spese = typeof speseDaPagareOggi === 'function' ? speseDaPagareOggi() : 0;
+  return [
+    h('div', { class: 'dati' },
+      saldi.length || haPatrimonio ? dato('Patrimonio netto', fmtEuro(patrimonioNetto()), 'beni e disponibilità meno debiti') : null,
+      saldi.length ? dato('Disponibilità sui conti', fmtEuro(ult.y), serie.length > 1 ? `${ult.y >= serie[0].y ? '+' : ''}${fmtEuro(ult.y - serie[0].y)} dal ${fmtData(serie[0].data)}` : `al ${fmtData(ult.data)}`) : null,
+      mov.length ? dato('Entrate, ultimi 12 mesi', fmtEuro(somma(entrate))) : null,
+      mov.length ? dato('Uscite, ultimi 12 mesi', fmtEuro(somma(uscite)), `risparmio ${fmtEuro(somma(entrate) - somma(uscite))}`) : null,
+      spese ? dato('Spese in scadenza', spese, 'entro domani, nella pagina Spese', 'allerta') : null),
+    pannelloIndiceFinanze(),
+    pannelloConsigli('finanze'),
+    serie.length > 1 ? pannello('Disponibilità nel tempo', grafico('Disponibilità finanziaria nel tempo', w => graficoLinea(w, { punti: serie, unita: '€', fmt: v => fmtNum(v, 0) })), h('p', { class: 'attenuato piccolo' }, 'Somma dell\'ultimo saldo noto di ogni conto a ciascuna data. I conti di tipo Debito sono sottratti.')) : null,
+    mov.length ? pannello('Entrate e uscite per mese', legenda(serieBarre), grafico('Entrate e uscite per mese', w => graficoBarre(w, { categorie: mesi.map(fmtMese), serie: serieBarre, fmt: v => fmtNum(v, 0) })), azioniFinanze(h('a', { class: 'btn piccolo', href: '#/a/finanze/movimenti' }, 'Dettaglio entrate e uscite'))) : null,
+  ];
+}
+
+/* Conti: dove sono i soldi oggi e l'ultimo saldo di ogni conto. */
+function finConti(k) {
+  const { saldi, ultimi, serie } = k;
+  const aggiungi = btn('Aggiungi un saldo', () => apriModulo('finanze', 'saldo', null, { data: oggi() }), 'primario');
+  if (!saldi.length) return pannello('', vuoto('Nessun saldo registrato. Aggiungi il saldo di ogni conto (BPM personale, BPM famiglia, Postepay…) quando lo controlli: bastano una o due volte al mese.', aggiungi));
+  const lista = [...ultimi.values()].sort((a, b) => segnoSaldo(b) - segnoSaldo(a));
+  return [
+    h('div', { class: 'dati' }, dato('Disponibilità sui conti', fmtEuro(serie[serie.length - 1].y), `${lista.length} ${lista.length === 1 ? 'conto' : 'conti'}`)),
+    pannello('Dove sono i soldi oggi', barreOrizzontali(lista.map(v => ({ nome: v.conto, valore: segnoSaldo(v) })), fmtEuro)),
+    pannello('Ultimo saldo di ogni conto', h('ul', { class: 'elenco' }, lista.map(v => h('li', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('finanze', 'saldo', v) },
+      h('div', { class: 'tra' }, h('strong', {}, v.conto), h('span', { class: 'num' }, fmtEuro(segnoSaldo(v)))),
+      h('div', { class: 'elenco-nota' }, [v.categoria, `al ${fmtData(v.data)}`].filter(Boolean).join(', '))))),
+      azioniFinanze(aggiungi, linkTabella('finanze', 'saldo', 'Storico dei saldi'))),
+  ];
+}
+
+/* Entrate e uscite: andamento per mese, dove vanno i soldi, ultimi movimenti. */
+function finMovimenti(k) {
+  const { mov, mesi, entrate, uscite } = k;
+  const importa = btn('Importa movimenti', () => apriImportaCsv('finanze', 'movimento'), 'primario');
+  const aggiungi = btn('Aggiungi un movimento', () => apriModulo('finanze', 'movimento', null, { data: oggi() }));
+  if (!mov.length) return pannello('', vuoto('Nessun movimento. Carica l\'estratto conto BPM (Excel o CSV) in Documenti o mandalo a Claude in chat: classifica lui le voci.', importa, aggiungi));
+  const corrente = oggi().slice(0, 7);
+  const perCat = [...raggruppa(mov.filter(v => v.valore < 0 && v.data >= mesi[0]), v => v.categoria || 'Senza categoria')].map(([nome, l]) => ({ nome, valore: -somma(l.map(v => v.valore)) })).sort((a, b) => b.valore - a.valore).slice(0, 8);
+  const serieBarre = [{ nome: 'Entrate', classe: 'g-barra1', valori: entrate }, { nome: 'Uscite', classe: 'g-barra2', valori: uscite }];
+  return [
+    h('div', { class: 'dati' },
+      dato('Entrate, ultimi 12 mesi', fmtEuro(somma(entrate)), `media ${fmtEuro(somma(entrate) / 12)} al mese`),
+      dato('Uscite, ultimi 12 mesi', fmtEuro(somma(uscite)), `media ${fmtEuro(somma(uscite) / 12)} al mese`),
+      dato('Risparmio, ultimi 12 mesi', fmtEuro(somma(entrate) - somma(uscite)), somma(entrate) ? `${fmtNum((somma(entrate) - somma(uscite)) / somma(entrate) * 100, 0)}% delle entrate` : ''),
+      dato('Questo mese', fmtEuro(entrate[11] - uscite[11]), `entrate ${fmtEuro(entrate[11])}, uscite ${fmtEuro(uscite[11])}`)),
+    pannello('Entrate e uscite per mese', legenda(serieBarre), grafico('Entrate e uscite per mese', w => graficoBarre(w, { categorie: mesi.map(fmtMese), serie: serieBarre, fmt: v => fmtNum(v, 0) })),
+      h('p', { class: 'attenuato piccolo' }, 'Giroconti, investimenti e prestiti ricevuti non contano: spostano soldi, non li spendono.')),
+    perCat.length ? pannello('Uscite per categoria negli ultimi 12 mesi', barreOrizzontali(perCat, fmtEuro)) : null,
+    pannello('Ultimi movimenti', tabella('finanze', 'movimento', voci('finanze', 'movimento').filter(v => v.data <= oggi() || v.data.startsWith(corrente)), { limite: 15, filtro: false }),
+      azioniFinanze(aggiungi, btn('Importa movimenti', () => apriImportaCsv('finanze', 'movimento')), linkTabella('finanze', 'movimento', 'Tutti i movimenti'))),
+  ];
+}
+
+/* Patrimonio: beni, debiti e patrimonio netto, insieme alle disponibilità dei conti. */
+function finPatrimonio() {
+  if (!voci('patrimonio', 'bene').length && !voci('patrimonio', 'debito').length) return cruscottoPatrimonio();
+  return [
+    ...[].concat(cruscottoPatrimonio()),
+    pannelloConsigli('patrimonio'),
+    azioniFinanze(btn('Aggiungi un bene', () => apriModulo('patrimonio', 'bene'), 'primario'), btn('Aggiungi un debito', () => apriModulo('patrimonio', 'debito')),
+      linkTabella('patrimonio', 'bene', 'Tutti i beni'), linkTabella('patrimonio', 'debito', 'Tutti i debiti')),
+  ];
+}
+
+/* Tetti di spesa: quanto hai speso nelle categorie che vuoi tenere sotto controllo. */
+function finTetti(k) {
+  const aggiungi = btn('Aggiungi un tetto', () => apriModulo('finanze', 'budget', null, { data: oggi() }), 'primario');
+  if (!voci('finanze', 'budget').length) return pannello('Tetti di spesa', h('p', { class: 'attenuato' }, 'Nessun tetto impostato. Fissane uno per le categorie che vuoi tenere sotto controllo (per esempio ristoranti): l\'indice finanziario controlla ogni mese se lo rispetti.'), azioniFinanze(aggiungi));
+  return [pannelloTetti(k.mov), azioniFinanze(aggiungi, linkTabella('finanze', 'budget', 'Tutti i tetti'))];
 }
 
 /* ===== 9. Impostazioni: persone, cartelle, repository dei dati, Garmin, sicurezza ===== */

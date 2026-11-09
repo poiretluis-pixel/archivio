@@ -1,6 +1,6 @@
 /* ===== 8c. Task, Gestione mail e task personali: liste Oggi, Coda e Archivio =====
    Le cose da fare sono le voci organizzazione/attivita, le mail sono organizzazione/mail (le carica Claude da Gmail).
-   I task con etichetta CASA, GIARDINO o PROGETTI sono personali: stanno nella cartella Organizzazione, non nella pagina Task.
+   I task con etichetta CASA, GIARDINO o PROGETTI sono personali: stanno nella pagina Task personali (cartella organizzazione), non nella pagina Task di lavoro.
    Per i task la scadenza si mette con il calendario della riga; il calendario Google TASK lo aggiorna Claude. */
 const listaSalvata = x => (x.lista === 'Domani' ? 'Coda' : x.lista);
 /* Un task in Coda o in Archivio passa da solo in Oggi quando arriva la scadenza, a meno che sia stato spostato dopo la scadenza. Le mail restano dove sono. */
@@ -15,7 +15,7 @@ const apertaLavoro = x => (x.tipo === 'mail' ? x.stato !== 'gestita' : x.stato !
 function lavoriAperti() {
   return [...voci('organizzazione', 'attivita'), ...voci('organizzazione', 'mail')].filter(apertaLavoro);
 }
-/* Tipo di pagina: 'attivita' (task di lavoro), 'personale' (task di Organizzazione) o 'mail'. */
+/* Tipo di pagina: 'attivita' (task di lavoro), 'personale' (task personali) o 'mail'. */
 const taskPersonale = x => x.tipo === 'attivita' && ETICHETTE_PERSONALI.includes(x.casella);
 const tipoPagina = x => (taskPersonale(x) ? 'personale' : x.tipo);
 const ordinePriorita = x => (PRIORITA.includes(x.priorita) ? PRIORITA.indexOf(x.priorita) : 1);
@@ -87,7 +87,7 @@ function rigaLavoro(x) {
       btn('Modifica', () => apriModulo('organizzazione', x.tipo, x), 'piccolo')));
 }
 
-/* Tre pagine: Task (lavoro), Gestione mail e la cartella Organizzazione (task personali). Stesse liste, stesso comportamento. */
+/* Tre pagine: Task (lavoro), Gestione mail e Task personali (cartella organizzazione). Stesse liste, stesso comportamento. */
 const fonteDi = x => (x.tipo === 'mail' ? x.casella : (x.casella || x.ambito));
 const SCHEDE_LAVORO = { oggi: 'Oggi', coda: 'Coda', archivio: 'Archivio', tutti: 'Tutti' };
 function vistaLavoro(tipo, scheda) {
@@ -104,7 +104,7 @@ function vistaLavoro(tipo, scheda) {
   const alte = l.filter(x => listaDi(x) === 'Oggi' && x.priorita === 'alta').length;
   return h('div', {},
     h('div', { class: 'testa' },
-      h('div', {}, h('h1', {}, mail ? 'Gestione mail' : pers ? 'Organizzazione' : 'Task'), h('p', { class: 'sotto largo-testo' }, mail
+      h('div', {}, h('h1', {}, mail ? 'Gestione mail' : pers ? 'Task personali' : 'Task'), h('p', { class: 'sotto largo-testo' }, mail
         ? 'Le mail delle tre caselle che chiedono una risposta o un\'azione. Le porta qui Claude da Gmail ogni mattina.'
         : pers ? 'Le tue cose personali, divise tra CASA, GIARDINO e PROGETTI. Funziona come Task: con la scadenza il task passa da solo in Oggi, con "Aggiungi al calendario" lo metti nel calendario Google TASK.'
         : 'Le tue cose da fare, come in Google Task. Metti la scadenza con il calendario: quando arriva, il task passa da solo in Oggi. Con "Aggiungi al calendario" lo metti nel calendario Google TASK.')),

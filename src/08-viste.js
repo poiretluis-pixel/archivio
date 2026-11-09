@@ -25,7 +25,7 @@ function riassuntiAree() {
   const prog = voci('progetti', 'progetto');
   return {
     salute: mis.length || S.estVoci.length ? [(ind => (ind ? dato('Indice di salute', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceSalute()), mis.length ? dato('Fuori intervallo all\'ultima misura', nFuori, `su ${perPar.length} parametri seguiti`, nFuori ? 'allerta' : '') : null] : null,
-    finanze: voci('finanze').length ? [(ind => (ind ? dato('Indice finanziario', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceFinanze()), voci('finanze', 'saldo').length ? dato('Disponibilità finanziaria', fmtEuro(totaleFinanze(voci('finanze', 'saldo')))) : null] : null,
+    finanze: voci('finanze').length ? [(ind => (ind ? dato('Indice finanziario', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceFinanze()), voci('finanze', 'saldo').length ? dato('Disponibilità finanziaria', fmtEuro(totaleFinanze(voci('finanze', 'saldo')))) : null, voci('patrimonio').length ? dato('Patrimonio netto', fmtEuro(patrimonioNetto())) : null] : null,
     organizzazione: voci('organizzazione').length ? [dato('Obiettivi attivi', voci('organizzazione', 'obiettivo').filter(o => o.stato === 'attivo' || !o.stato).length), dato('Task personali aperti', voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta' && taskPersonale(x)).length)] : null,
     sport: voci('sport').length ? [dato('Sedute nelle ultime 4 settimane', [...voci('sport', 'allenamento'), ...voci('sport', 'attivita')].filter(v => giorniDa(v.data) < 28).length)] : null,
     mindfulness: voci('mindfulness').length ? [dato('Giorni di pratica negli ultimi 30', new Set(voci('mindfulness', 'pratica').filter(v => giorniDa(v.data) < 30).map(v => v.data)).size)] : null,
@@ -46,7 +46,7 @@ function vistaCasa() {
     daFare.push({ tipo: x.priorita === 'alta' || g < 0 ? 'ritardo' : 'vuota', testo: (mail ? 'Mail: ' : '') + x.titolo,
       nota: [mail ? x.casella : (x.casella || x.ambito), mail ? (x.mittente ? 'da ' + x.mittente : '') : !x.data ? '' : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`].filter(Boolean).join(', '), href: mail ? '#/mail' : taskPersonale(x) ? '#/a/organizzazione' : '#/task' });
   }
-  if (lav.length > 6) daFare.push({ tipo: 'vuota', testo: `Altre ${lav.length - 6} cose per oggi`, nota: 'Tutte nelle pagine Task, Gestione mail e Organizzazione.', href: '#/task' });
+  if (lav.length > 6) daFare.push({ tipo: 'vuota', testo: `Altre ${lav.length - 6} cose per oggi`, nota: 'Tutte nelle pagine Task, Gestione mail e Task personali.', href: '#/task' });
   const daElab = allegati().filter(a => a.stato === 'da elaborare').length;
   if (daElab) daFare.push({ tipo: 'vuota', testo: daElab === 1 ? '1 documento in attesa che Claude ne inserisca i valori' : `${daElab} documenti in attesa che Claude ne inserisca i valori`, nota: 'Sono al sicuro. Li elabora alla verifica del lunedì, oppure subito se glielo chiedi in chat.', href: '#/documenti' });
   if (!ghPronto()) daFare.push({ tipo: 'ritardo', testo: 'I dati sono solo su questo dispositivo', nota: 'Collega il repository dei dati in Impostazioni.', href: '#/impostazioni' });
@@ -58,7 +58,7 @@ function vistaCasa() {
     h('div', { class: 'testa' }, h('div', {}, h('h1', {}, 'Quadro generale'), h('p', { class: 'sotto' }, new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })))),
     pannello('Da fare', daFare.length ? h('ul', { class: 'elenco' }, daFare.map(x => h('li', {}, h('a', { href: x.href }, stato(x.tipo, x.testo)), h('div', { class: 'elenco-nota' }, x.nota)))) : h('p', { class: 'attenuato' }, 'Niente in sospeso.')),
     consigliPrincipali(),
-    h('div', { class: 'griglia' }, aree().filter(a => !PASSIONI.includes(a.id) && !AREE_LAVORO.includes(a.id)).map(a => schedaArea(a, schede)),
+    h('div', { class: 'griglia' }, aree().filter(a => !PASSIONI.includes(a.id) && !AREE_LAVORO.includes(a.id) && !DENTRO_FINANZE.includes(a.id)).map(a => schedaArea(a, schede)),
       h('a', { class: 'scheda', href: '#/passioni' }, h('h3', {}, 'Passioni'), h('p', { class: 'attenuato' }, PASSIONI.map(area).filter(Boolean).map(a => a.nome).join(', ')))),
     pannello('Stato dei caricamenti', h('ul', { class: 'elenco' }, FONTI.map(f => { const st = statoFonte(f); return h('li', {}, h('div', { class: 'tra' }, h('strong', {}, f.nome), stato(st.stato, st.stato === 'ok' ? 'In regola' : st.stato === 'ritardo' ? 'In ritardo' : 'Mai caricati')), h('div', { class: 'elenco-nota' }, st.stato === 'ok' ? st.testo : (st.stato === 'ritardo' ? st.testo + '. ' : '') + f.come)); }))),
     ultimoRapporto(),
@@ -155,11 +155,11 @@ function vistaPassioni() {
 }
 
 function vistaArea(a, scheda) {
-  const cr = { salute: cruscottoSalute, finanze: cruscottoFinanze, patrimonio: cruscottoPatrimonio, organizzazione: cruscottoOrganizzazione, sport: cruscottoSport, mindfulness: cruscottoMindfulness, lettura: cruscottoLettura, viaggi: cruscottoViaggi, progetti: cruscottoProgetti }[a.id] || cruscottoLibero;
+  const cr = { salute: cruscottoSalute, organizzazione: cruscottoOrganizzazione, sport: cruscottoSport, mindfulness: cruscottoMindfulness, lettura: cruscottoLettura, viaggi: cruscottoViaggi, progetti: cruscottoProgetti }[a.id] || cruscottoLibero;
   return h('div', {},
     PASSIONI.includes(a.id) ? h('p', { class: 'briciole' }, h('a', { href: '#/passioni' }, '← Passioni')) : null,
     a.id === 'organizzazione' ? vistaLavoro('personale', scheda) : h('div', { class: 'testa' }, h('h1', {}, a.nome)),
-    a.id === 'salute' ? pannelloIndice() : a.id === 'finanze' ? pannelloIndiceFinanze() : null,
+    a.id === 'salute' ? pannelloIndice() : null,
     pannelloConsigli(a.id),
     cr(a),
     a.id === 'progetti' ? null : pannello('Sezioni di questa cartella', h('div', { class: 'sezioni' }, Object.entries(a.tipi).map(([k, d]) => h('div', { class: 'sezione' },
@@ -238,30 +238,6 @@ function cruscottoSalute() {
   ];
 }
 
-/* --- Finanze --- */
-function cruscottoFinanze() {
-  const saldi = voci('finanze', 'saldo').sort(perData), mov = movimentiReali();
-  if (!saldi.length && !mov.length) return pannello('', vuoto('Cartella vuota. Il modo più rapido: carica in Documenti i movimenti BPM degli ultimi mesi (Excel o CSV) oppure mandali a Claude in chat. Li classifica lui e da lì si calcolano entrate, uscite, risparmio e indice finanziario.', btn('Aggiungi un saldo', () => apriModulo('finanze', 'saldo'), 'primario'), btn('Importa movimenti', () => apriImportaCsv('finanze', 'movimento'))));
-  const date = [...new Set(saldi.map(v => v.data))];
-  const serie = date.map(d => ({ data: d, y: totaleFinanze(saldi.filter(v => v.data <= d)) }));
-  const ultimi = new Map(); for (const v of saldi) ultimi.set(v.conto, v);
-  const mesi = []; { const o = oggi(); let y = +o.slice(0, 4), m = +o.slice(5, 7); for (let i = 0; i < 12; i++) { mesi.unshift(`${y}-${String(m).padStart(2, '0')}`); if (--m < 1) { m = 12; y--; } } }
-  const entrate = mesi.map(k => somma(mov.filter(v => v.data.startsWith(k) && v.valore > 0).map(v => v.valore)));
-  const uscite = mesi.map(k => -somma(mov.filter(v => v.data.startsWith(k) && v.valore < 0).map(v => v.valore)));
-  const perCat = [...raggruppa(mov.filter(v => v.valore < 0 && v.data >= mesi[0]), v => v.categoria || 'Senza categoria')].map(([nome, l]) => ({ nome, valore: -somma(l.map(v => v.valore)) })).sort((a, b) => b.valore - a.valore).slice(0, 8);
-  const serieBarre = [{ nome: 'Entrate', classe: 'g-barra1', valori: entrate }, { nome: 'Uscite', classe: 'g-barra2', valori: uscite }];
-  return [
-    h('div', { class: 'dati' },
-      saldi.length ? dato('Disponibilità finanziaria', fmtEuro(serie[serie.length - 1].y), serie.length > 1 ? `${serie[serie.length - 1].y >= serie[0].y ? '+' : ''}${fmtEuro(serie[serie.length - 1].y - serie[0].y)} dal ${fmtData(serie[0].data)}` : `al ${fmtData(serie[0].data)}`) : null,
-      mov.length ? dato('Entrate negli ultimi 12 mesi', fmtEuro(somma(entrate))) : null, mov.length ? dato('Uscite negli ultimi 12 mesi', fmtEuro(somma(uscite)), `risparmio ${fmtEuro(somma(entrate) - somma(uscite))}`) : null),
-    saldi.length ? pannello('Disponibilità nel tempo', grafico('Disponibilità finanziaria nel tempo', w => graficoLinea(w, { punti: serie, unita: '€', fmt: v => fmtNum(v, 0) })), h('p', { class: 'attenuato piccolo' }, 'Somma dell\'ultimo saldo noto di ogni conto a ciascuna data. I conti di tipo Debito sono sottratti.')) : null,
-    saldi.length ? pannello('Dove sono i soldi oggi', barreOrizzontali([...ultimi.values()].map(v => ({ nome: v.conto, valore: segnoSaldo(v) })).sort((a, b) => b.valore - a.valore), fmtEuro)) : null,
-    mov.length ? pannello('Entrate e uscite per mese', legenda(serieBarre), grafico('Entrate e uscite per mese', w => graficoBarre(w, { categorie: mesi.map(fmtMese), serie: serieBarre, fmt: v => fmtNum(v, 0) }))) : null,
-    perCat.length ? pannello('Uscite per categoria negli ultimi 12 mesi', barreOrizzontali(perCat, fmtEuro)) : null,
-    pannelloTetti(mov),
-    mov.length ? pannello('Ultimi movimenti', tabella('finanze', 'movimento', voci('finanze', 'movimento'), { limite: 12, filtro: false })) : null,
-  ];
-}
 /* Tetti di spesa: spesa del mese in corso e dell'ultimo mese completo per ogni categoria con un tetto. */
 function pannelloTetti(mov) {
   const tetti = new Map(); for (const b of voci('finanze', 'budget').sort(perData)) tetti.set(b.categoria, b);
@@ -277,7 +253,7 @@ function pannelloTetti(mov) {
   })));
 }
 
-/* --- Organizzazione: sopra i task personali (vistaLavoro), qui sotto obiettivi e revisione settimanale --- */
+/* --- Task personali (cartella organizzazione): sopra i task (vistaLavoro), qui sotto obiettivi e revisione settimanale --- */
 function cruscottoOrganizzazione() {
   const ob = voci('organizzazione', 'obiettivo'), rev = voci('organizzazione', 'revisione').sort(perData);
   const attivi = ob.filter(o => o.stato === 'attivo' || !o.stato);
