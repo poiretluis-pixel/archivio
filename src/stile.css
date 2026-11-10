@@ -314,3 +314,8 @@ a.sito-link:hover strong{color:var(--marca)}
   .ambiti a.ambito-tab .conta{background:var(--lavoro);color:var(--carta)}
   .menu-lavoro .menu-gruppo.g-lavoro, .menu-privata .menu-gruppo.g-personale{display:none}
 }
+/* Spese: le occasionali hanno un filo viola a sinistra, le ricorrenti verde */
+.tabella-spese tr.riga-ricorrente td:first-child{box-shadow:inset 3px 0 0 var(--e-verde-t)}
+.tabella-spese tr.riga-occasionale td:first-child{box-shadow:inset 3px 0 0 var(--e-viola-t)}
+.tabella-spese tbody td:first-child{padding-left:.6rem}
+.separa-filtri{margin-left:.8rem}

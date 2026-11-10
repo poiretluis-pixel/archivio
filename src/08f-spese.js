@@ -1,5 +1,6 @@
-/* ===== 8f. Spese: le spese ricorrenti mese per mese, mie e della famiglia =====
+/* ===== 8f. Spese: le spese ricorrenti e occasionali mese per mese, mie e della famiglia =====
    Ogni spesa (finanze/spesa) ha importo, frequenza e una scadenza di riferimento: da lì si calcolano le scadenze di ogni mese.
+   Le occasionali (frequenza "occasionale") scadono una volta sola, alla data indicata.
    È pagata quando nei movimenti del conto c'è un'uscita che contiene la parola "riconosci" vicino alla scadenza,
    oppure quando Luis la segna a mano (campo pagati, elenco di mesi AAAA-MM). L'avviso del giorno prima, nel calendario
    Google SPESE, lo crea Claude ogni mattina. */
@@ -7,6 +8,7 @@ const spesaAttiva = sp => sp.stato !== 'chiusa';
 const mesiTra = (da, a) => (+a.slice(0, 4) - +da.slice(0, 4)) * 12 + (+a.slice(5, 7) - +da.slice(5, 7));
 function scadenzaNelMese(sp, mese) {
   if (!sp.data) return null;
+  if (sp.frequenza === OCCASIONALE) return sp.data.slice(0, 7) === mese ? sp.data : null;
   const passo = MESI_FREQ[sp.frequenza] || 1, diff = mesiTra(sp.data.slice(0, 7), mese);
   if (diff < 0 || diff % passo) return null;
   const ultimo = +ultimoDelMese(mese).slice(8, 10), giorno = Math.min(+sp.data.slice(8, 10), ultimo);
@@ -44,21 +46,28 @@ function segnaPagata(sp, mese, si) {
   metti(l.length ? { ...resto, pagati: l.sort().join(', ') } : resto);
   avviso(si ? `${sp.titolo}: segnata pagata.` : `${sp.titolo}: di nuovo da pagare.`);
 }
+const eOccasionale = sp => sp.frequenza === OCCASIONALE;
+/* Tipo della spesa: ricorrente (verde, con la frequenza) oppure occasionale (viola). */
+const etichettaTipo = sp => eOccasionale(sp) ? h('span', { class: 'etichetta e-viola', title: 'Spesa occasionale, una volta sola' }, 'occasionale') : h('span', { class: 'etichetta e-verde', title: 'Spesa ricorrente' }, '↻ ' + (sp.frequenza || 'mensile'));
 const etichettaDiChi = d => (d ? h('span', { class: 'etichetta e-' + (d === 'mie' ? 'acqua' : 'arancione') }, d) : null);
-const mensileEquivalente = sp => sp.valore / (MESI_FREQ[sp.frequenza] || 1);
+const mensileEquivalente = sp => (eOccasionale(sp) ? 0 : sp.valore / (MESI_FREQ[sp.frequenza] || 1));
+const TIPI_SPESE = { ricorrenti: r => !eOccasionale(r.sp), occasionali: r => eOccasionale(r.sp) };
 
 function vistaSpese(meseRotta) {
   const mese = /^\d{4}-\d{2}$/.test(meseRotta || '') ? meseRotta : oggi().slice(0, 7);
   const nuova = () => apriModulo('finanze', 'spesa', null, { frequenza: 'mensile', di_chi: 'mie', stato: 'attiva', modo: 'addebito automatico', data: oggi() });
-  const tutte = voci('finanze', 'spesa').filter(spesaAttiva);
+  const occasionale = () => apriModulo('finanze', 'spesa', null, { frequenza: OCCASIONALE, di_chi: 'mie', stato: 'attiva', modo: 'carta', data: oggi() });
+  const tutte = voci('finanze', 'spesa').filter(spesaAttiva), ricorrenti = tutte.filter(sp => !eOccasionale(sp));
   if (!voci('finanze', 'spesa').length) return h('div', {}, h('div', { class: 'testa' }, h('h1', {}, 'Spese')),
-    pannello('', vuoto('Nessuna spesa ricorrente. Aggiungi mutuo, rate, bollette e abbonamenti: qui vedi ogni mese cosa scade e cosa è già pagato, e il giorno prima arriva l\'avviso nel calendario SPESE.', btn('Aggiungi una spesa', nuova, 'primario'))));
+    pannello('', vuoto('Nessuna spesa. Aggiungi mutuo, rate, bollette e abbonamenti, e anche le spese occasionali: qui vedi ogni mese cosa scade e cosa è già pagato, e il giorno prima arriva l\'avviso nel calendario SPESE.', btn('Aggiungi una spesa ricorrente', nuova, 'primario'), btn('Aggiungi una spesa occasionale', occasionale))));
   const chi = DI_CHI_SPESE.includes(S.speseChi) ? S.speseChi : '';
-  const righe = righeSpese(mese), viste = righe.filter(r => !chi || r.sp.di_chi === chi);
+  const tipo = TIPI_SPESE[S.speseTipo] ? S.speseTipo : '';
+  const righe = righeSpese(mese), viste = righe.filter(r => (!chi || r.sp.di_chi === chi) && (!tipo || TIPI_SPESE[tipo](r)));
   const tot = l => somma(l.map(r => r.importo));
   const perChi = (l, d) => tot(l.filter(r => r.sp.di_chi === d));
   const daPagare = righe.filter(r => !r.pagata), prossima = daPagare.find(r => r.scad >= oggi());
   const filtro = (valore, testo) => h('button', { type: 'button', class: 'filtro' + (chi === valore ? ' scelto' : ''), 'aria-pressed': chi === valore ? 'true' : 'false', onclick: () => { S.speseChi = valore; disegna(); } }, testo);
+  const filtroTipo = (valore, testo) => h('button', { type: 'button', class: 'filtro filtro-tipo' + (tipo === valore ? ' scelto' : ''), 'aria-pressed': tipo === valore ? 'true' : 'false', onclick: () => { S.speseTipo = valore; disegna(); } }, testo);
   const statoRiga = r => {
     if (r.mov) return stato('ok', `pagata il ${fmtData(r.mov.data)}`);
     if (r.aMano) return stato('ok', 'pagata');
@@ -66,23 +75,24 @@ function vistaSpese(meseRotta) {
     return g < 0 ? stato('ritardo', `scaduta il ${fmtData(r.scad)}`) : g <= 1 ? stato('ritardo', g === 0 ? 'scade oggi' : 'scade domani') : stato('vuota', 'da pagare');
   };
   const tabella = l => h('div', { class: 'scorri' }, h('table', { class: 'tabella-spese' },
-    h('thead', {}, h('tr', {}, ['Giorno', 'Spesa', 'Di chi', 'Importo', 'Conto', 'Stato', ''].map((t, i) => h('th', { class: i === 3 ? 'destra' : '' }, t)))),
-    h('tbody', {}, l.map(r => h('tr', { class: 'cliccabile', tabindex: 0, title: 'Modifica la spesa', onclick: () => apriModulo('finanze', 'spesa', r.sp), onkeydown: e => { if (e.key === 'Enter') apriModulo('finanze', 'spesa', r.sp); } },
+    h('thead', {}, h('tr', {}, ['Giorno', 'Spesa', 'Tipo', 'Di chi', 'Importo', 'Conto', 'Stato', ''].map((t, i) => h('th', { class: i === 4 ? 'destra' : '' }, t)))),
+    h('tbody', {}, l.map(r => h('tr', { class: 'cliccabile ' + (eOccasionale(r.sp) ? 'riga-occasionale' : 'riga-ricorrente'), tabindex: 0, title: 'Modifica la spesa', onclick: () => apriModulo('finanze', 'spesa', r.sp), onkeydown: e => { if (e.key === 'Enter') apriModulo('finanze', 'spesa', r.sp); } },
       h('td', { class: 'nonspezza' }, fmtData(r.scad).replace(/ \d{4}$/, '')),
       h('td', {}, h('strong', {}, r.sp.titolo), r.sp.categoria ? h('div', { class: 'attenuato piccolo' }, r.sp.categoria + (r.sp.modo ? ', ' + r.sp.modo : '')) : null),
+      h('td', { class: 'nonspezza' }, etichettaTipo(r.sp)),
       h('td', {}, etichettaDiChi(r.sp.di_chi)),
       h('td', { class: 'num destra nonspezza' }, (r.sp.variabile && !r.mov ? '~ ' : '') + fmtEuro2(r.importo)),
       h('td', { class: 'attenuato' }, r.sp.conto || ''),
       h('td', {}, statoRiga(r)),
       h('td', { class: 'destra', onclick: e => e.stopPropagation() }, r.mov ? null : btn(r.aMano ? 'Annulla' : 'Pagata', () => segnaPagata(r.sp, mese, !r.aMano), 'piccolo')))))));
-  const blocco = (titolo, l, vuotoTesto) => pannello(titolo,
-    l.length ? [tabella(l), h('p', { class: 'attenuato piccolo' }, `Totale ${fmtEuro2(tot(l))}: mie ${fmtEuro2(perChi(l, 'mie'))}, famiglia ${fmtEuro2(perChi(l, 'famiglia'))}.`)] : h('p', { class: 'attenuato' }, vuotoTesto));
-  const altre = tutte.filter(sp => sp.frequenza && sp.frequenza !== 'mensile' && (!chi || sp.di_chi === chi) && !scadenzaNelMese(sp, mese));
-  const equivalente = d => somma(tutte.filter(sp => !d || sp.di_chi === d).map(mensileEquivalente));
+  const perTipo = (l, t) => tot(l.filter(TIPI_SPESE[t]));
+  const altre = tutte.filter(sp => sp.frequenza && sp.frequenza !== 'mensile' && (!chi || sp.di_chi === chi) && (!tipo || (tipo === 'occasionali') === eOccasionale(sp)) && !scadenzaNelMese(sp, mese))
+    .map(sp => ({ sp, d: prossimaScadenza(sp, meseDopo(mese, 1) + '-01') })).filter(x => x.d || !eOccasionale(x.sp)).sort((a, b) => (a.d || '9').localeCompare(b.d || '9'));
+  const equivalente = d => somma(ricorrenti.filter(sp => !d || sp.di_chi === d).map(mensileEquivalente));
   return h('div', {},
     h('div', { class: 'testa' },
-      h('div', {}, h('h1', {}, 'Spese'), h('p', { class: 'sotto largo-testo' }, 'Le spese ricorrenti del mese, tue e della famiglia. Quando il movimento arriva dalla banca la spesa risulta pagata da sola; il giorno prima di ogni scadenza trovi l\'avviso nel calendario Google SPESE.')),
-      h('div', { class: 'azioni' }, btn('Aggiungi una spesa', nuova, 'primario'))),
+      h('div', {}, h('h1', {}, 'Spese'), h('p', { class: 'sotto largo-testo' }, 'Le spese del mese, ricorrenti e occasionali, tue e della famiglia, in un solo elenco. Quando il movimento arriva dalla banca la spesa risulta pagata da sola; il giorno prima di ogni scadenza trovi l\'avviso nel calendario Google SPESE.')),
+      h('div', { class: 'azioni' }, btn('Spesa ricorrente', nuova, 'primario'), btn('Spesa occasionale', occasionale))),
     h('nav', { class: 'mese-nav azioni', 'aria-label': 'Mese' },
       h('a', { class: 'btn piccolo', href: '#/spese/' + meseDopo(mese, -1), 'aria-label': 'Mese precedente' }, '‹'),
       h('strong', { class: 'mese-pt' }, meseLungo(mese)),
@@ -92,12 +102,14 @@ function vistaSpese(meseRotta) {
       dato('Ancora da pagare', fmtEuro(tot(daPagare)), [daPagare.length ? `${daPagare.length} ${daPagare.length === 1 ? 'spesa' : 'spese'}` : 'tutto pagato', prossima ? `prossima: ${prossima.sp.titolo}, ${fmtData(prossima.scad)}` : ''].filter(Boolean).join(', '), daPagare.some(r => r.scad < oggi()) ? 'allerta' : ''),
       dato('Spese del mese', fmtEuro(tot(righe)), `mie ${fmtEuro(perChi(righe, 'mie'))}, famiglia ${fmtEuro(perChi(righe, 'famiglia'))}`),
       dato('Già pagate', fmtEuro(tot(righe.filter(r => r.pagata))), `${righe.filter(r => r.pagata).length} su ${righe.length}`),
-      dato('Impegno medio al mese', fmtEuro(equivalente()), `mie ${fmtEuro(equivalente('mie'))}, famiglia ${fmtEuro(equivalente('famiglia'))}`)),
-    h('div', { class: 'azioni filtri' }, h('span', { class: 'attenuato piccolo' }, 'Mostra:'), filtro('', 'Tutte'), filtro('mie', 'Mie'), filtro('famiglia', 'Famiglia')),
-    blocco('Spese mensili', viste.filter(r => (r.sp.frequenza || 'mensile') === 'mensile'), 'Nessuna spesa mensile.'),
-    blocco('Altre spese ricorrenti di questo mese', viste.filter(r => r.sp.frequenza && r.sp.frequenza !== 'mensile'), 'Questo mese non scadono spese bimestrali, trimestrali o annuali.'),
-    altre.length ? pannello('Le altre ricorrenti, prossime scadenze', h('ul', { class: 'elenco' }, altre.map(sp => ({ sp, d: prossimaScadenza(sp, meseDopo(mese, 1) + '-01') })).sort((a, b) => (a.d || '9').localeCompare(b.d || '9')).map(({ sp, d }) =>
-      h('li', { class: 'tra cliccabile', tabindex: 0, onclick: () => apriModulo('finanze', 'spesa', sp) }, h('span', {}, h('strong', {}, sp.titolo), ' ', etichettaDiChi(sp.di_chi), h('span', { class: 'attenuato' }, ` ${sp.frequenza}, ${fmtEuro2(sp.valore)}`)), h('span', { class: 'attenuato nonspezza' }, d ? fmtData(d) : 'finita'))))) : null,
+      dato('Ricorrenti, media al mese', fmtEuro(equivalente()), `mie ${fmtEuro(equivalente('mie'))}, famiglia ${fmtEuro(equivalente('famiglia'))}`)),
+    h('div', { class: 'azioni filtri' }, h('span', { class: 'attenuato piccolo' }, 'Mostra:'), filtro('', 'Tutte'), filtro('mie', 'Mie'), filtro('famiglia', 'Famiglia'),
+      h('span', { class: 'attenuato piccolo separa-filtri' }, 'Tipo:'), filtroTipo('', 'Tutti'), filtroTipo('ricorrenti', 'Ricorrenti'), filtroTipo('occasionali', 'Occasionali')),
+    pannello('Spese del mese', viste.length ? [tabella(viste), h('p', { class: 'attenuato piccolo' },
+      `Totale ${fmtEuro2(tot(viste))}: ricorrenti ${fmtEuro2(perTipo(viste, 'ricorrenti'))}, occasionali ${fmtEuro2(perTipo(viste, 'occasionali'))}; mie ${fmtEuro2(perChi(viste, 'mie'))}, famiglia ${fmtEuro2(perChi(viste, 'famiglia'))}.`)]
+      : h('p', { class: 'attenuato' }, righe.length ? 'Nessuna spesa con questi filtri.' : 'Questo mese non scade nessuna spesa.')),
+    altre.length ? pannello('Prossime scadenze negli altri mesi', h('ul', { class: 'elenco' }, altre.map(({ sp, d }) =>
+      h('li', { class: 'tra cliccabile', tabindex: 0, onclick: () => apriModulo('finanze', 'spesa', sp) }, h('span', {}, h('strong', {}, sp.titolo), ' ', etichettaTipo(sp), ' ', etichettaDiChi(sp.di_chi), h('span', { class: 'attenuato' }, ` ${fmtEuro2(sp.valore)}`)), h('span', { class: 'attenuato nonspezza' }, d ? fmtData(d) : 'finita'))))) : null,
     h('div', { class: 'azioni' }, h('a', { class: 'btn piccolo', href: '#/a/finanze/spesa' }, 'Tutte le spese in tabella')));
 }
 const fmtEuro2 = n => (n == null || isNaN(n) ? '' : Number(n).toLocaleString('it-IT', { style: 'currency', currency: 'EUR', minimumFractionDigits: Number.isInteger(+n) ? 0 : 2, maximumFractionDigits: 2 }));
