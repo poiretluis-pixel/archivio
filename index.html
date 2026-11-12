@@ -10,7 +10,7 @@
 <title>Life Planning</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2231%22 fill=%22%2326321f%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2227%22 fill=%22none%22 stroke=%22%23c9a54e%22 stroke-width=%221.6%22/%3E%3Cpath d=%22M22 18v28h12M28.5 46V22h7.5a6.8 6.8 0 0 1 0 13.6h-7.5%22 fill=%22none%22 stroke=%22%23c9a54e%22 stroke-width=%224.2%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3Ccircle cx=%2241.5%22 cy=%2246%22 r=%222.6%22 fill=%22%23c9a54e%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="icone/apple-touch-icon.png">
-<!-- Versione costruita il 2026-11-10. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
+<!-- Versione costruita il 2026-11-12. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
 <style>
 :root{
   --fondo:#ece6d9; --carta:#fbf9f4; --inchiostro:#2a2620; --inchiostro2:#5a5348; --tenue:#7d7466; --linea:#ddd5c6; --linea2:#ebe5d8;
@@ -333,6 +333,8 @@ a.sito-link:hover strong{color:var(--marca)}
 .tabella-spese tr.riga-occasionale td:first-child{box-shadow:inset 3px 0 0 var(--e-viola-t)}
 .tabella-spese tbody td:first-child{padding-left:.6rem}
 .separa-filtri{margin-left:.8rem}
+.tabella-spese .solo-telefono{display:none;margin-top:.25rem}
+@media (max-width:820px){.tabella-spese .solo-telefono{display:block}.tabella-spese .col-conto{display:none}}
 </style>
 </head>
 <body>
@@ -2855,6 +2857,12 @@ function segnaPagata(sp, mese, si) {
 const eOccasionale = sp => sp.frequenza === OCCASIONALE;
 /* Tipo della spesa: ricorrente (verde, con la frequenza) oppure occasionale (viola). */
 const etichettaTipo = sp => eOccasionale(sp) ? h('span', { class: 'etichetta e-viola', title: 'Spesa occasionale, una volta sola' }, 'occasionale') : h('span', { class: 'etichetta e-verde', title: 'Spesa ricorrente' }, '↻ ' + (sp.frequenza || 'mensile'));
+/* Conto da cui esce la spesa: BPM personale blu, BPM famiglia giallo, gli altri grigi. */
+const etichettaConto = c => {
+  if (!c) return null;
+  const n = normaNome(c), colore = n.includes('famiglia') ? 'giallo' : n.includes('personale') ? 'blu' : 'grigio';
+  return h('span', { class: 'etichetta conto-spesa e-' + colore, title: 'Conto: ' + c }, c);
+};
 const etichettaDiChi = d => (d ? h('span', { class: 'etichetta e-' + (d === 'mie' ? 'acqua' : 'arancione') }, d) : null);
 const mensileEquivalente = sp => (eOccasionale(sp) ? 0 : sp.valore / (MESI_FREQ[sp.frequenza] || 1));
 const TIPI_SPESE = { ricorrenti: r => !eOccasionale(r.sp), occasionali: r => eOccasionale(r.sp) };
@@ -2881,14 +2889,14 @@ function vistaSpese(meseRotta) {
     return g < 0 ? stato('ritardo', `scaduta il ${fmtData(r.scad)}`) : g <= 1 ? stato('ritardo', g === 0 ? 'scade oggi' : 'scade domani') : stato('vuota', 'da pagare');
   };
   const tabella = l => h('div', { class: 'scorri' }, h('table', { class: 'tabella-spese' },
-    h('thead', {}, h('tr', {}, ['Giorno', 'Spesa', 'Tipo', 'Di chi', 'Importo', 'Conto', 'Stato', ''].map((t, i) => h('th', { class: i === 4 ? 'destra' : '' }, t)))),
+    h('thead', {}, h('tr', {}, ['Giorno', 'Spesa', 'Tipo', 'Di chi', 'Importo', 'Conto', 'Stato', ''].map((t, i) => h('th', { class: i === 4 ? 'destra' : i === 5 ? 'col-conto' : '' }, t)))),
     h('tbody', {}, l.map(r => h('tr', { class: 'cliccabile ' + (eOccasionale(r.sp) ? 'riga-occasionale' : 'riga-ricorrente'), tabindex: 0, title: 'Modifica la spesa', onclick: () => apriModulo('finanze', 'spesa', r.sp), onkeydown: e => { if (e.key === 'Enter') apriModulo('finanze', 'spesa', r.sp); } },
       h('td', { class: 'nonspezza' }, fmtData(r.scad).replace(/ \d{4}$/, '')),
-      h('td', {}, h('strong', {}, r.sp.titolo), r.sp.categoria ? h('div', { class: 'attenuato piccolo' }, r.sp.categoria + (r.sp.modo ? ', ' + r.sp.modo : '')) : null),
+      h('td', {}, h('strong', {}, r.sp.titolo), r.sp.categoria ? h('div', { class: 'attenuato piccolo' }, r.sp.categoria + (r.sp.modo ? ', ' + r.sp.modo : '')) : null, r.sp.conto ? h('div', { class: 'solo-telefono' }, etichettaConto(r.sp.conto)) : null),
       h('td', { class: 'nonspezza' }, etichettaTipo(r.sp)),
       h('td', {}, etichettaDiChi(r.sp.di_chi)),
       h('td', { class: 'num destra nonspezza' }, (r.sp.variabile && !r.mov ? '~ ' : '') + fmtEuro2(r.importo)),
-      h('td', { class: 'attenuato' }, r.sp.conto || ''),
+      h('td', { class: 'nonspezza col-conto' }, etichettaConto(r.sp.conto)),
       h('td', {}, statoRiga(r)),
       h('td', { class: 'destra', onclick: e => e.stopPropagation() }, r.mov ? null : btn(r.aMano ? 'Annulla' : 'Pagata', () => segnaPagata(r.sp, mese, !r.aMano), 'piccolo')))))));
   const perTipo = (l, t) => tot(l.filter(TIPI_SPESE[t]));
@@ -2915,7 +2923,7 @@ function vistaSpese(meseRotta) {
       `Totale ${fmtEuro2(tot(viste))}: ricorrenti ${fmtEuro2(perTipo(viste, 'ricorrenti'))}, occasionali ${fmtEuro2(perTipo(viste, 'occasionali'))}; mie ${fmtEuro2(perChi(viste, 'mie'))}, famiglia ${fmtEuro2(perChi(viste, 'famiglia'))}.`)]
       : h('p', { class: 'attenuato' }, righe.length ? 'Nessuna spesa con questi filtri.' : 'Questo mese non scade nessuna spesa.')),
     altre.length ? pannello('Prossime scadenze negli altri mesi', h('ul', { class: 'elenco' }, altre.map(({ sp, d }) =>
-      h('li', { class: 'tra cliccabile', tabindex: 0, onclick: () => apriModulo('finanze', 'spesa', sp) }, h('span', {}, h('strong', {}, sp.titolo), ' ', etichettaTipo(sp), ' ', etichettaDiChi(sp.di_chi), h('span', { class: 'attenuato' }, ` ${fmtEuro2(sp.valore)}`)), h('span', { class: 'attenuato nonspezza' }, d ? fmtData(d) : 'finita'))))) : null,
+      h('li', { class: 'tra cliccabile', tabindex: 0, onclick: () => apriModulo('finanze', 'spesa', sp) }, h('span', {}, h('strong', {}, sp.titolo), ' ', etichettaTipo(sp), ' ', etichettaDiChi(sp.di_chi), ' ', etichettaConto(sp.conto), h('span', { class: 'attenuato' }, ` ${fmtEuro2(sp.valore)}`)), h('span', { class: 'attenuato nonspezza' }, d ? fmtData(d) : 'finita'))))) : null,
     h('div', { class: 'azioni' }, h('a', { class: 'btn piccolo', href: '#/a/finanze/spesa' }, 'Tutte le spese in tabella')));
 }
 const fmtEuro2 = n => (n == null || isNaN(n) ? '' : Number(n).toLocaleString('it-IT', { style: 'currency', currency: 'EUR', minimumFractionDigits: Number.isInteger(+n) ? 0 : 2, maximumFractionDigits: 2 }));

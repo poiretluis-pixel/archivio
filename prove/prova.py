@@ -534,6 +534,7 @@ async def main():
         await A.click("tr:has-text('Rata di prova') button:has-text('Pagata')")
         controlla(await A.locator("tr:has-text('Rata di prova') :text('pagata')").count() == 1 and await A.evaluate("S.A.voci.find(v => v.titolo === 'Rata di prova').pagati") == await A.evaluate("oggi().slice(0, 7)"), "segnata pagata a mano")
         controlla(await A.locator("tr.riga-occasionale:has-text('Regalo di prova') .e-viola:text('occasionale')").count() == 1 and await A.locator("tr.riga-ricorrente:has-text('Rata di prova') .e-verde").count() == 1 and await A.locator(".tabella-spese").count() == 1, "ricorrenti e occasionali nello stesso elenco, distinte")
+        controlla(await A.locator("tr:has-text('Rata di prova') .col-conto .conto-spesa.e-giallo:text('BPM famiglia')").count() == 1 and await A.locator("tr:has-text('Internet di prova') .col-conto .conto-spesa.e-blu:text('BPM personale')").count() == 1, "conto BPM famiglia e personale distinti da etichette di colore diverso")
         await A.click("button.filtro-tipo:has-text('Occasionali')")
         controlla(await A.locator(".tabella-spese tbody tr").count() == 1 and await A.locator("tr:has-text('Regalo di prova')").count() == 1, "filtro spese occasionali")
         await A.click("button.filtro-tipo:has-text('Tutti')")
@@ -633,6 +634,8 @@ async def main():
             await B.wait_for_timeout(300)
             await scatta(B, n)
             controlla(await B.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0, f"nessuno scorrimento orizzontale sul telefono in {r}")
+            if r == "#/spese":
+                controlla(await B.locator("tr:has-text('Rata di prova') .solo-telefono .conto-spesa.e-giallo").is_visible() and not await B.locator("th.col-conto").is_visible(), "sul telefono il conto è sotto il nome della spesa")
 
         # --- scheda ricaricata dal browser: resta sbloccata finché non scadono i minuti di inattività
         await A.goto(URL + "#/")

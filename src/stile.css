@@ -319,3 +319,5 @@ a.sito-link:hover strong{color:var(--marca)}
 .tabella-spese tr.riga-occasionale td:first-child{box-shadow:inset 3px 0 0 var(--e-viola-t)}
 .tabella-spese tbody td:first-child{padding-left:.6rem}
 .separa-filtri{margin-left:.8rem}
+.tabella-spese .solo-telefono{display:none;margin-top:.25rem}
+@media (max-width:820px){.tabella-spese .solo-telefono{display:block}.tabella-spese .col-conto{display:none}}
