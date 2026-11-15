@@ -28,7 +28,7 @@ function riassuntiAree() {
     finanze: voci('finanze').length ? [(ind => (ind ? dato('Indice finanziario', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceFinanze()), voci('finanze', 'saldo').length ? dato('Disponibilità finanziaria', fmtEuro(totaleFinanze(voci('finanze', 'saldo')))) : null, voci('patrimonio').length ? dato('Patrimonio netto', fmtEuro(patrimonioNetto())) : null] : null,
     organizzazione: voci('organizzazione').length ? [dato('Obiettivi attivi', voci('organizzazione', 'obiettivo').filter(o => o.stato === 'attivo' || !o.stato).length), dato('Task personali aperti', voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta' && taskPersonale(x)).length)] : null,
     sport: voci('sport').length ? [dato('Sedute nelle ultime 4 settimane', [...voci('sport', 'allenamento'), ...voci('sport', 'attivita')].filter(v => giorniDa(v.data) < 28).length)] : null,
-    mindfulness: voci('mindfulness').length ? [dato('Giorni di pratica negli ultimi 30', new Set(voci('mindfulness', 'pratica').filter(v => giorniDa(v.data) < 30).map(v => v.data)).size)] : null,
+    mindfulness: (g => (g.size ? [dato('Giorni di pratica negli ultimi 30', [...g.keys()].filter(d => giorniDa(d) < 30).length, `di fila: ${serieMeditazione(g).attuale}`)] : null))(giorniMeditazione()),
     lettura: voci('lettura').length ? [dato('Libri letti quest\'anno', voci('lettura', 'libro').filter(v => v.stato === 'letto' && (v.fine || '').startsWith(oggi().slice(0, 4))).length, (l => (l.length ? 'In lettura: ' + l.map(v => v.titolo).join(', ') : ''))(voci('lettura', 'libro').filter(v => v.stato === 'in lettura')))] : null,
     patrimonio: voci('patrimonio').length || voci('finanze', 'saldo').length ? [dato('Patrimonio netto', fmtEuro(patrimonioNetto()), 'beni e disponibilità meno debiti')] : null,
     viaggi: viaggi.length ? [dato('Viaggi registrati', viaggi.length, prossimo ? `Prossimo: ${prossimo.titolo}, ${fmtData(prossimo.data)}` : '')] : null,
@@ -231,7 +231,7 @@ function cruscottoSalute() {
       h('p', { class: 'attenuato piccolo' }, 'Sono i parametri il cui ultimo valore è fuori dall\'intervallo indicato dal laboratorio. È un aiuto alla lettura: il significato clinico lo stabilisce il medico.')] : h('p', {}, 'Tutti gli ultimi valori sono nell\'intervallo di riferimento.')) : pannello('Esami di laboratorio', vuoto('Nessun esame inserito. Puoi inserire i valori a mano, importare un file dati, oppure caricare intanto il PDF in Documenti.', btn('Aggiungi un valore', () => apriModulo('salute', 'misura'), 'primario'))),
     pannello('Osservazioni e piano', oss.length ? h('ul', { class: 'elenco' }, oss.map(o => h('li', { class: 'cliccabile', tabindex: 0, onclick: () => apriModulo('salute', 'osservazione', o) }, h('div', { class: 'tra' }, h('strong', {}, o.titolo), h('span', { class: 'attenuato' }, [o.priorita ? 'priorità ' + o.priorita : '', fmtData(o.data)].filter(Boolean).join(', '))), h('div', { class: 'elenco-nota testo-lungo' }, o.testo || ''), o.origine ? h('div', { class: 'attenuato piccolo' }, 'Scritta da: ' + o.origine) : null))) : h('p', { class: 'attenuato' }, 'Nessuna osservazione aperta.'), h('div', { class: 'azioni' }, btn('Aggiungi osservazione', () => apriModulo('salute', 'osservazione', null, { stato: 'aperta' }), 'piccolo'))),
     mis.length ? pannello('Tutti i parametri per categoria', CAT_ESAMI.filter(k => perCat.has(k)).map(k => { const gl = perCat.get(k), nf = gl.filter(l => fuoriIntervallo(l[l.length - 1])).length; return h('details', { open: nf > 0 }, h('summary', {}, k, h('span', { class: 'attenuato' }, ` ${gl.length} parametri` + (nf ? `, ${nf} fuori intervallo` : ''))), h('div', { class: 'scorri' }, h('table', { class: 'cliccabile' }, testaTab(), h('tbody', {}, gl.sort((a, b) => a[0].parametro.localeCompare(b[0].parametro)).map(rigaParametro))))); })) : null,
-    pannelloSerie('Dati del dispositivo', voci('salute', 'sensore'), 'Nessun dato del dispositivo. Arrivano da soli ogni notte una volta attivato lo scaricamento Garmin (Impostazioni). In alternativa puoi importare un CSV.', btn('Importa CSV', () => apriImportaCsv('salute', 'sensore'))),
+    pannelloSerie('Dati del dispositivo', voci('salute', 'sensore').filter(v => !META_MEDITAZIONE.test(v.metrica || '')), 'Nessun dato del dispositivo. Arrivano da soli ogni notte una volta attivato lo scaricamento Garmin (Impostazioni). In alternativa puoi importare un CSV.', btn('Importa CSV', () => apriImportaCsv('salute', 'sensore'))),
     pannelloSerie('Peso e misure', voci('salute', 'corpo'), 'Nessuna misura del corpo registrata.', btn('Aggiungi misura', () => apriModulo('salute', 'corpo'), 'primario')),
     visite.length ? pannello('Visite e referti', tabella('salute', 'visita', visite, { limite: 6, filtro: false })) : null,
     voci('salute', 'alimentazione').length ? pannello('Alimentazione', tabella('salute', 'alimentazione', voci('salute', 'alimentazione'), { filtro: false })) : null,
@@ -288,17 +288,99 @@ function cruscottoSport() {
   ];
 }
 
-/* --- Mindfulness: costanza della pratica e stress misurato dal Garmin --- */
+/* --- Mindfulness: costanza della pratica (Garmin e pratiche registrate a mano) e stress misurato dal Garmin --- */
+const META_MEDITAZIONE = /^Meditazione /;
+/* Giorni di pratica: data → { minuti, sessioni, fonti }. Garmin e pratiche a mano dello stesso giorno si sommano. */
+function giorniMeditazione() {
+  const m = new Map(), giorno = d => { if (!m.has(d)) m.set(d, { minuti: 0, sessioni: 0, fonti: new Set() }); return m.get(d); };
+  for (const v of voci('salute', 'sensore')) if (META_MEDITAZIONE.test(v.metrica || '') && typeof v.valore === 'number') {
+    const g = giorno(v.data); g.fonti.add('Garmin');
+    if (v.metrica === 'Meditazione (minuti)') g.minuti += v.valore; else g.sessioni += v.valore;
+  }
+  for (const v of voci('mindfulness', 'pratica')) { const g = giorno(v.data); g.fonti.add('a mano'); g.minuti += Number(v.minuti) || 0; g.sessioni += 1; }
+  return m;
+}
+function serieMeditazione(giorni) {
+  let attuale = 0, d = oggi();
+  if (!giorni.has(d)) d = piuGiorni(d, -1);
+  while (giorni.has(d)) { attuale++; d = piuGiorni(d, -1); }
+  let record = 0, corsa = 0, prec = null;
+  for (const x of [...giorni.keys()].sort()) { corsa = prec && piuGiorni(prec, 1) === x ? corsa + 1 : 1; record = Math.max(record, corsa); prec = x; }
+  return { attuale, record };
+}
+const FRASI_MINDFULNESS = [
+  'Cinque minuti fatti valgono più di trenta rimandati.',
+  'Non serve una giornata calma per meditare: serve meditare per affrontare la giornata.',
+  'La costanza batte l\'intensità. Anche oggi, anche poco.',
+  'Chiudi la porta dello studio: il mondo sa aspettare dieci minuti.',
+  'Allena la mente come alleni i clienti, con regolarità e senza saltare le sedute.',
+  'Ogni respiro contato è una ripetizione per l\'attenzione.',
+  'Prima la meditazione, poi le mail: le mail non scappano.',
+  'Il giorno in cui non hai tempo è quello in cui ti serve di più.',
+  'Non devi svuotare la mente, solo accorgerti di dove va e riportarla qui.',
+  'Una catena si costruisce un anello alla volta. Oggi è l\'anello che conta.',
+  'Distrarsi e tornare al respiro non è un errore: è l\'esercizio.',
+  'Calma non vuol dire lento: vuol dire lucido.',
+  'Chi guida un centro ha bisogno di un posto dove nessuno lo cerca. Dieci minuti, ogni giorno.',
+  'Saltare un giorno capita. Due di fila no.',
+];
+function fraseMindfulness(giorni, serie) {
+  const o = oggi(), base = FRASI_MINDFULNESS[Math.floor(tempo(o) / MS_G) % FRASI_MINDFULNESS.length];
+  if (giorni.has(o)) return { titolo: serie.attuale > 1 ? `Fatto anche oggi: ${serie.attuale} giorni di fila.` : 'Fatto anche oggi.', testo: serie.attuale >= serie.record && serie.record > 2 ? 'Sei al tuo record. ' + base : base };
+  if (serie.attuale > 0) return { titolo: `Hai ${serie.attuale} ${serie.attuale === 1 ? 'giorno' : 'giorni'} di fila: non spezzare la catena.`, testo: base };
+  if (giorni.has(piuGiorni(o, -2)) || !giorni.size) return { titolo: 'Oggi è il giorno buono per ripartire.', testo: base };
+  return { titolo: 'Ricominciare conta più che non smettere mai.', testo: 'Saltare un giorno capita. Due di fila no. Bastano cinque minuti, adesso.' };
+}
+/* Griglia delle ultime settimane: righe da lunedì a domenica, colonne le settimane, colore secondo i minuti. */
+function grigliaMeditazione(giorni, settimane = 13) {
+  const o = oggi(), inizio = piuGiorni(lunedi(o), -7 * (settimane - 1)), mesi = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
+  const livello = m => (m <= 0 ? 1 : m < 6 ? 1 : m < 10 ? 2 : m < 16 ? 3 : 4);
+  const colonne = [];
+  for (let c = 0; c < settimane; c++) {
+    const lun = piuGiorni(inizio, 7 * c), nuovoMese = c === 0 || lun.slice(5, 7) !== piuGiorni(lun, -7).slice(5, 7);
+    const celle = [];
+    for (let r = 0; r < 7; r++) {
+      const d = piuGiorni(lun, r), g = giorni.get(d);
+      const testo = `${fmtData(d)}: ` + (g ? (g.minuti ? `${fmtNum(g.minuti, 0)} minuti` : 'pratica registrata') + (g.fonti.size ? `, ${[...g.fonti].join(' e ')}` : '') : 'nessuna pratica');
+      celle.push(d > o ? h('span', { class: 'med-cella futuro' }) : h('span', { class: 'med-cella' + (g ? ' l' + livello(g.minuti) : '') + (d === o ? ' oggi' : ''), title: testo, 'aria-label': testo }));
+    }
+    colonne.push(h('div', { class: 'med-col' }, h('span', { class: 'med-mese' }, nuovoMese ? mesi[Number(lun.slice(5, 7)) - 1] : ''), celle));
+  }
+  return h('div', { class: 'med-griglia-box' },
+    h('div', { class: 'med-griglia' }, h('div', { class: 'med-col med-giorni', 'aria-hidden': 'true' }, h('span', { class: 'med-mese' }, ''), ['L', '', 'M', '', 'V', '', 'D'].map(x => h('span', { class: 'med-g' }, x))), colonne),
+    h('div', { class: 'med-legenda attenuato piccolo' }, 'Nessuna', h('span', { class: 'med-cella' }), h('span', { class: 'med-cella l1' }), h('span', { class: 'med-cella l2' }), h('span', { class: 'med-cella l3' }), h('span', { class: 'med-cella l4' }), '15 minuti e più'));
+}
 function cruscottoMindfulness() {
-  const pr = voci('mindfulness', 'pratica').sort(perData), stress = mediaRecente('Stress medio', 14), stressPrima = (() => { const l = serieMetrica('Stress medio', 'sensore').filter(v => giorniDa(v.data) >= 14 && giorniDa(v.data) < 42); return l.length >= 7 ? somma(l.map(v => v.valore)) / l.length : null; })();
-  if (!pr.length && !stress) return pannello('', vuoto('Cartella vuota. Registra ogni pratica, anche di 5 minuti: conta la costanza, non la durata. Lo stress misurato dal Garmin compare qui da solo.', btn('Aggiungi una pratica', () => apriModulo('mindfulness', 'pratica', null, { data: oggi() }), 'primario')));
-  const giorni30 = new Set(pr.filter(v => giorniDa(v.data) < 30).map(v => v.data)).size;
-  let serie = 0; { let d = oggi(); const giorni = new Set(pr.map(v => v.data)); if (!giorni.has(d)) d = isoData(...((x) => [x.getUTCFullYear(), x.getUTCMonth() + 1, x.getUTCDate()])(new Date(tempo(d) - MS_G))); while (giorni.has(d)) { serie++; d = isoData(...((x) => [x.getUTCFullYear(), x.getUTCMonth() + 1, x.getUTCDate()])(new Date(tempo(d) - MS_G))); } }
+  const pr = voci('mindfulness', 'pratica').sort(perData), giorni = giorniMeditazione(), stress = mediaRecente('Stress medio', 14), stressPrima = (() => { const l = serieMetrica('Stress medio', 'sensore').filter(v => giorniDa(v.data) >= 14 && giorniDa(v.data) < 42); return l.length >= 7 ? somma(l.map(v => v.valore)) / l.length : null; })();
+  const aggiungi = btn('Aggiungi una pratica a mano', () => apriModulo('mindfulness', 'pratica', null, { data: oggi(), pratica: 'Meditazione' }), 'piccolo');
+  if (!giorni.size && !stress) return pannello('', vuoto('Cartella vuota. Avvia la meditazione dall\'app Mindfulness del Garmin: le sessioni arrivano qui da sole ogni notte. Puoi anche registrare una pratica a mano. Conta la costanza, non la durata.', btn('Aggiungi una pratica', () => apriModulo('mindfulness', 'pratica', null, { data: oggi(), pratica: 'Meditazione' }), 'primario')));
+  const serie = serieMeditazione(giorni), frase = fraseMindfulness(giorni, serie);
+  const ult30 = [...giorni].filter(([d]) => giorniDa(d) < 30), min30 = somma(ult30.map(([, g]) => g.minuti)), conMin = ult30.filter(([, g]) => g.minuti > 0);
+  const primo = giorni.size ? [...giorni.keys()].sort()[0] : null;
+  /* Minuti per settimana, ultime 12 */
+  const sett = []; for (let i = 11; i >= 0; i--) sett.push(piuGiorni(lunedi(oggi()), -7 * i));
+  const minSett = sett.map(l => somma([0, 1, 2, 3, 4, 5, 6].map(i => (giorni.get(piuGiorni(l, i)) || {}).minuti || 0)));
+  const giorniSett = sett.map(l => [0, 1, 2, 3, 4, 5, 6].filter(i => giorni.has(piuGiorni(l, i))).length);
+  /* Stress nei giorni con e senza meditazione, ultimi 60 giorni */
+  const st60 = serieMetrica('Stress medio', 'sensore').filter(v => giorniDa(v.data) < 60), con = st60.filter(v => giorni.has(v.data)), senza = st60.filter(v => !giorni.has(v.data));
+  const media = l => somma(l.map(v => v.valore)) / l.length;
   return [
-    h('div', { class: 'dati' }, dato('Giorni di pratica negli ultimi 30', giorni30), dato('Giorni consecutivi', serie), pr.length ? dato('Minuti negli ultimi 30 giorni', fmtNum(somma(pr.filter(v => giorniDa(v.data) < 30).map(v => v.minuti)), 0)) : null,
+    h('blockquote', { class: 'med-frase' }, h('strong', {}, frase.titolo), h('p', {}, frase.testo)),
+    h('div', { class: 'dati' },
+      dato('Giorni di pratica negli ultimi 30', ult30.length, `su 30, ${Math.round(ult30.length / 30 * 100)}%`),
+      dato('Giorni consecutivi', serie.attuale, serie.record ? `record ${serie.record}` : ''),
+      dato('Minuti negli ultimi 30 giorni', fmtNum(min30, 0), conMin.length ? `in media ${fmtNum(min30 / conMin.length, 0)} a seduta` : ''),
       stress ? dato('Stress medio Garmin, 14 giorni', fmtNum(stress.media, 0), stressPrima ? `prima ${fmtNum(stressPrima, 0)}; più basso è meglio` : 'su 100; più basso è meglio') : null),
+    pannello('Le tue ultime settimane', grigliaMeditazione(giorni),
+      h('p', { class: 'attenuato piccolo' }, primo ? `Ogni quadrato è un giorno, più scuro quando hai meditato più a lungo. Dati dal ${fmtData(primo)}: contano le sessioni avviate dall'app Mindfulness del Garmin e le pratiche registrate a mano.` : 'Ogni quadrato è un giorno.'),
+      h('div', { class: 'azioni' }, aggiungi)),
+    minSett.some(x => x > 0) ? pannello('Minuti per settimana', grafico('Minuti di meditazione per settimana', w => graficoBarre(w, { categorie: sett.map(l => fmtData(l).replace(/ \d{4}$/, '')), serie: [{ nome: 'Minuti', classe: 'g-barra1', valori: minSett }], alto: 170 })),
+      h('p', { class: 'attenuato piccolo' }, `Ultime 12 settimane. Questa settimana: ${giorniSett[11]} ${giorniSett[11] === 1 ? 'giorno' : 'giorni'} di pratica, ${fmtNum(minSett[11], 0)} minuti.`)) : null,
+    con.length >= 3 && senza.length >= 3 ? pannello('Stress nei giorni in cui mediti',
+      h('div', { class: 'dati' }, dato('Giorni con meditazione', fmtNum(media(con), 0), `stress medio, ${con.length} giorni`), dato('Giorni senza', fmtNum(media(senza), 0), `stress medio, ${senza.length} giorni`)),
+      h('p', { class: 'attenuato piccolo' }, 'Ultimi 60 giorni, stress medio della giornata misurato dal Garmin (più basso è meglio). È un confronto tra giorni, non una prova di causa ed effetto: conta come cambia quando i giorni con meditazione diventano la maggioranza.')) : null,
     pannelloSerie('Stress misurato', voci('salute', 'sensore').filter(v => v.metrica === 'Stress medio' || v.metrica === 'Body Battery massima'), 'Lo stress arriva dal Garmin una volta attivato lo scaricamento.'),
-    pr.length ? pannello('Ultime pratiche', tabella('mindfulness', 'pratica', pr, { limite: 10, filtro: false })) : null,
+    pr.length ? pannello('Pratiche registrate a mano', tabella('mindfulness', 'pratica', pr, { limite: 10, filtro: false })) : null,
   ];
 }
 
