@@ -5,12 +5,12 @@ Questo repository è **pubblico**: mai dati personali, nemmeno nelle prove o nei
 Il programma deriva da ArchivioGhessa di Lorenzo Ghessa: le migliorie generali si possono proporre anche a lui, ma qui si lavora solo su questa copia.
 
 ## Lavorare qui
-- Sorgenti in `src/` (numerati, uniti in quest'ordine). `python3 costruisci.py` rigenera `index.html`: committare sempre sorgenti e `index.html` insieme.
+- Sorgenti in `src/` (numerati, uniti in quest'ordine). `python3 costruisci.py` rigenera `index.html` e `versione.txt` (impronta dei sorgenti): committare sempre sorgenti, `index.html` e `versione.txt` insieme. Dal 19/11/2026 la pagina aperta confronta la sua impronta con `versione.txt` (all'avvio, quando torna in primo piano e ogni 30 minuti) e, se è cambiata, salva e si ricarica da sola restando sbloccata, ma mai con una finestra aperta o mentre si scrive in un campo.
 - Prima di ogni push: `python3 prove/prova.py /tmp/schermate` deve finire con "TUTTO OK". Guardare le schermate dopo modifiche grafiche (anche a larghezza telefono). Aggiungere un controllo alla prova per ogni funzione nuova.
 - GitHub Pages pubblica da `main`, radice, all'indirizzo https://poiretluis-pixel.github.io/archivio/: ogni push è online in 1-2 minuti.
 
 ## Regole
-- Nessuna libreria esterna, nessuna chiamata di rete oltre a `api.github.com`. Unica eccezione, voluta da Luis il 19/10/2026: il calendario Google TASK (`src/08g-google.js` e `google.html`), con accesso da `accounts.google.com` e chiamate solo a `www.googleapis.com/calendar`.
+- Nessuna libreria esterna, nessuna chiamata di rete oltre a `api.github.com` (e al file `versione.txt` dello stesso indirizzo della pagina). Unica eccezione, voluta da Luis il 19/10/2026: il calendario Google TASK (`src/08g-google.js` e `google.html`), con accesso da `accounts.google.com` e chiamate solo a `www.googleapis.com/calendar`.
 - Il testo dei dati va inserito nella pagina sempre come testo (funzioni `h` e `s`), mai come HTML.
 - Non cambiare il significato dei campi esistenti. Un cambiamento incompatibile del formato richiede `archivio-vita/2` e la conversione automatica della versione 1.
 - La forma di `archivio.json` (funzione `serializza`) deve restare identica a quella di `strumenti/archivio.py` nel repository dei dati.

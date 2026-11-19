@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Unisce i sorgenti in un solo index.html senza dipendenze esterne."""
-import pathlib, datetime, urllib.parse
+import pathlib, datetime, urllib.parse, hashlib
 qui = pathlib.Path(__file__).parent
 js = "\n".join(p.read_text(encoding="utf-8") for p in sorted((qui / "src").glob("*.js")))
 css = (qui / "src" / "stile.css").read_text(encoding="utf-8")
 icona = "data:image/svg+xml," + urllib.parse.quote((qui / "icone" / "logo.svg").read_text(encoding="utf-8").strip(), safe=" =:/'")
+# La versione è l'impronta dei sorgenti: la pagina la confronta con versione.txt e, se online ce n'è una nuova, si ricarica da sola.
+versione = hashlib.sha256((js + css + icona).encode("utf-8")).hexdigest()[:12]
+js = f"const VERSIONE_PAGINA = '{versione}';\n" + js
 html = f"""<!doctype html>
 <html lang="it">
 <head>
@@ -31,4 +34,5 @@ html = f"""<!doctype html>
 </html>
 """
 (qui / "index.html").write_text(html, encoding="utf-8")
-print("index.html:", len(html.encode()) // 1024, "kB")
+(qui / "versione.txt").write_text(versione + "\n", encoding="utf-8")
+print("index.html:", len(html.encode()) // 1024, "kB, versione", versione)

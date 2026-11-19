@@ -703,6 +703,23 @@ async def main():
         controlla(await A.evaluate("S.A.voci.some(v=>v.titolo==='Tokyo')"), "frase dimenticata: ricollegato senza perdere dati")
         await A.goto(URL + "#/impostazioni")
         await scatta(A, "20-impostazioni")
+
+        # --- versione nuova della pagina: si ricarica da sola, la sessione resta aperta, mai con una finestra aperta
+        v_file = (RADICE / "versione.txt").read_text().strip()
+        controlla(await A.evaluate("VERSIONE_PAGINA") == v_file, "versione.txt corrisponde alla pagina costruita")
+        await A.evaluate("controllaVersione()")
+        await A.wait_for_timeout(300)
+        controlla(await A.evaluate("_nuovaVersione") is False, "stessa versione: nessuna ricarica")
+        await A.route("**/versione.txt", lambda r: r.fulfill(status=200, body="0123456789ab\n"))
+        await A.evaluate("window._segno = 1; apriModale('Prova', h('p', {}, 'finestra aperta'))")
+        await A.evaluate("controllaVersione()")
+        await A.wait_for_timeout(500)
+        controlla(await A.evaluate("window._segno === 1 && _nuovaVersione === true"), "versione nuova con una finestra aperta: aspetta")
+        async with A.expect_navigation():
+            await A.evaluate("chiudiModale(); applicaVersione()")
+        await A.wait_for_selector("#vista")
+        controlla(await A.evaluate("window._segno === undefined && S.sbloccato === true"), "versione nuova: pagina ricaricata e ancora sbloccata")
+        await A.unroute("**/versione.txt")
         await b.close()
 
     controlla(not errori_console, f"nessun errore nella console {errori_console}")

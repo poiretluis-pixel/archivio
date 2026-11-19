@@ -101,6 +101,31 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) { ricordaSessione(true); salvaSubito().catch(() => {}); }
   else if (!controllaBlocco() && ghPronto()) programmaSync();
 });
+/* Versione nuova della pagina: confronta la propria impronta con versione.txt (stesso indirizzo della pagina).
+   Se online ce n'è una diversa, salva e si ricarica da sola; la sessione sbloccata resta aperta.
+   Mai con una finestra aperta o mentre si scrive in un campo: aspetta che si finisca. */
+let _nuovaVersione = false;
+async function controllaVersione() {
+  if (_nuovaVersione || !/^https?:$/.test(location.protocol) || typeof VERSIONE_PAGINA === 'undefined') return;
+  try {
+    const r = await fetch('versione.txt', { cache: 'no-store' });
+    if (!r.ok) return;
+    const v = (await r.text()).trim();
+    if (/^[0-9a-f]{12}$/.test(v) && v !== VERSIONE_PAGINA) _nuovaVersione = true;
+  } catch (e) { return; /* senza connessione si riprova più tardi */ }
+  applicaVersione();
+}
+async function applicaVersione() {
+  if (!_nuovaVersione || $('#modale')) return;
+  const a = document.activeElement;
+  if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !a.closest('.blocco')) return;
+  if (S.sbloccato) { try { await salvaSubito(); } catch (e) { /* le modifiche restano in coda sul dispositivo */ } ricordaSessione(true); }
+  location.reload();
+}
+setTimeout(controllaVersione, 3000);
+setInterval(controllaVersione, 30 * 60000);
+setInterval(applicaVersione, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) controllaVersione(); });
 window.addEventListener('pagehide', () => { if (S.sbloccato) ricordaSessione(true); });
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 if (!window.isSecureContext || !crypto.subtle) document.getElementById('app').textContent = 'Questa pagina va aperta da un indirizzo https (o da localhost): senza, il browser non permette la cifratura.';
