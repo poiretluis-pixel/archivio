@@ -273,7 +273,7 @@ function cruscottoOrganizzazione() {
 /* --- Sport: attività e sedute da scheda --- */
 function cruscottoSport() {
   const at = voci('sport', 'attivita').sort(perData), al = voci('sport', 'allenamento');
-  if (!at.length && !al.length && !voci('sport', 'massimale').length) return pannello('', vuoto('Cartella vuota. Registra le attività (palestra, corsa, padel…) oppure manda a Claude le schede di allenamento: le sedute le ricava lui.', btn('Aggiungi un\'attività', () => apriModulo('sport', 'attivita', null, { data: oggi() }), 'primario')));
+  if (!at.length && !al.length && !voci('sport', 'massimale').length) return pannello('', vuoto('Cartella vuota. Le attività registrate con il Garmin (corsa, nuoto, mobilità…) arrivano qui da sole ogni notte; puoi anche registrarle a mano oppure mandare a Claude le schede di allenamento: le sedute le ricava lui.', btn('Aggiungi un\'attività', () => apriModulo('sport', 'attivita', null, { data: oggi() }), 'primario')));
   const tutte = [...at, ...al].sort(perData);
   const sett = []; if (tutte.length) { let l = lunedi(tutte[0].data); const fine = lunedi(oggi()); while (l <= fine) { sett.push(l); l = isoData(...((d) => [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()])(new Date(tempo(l) + 7 * MS_G))); } }
   const ultime = sett.slice(-12);
@@ -283,7 +283,8 @@ function cruscottoSport() {
     h('div', { class: 'dati' }, dato('Sedute nelle ultime 4 settimane', tutte.filter(v => giorniDa(v.data) < 28).length, 'obiettivo: almeno 3 a settimana'), at.length ? dato('Minuti nelle ultime 4 settimane', fmtNum(somma(at.filter(v => giorniDa(v.data) < 28).map(v => v.minuti)), 0)) : null),
     ultime.length > 1 ? pannello('Sedute per settimana', grafico('Sedute per settimana', w => graficoBarre(w, { categorie: ultime.map(s => fmtData(s).replace(/ \d{4}$/, '')), serie, alto: 160 }))) : null,
     perDisc.length ? pannello('Attività negli ultimi 90 giorni', barreOrizzontali(perDisc, v => fmtNum(v, 0))) : null,
-    at.length ? pannello('Ultime attività', tabella('sport', 'attivita', at, { limite: 8, filtro: false })) : null,
+    at.length ? pannello('Ultime attività', tabella('sport', 'attivita', at, { limite: 8, filtro: false }),
+      at.some(v => v.auto) ? h('p', { class: 'attenuato piccolo' }, 'Le attività registrate con il Garmin arrivano da sole ogni notte e si correggono nell\'app Garmin Connect; quelle aggiunte a mano si modificano qui.') : null) : null,
     pannelloAllenamenti(),
   ];
 }

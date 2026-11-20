@@ -10,7 +10,7 @@
 <title>Life Planning</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2231%22 fill=%22%2326321f%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2227%22 fill=%22none%22 stroke=%22%23c9a54e%22 stroke-width=%221.6%22/%3E%3Cpath d=%22M22 18v28h12M28.5 46V22h7.5a6.8 6.8 0 0 1 0 13.6h-7.5%22 fill=%22none%22 stroke=%22%23c9a54e%22 stroke-width=%224.2%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3Ccircle cx=%2241.5%22 cy=%2246%22 r=%222.6%22 fill=%22%23c9a54e%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="icone/apple-touch-icon.png">
-<!-- Versione costruita il 2026-11-19. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
+<!-- Versione costruita il 2026-11-20. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
 <style>
 :root{
   --fondo:#ece6d9; --carta:#fbf9f4; --inchiostro:#2a2620; --inchiostro2:#5a5348; --tenue:#7d7466; --linea:#ddd5c6; --linea2:#ebe5d8;
@@ -360,7 +360,7 @@ a.sito-link:hover strong{color:var(--marca)}
 <div id="app"></div>
 <noscript>Questa pagina ha bisogno di JavaScript per decifrare i dati.</noscript>
 <script>
-const VERSIONE_PAGINA = 'b6ebe1e085d0';
+const VERSIONE_PAGINA = '865a7a6f58f7';
 'use strict';
 /* ===== 1. Utilità di base ===== */
 const $ = (s, r = document) => r.querySelector(s);
@@ -724,14 +724,19 @@ const personaPredefinita = () => S.persona || (persone()[0] || {}).id || '';
 function voci(area, tipo, tutti = false) {
   const filtro = v => !v.canc && v.area === area && (!tipo || v.tipo === tipo) && (tutti || !S.persona || !v.persona || v.persona === S.persona);
   const l = S.A.voci.filter(filtro);
-  return area === 'salute' && S.estVoci.length ? l.concat(S.estVoci.filter(filtro)) : l;
+  return (area === 'salute' || area === 'sport') && S.estVoci.length ? l.concat(S.estVoci.filter(filtro)) : l;
 }
-/* Righe dei file garmin/*.csv trasformate in voci di sola lettura. */
+/* Righe dei file garmin/*.csv trasformate in voci di sola lettura: dati del dispositivo in Salute, attività sportive in Sport. */
 function ricostruisciEsterni() {
   const titolare = (S.A.persone.find(p => !p.canc && p.ruolo === 'titolare') || S.A.persone.find(p => !p.canc) || {}).id || '';
   const out = [];
   for (const righe of Object.values((S.est && S.est.file) || {})) for (const [data, tipo, metrica, valore, unita] of righe) {
     out.push({ id: 'g-' + data + '-' + nomeFile(metrica), area: 'salute', tipo: tipo === 'corpo' ? 'corpo' : 'sensore', persona: titolare, data, metrica, valore, unita, fonte: 'Garmin', auto: true, creato: data });
+  }
+  for (const righe of Object.values((S.est && S.est.attivita) || {})) for (const a of righe) {
+    const nota = ['Da Garmin', a.ora ? 'ore ' + a.ora : '', a.fc_media ? `frequenza cardiaca media ${a.fc_media} bpm` : '', a.calorie ? `${a.calorie} kcal` : ''].filter(Boolean).join(', ');
+    out.push({ id: 'ga-' + (a.id || a.data + '-' + (a.ora || '').replace(':', '') + '-' + nomeFile(a.disciplina)), area: 'sport', tipo: 'attivita', persona: titolare, data: a.data, ora: a.ora, disciplina: a.disciplina,
+      minuti: a.minuti, distanza: a.distanza, calorie: a.calorie, fc_media: a.fc_media, nota, fonte: 'Garmin', auto: true, creato: a.data });
   }
   S.estVoci = out;
 }
@@ -994,17 +999,27 @@ function leggiCsvGarmin(testo) {
   const [id, it, im, iv, iu] = ['data', 'tipo', 'metrica', 'valore', 'unita'].map(i);
   return righe.map(r => [r[id], it >= 0 ? r[it] : 'sensore', r[im], Number(r[iv]), iu >= 0 ? r[iu] : '']).filter(r => /^\d{4}-\d{2}-\d{2}$/.test(r[0]) && r[2] && isFinite(r[3]));
 }
+/* Attività sportive Garmin (garmin/attivita-AAAA.csv): data;ora;disciplina;minuti;distanza;calorie;fc_media;id. */
+function leggiCsvAttivita(testo) {
+  const { intestazioni, righe } = leggiCsv(testo);
+  const n = x => (x === undefined || x === '' ? null : (isFinite(Number(x)) ? Number(x) : null));
+  return righe.map(r => { const o = {}; intestazioni.forEach((k, i) => { o[k] = r[i]; }); return o; })
+    .filter(o => /^\d{4}-\d{2}-\d{2}$/.test(o.data || '') && o.disciplina)
+    .map(o => ({ data: o.data, ora: o.ora || '', disciplina: o.disciplina, minuti: n(o.minuti), distanza: n(o.distanza), calorie: n(o.calorie), fc_media: n(o.fc_media), id: o.id || '' }));
+}
 async function leggiEsterni(g) {
   const E = S.est; let cambiato = false;
-  E.file = E.file || {}; E.sha = E.sha || {}; E.rapporti = E.rapporti || {};
+  E.file = E.file || {}; E.sha = E.sha || {}; E.rapporti = E.rapporti || {}; E.attivita = E.attivita || {};
   const garmin = await elencoCartella(g, 'garmin');
   const visti = new Set();
   for (const f of garmin.filter(x => /\.csv$/i.test(x.name))) {
     visti.add(f.name);
-    if (E.sha[f.name] === f.sha && E.file[f.name]) continue;
-    E.file[f.name] = leggiCsvGarmin(await ghLeggiTesto(g, 'garmin/' + f.name)); E.sha[f.name] = f.sha; cambiato = true;
+    const sport = /^attivita-/i.test(f.name), dove = sport ? E.attivita : E.file;
+    if (E.sha[f.name] === f.sha && dove[f.name]) continue;
+    const testo = await ghLeggiTesto(g, 'garmin/' + f.name);
+    dove[f.name] = sport ? leggiCsvAttivita(testo) : leggiCsvGarmin(testo); E.sha[f.name] = f.sha; cambiato = true;
   }
-  for (const n of Object.keys(E.file)) if (!visti.has(n)) { delete E.file[n]; delete E.sha[n]; cambiato = true; }
+  for (const d of [E.file, E.attivita]) for (const n of Object.keys(d)) if (!visti.has(n)) { delete d[n]; delete E.sha[n]; cambiato = true; }
   const st = garmin.find(x => x.name === 'stato.json');
   if (st && st.sha !== E.statoSha) {
     try { E.stato = JSON.parse(await ghLeggiTesto(g, 'garmin/stato.json')); } catch (e) { E.stato = { esito: 'errore', messaggio: 'garmin/stato.json non leggibile' }; }
@@ -1146,7 +1161,7 @@ const AREE_BASE = [
       c('stato', 'Stato', 'scelta', { opzioni: ['aperta', 'in corso', 'chiusa'] }), c('origine', 'Scritta da')] },
   } },
   { id: 'sport', nome: 'Sport', tipi: {
-    attivita: { nome: 'Attività sportiva', plur: 'Attività sportive', titolo: v => v.disciplina, colonne: ['data', 'disciplina', 'minuti', 'intensita'], campi: [
+    attivita: { nome: 'Attività sportiva', plur: 'Attività sportive', titolo: v => v.disciplina, colonne: ['data', 'disciplina', 'minuti', 'distanza', 'intensita'], campi: [
       c('data', 'Data', 'data', { obbl: true }), c('disciplina', 'Disciplina', 'testo', { obbl: true, suggerisci: true, esempi: ['Palestra', 'Corsa', 'Camminata', 'Padel', 'Pilates', 'Nuoto', 'Bici'] }),
       c('minuti', 'Durata in minuti', 'numero'), c('intensita', 'Intensità', 'scelta', { opzioni: ['leggera', 'moderata', 'intensa'] }), c('distanza', 'Distanza in km', 'numero'), c('nota', 'Nota', 'lungo')] },
     allenamento: { nome: 'Seduta di allenamento', plur: 'Sedute da scheda', titolo: v => v.seduta || v.scheda, colonne: ['data', 'scheda', 'seduta', 'serie', 'stimato'], campi: [
@@ -1971,7 +1986,7 @@ function cruscottoOrganizzazione() {
 /* --- Sport: attività e sedute da scheda --- */
 function cruscottoSport() {
   const at = voci('sport', 'attivita').sort(perData), al = voci('sport', 'allenamento');
-  if (!at.length && !al.length && !voci('sport', 'massimale').length) return pannello('', vuoto('Cartella vuota. Registra le attività (palestra, corsa, padel…) oppure manda a Claude le schede di allenamento: le sedute le ricava lui.', btn('Aggiungi un\'attività', () => apriModulo('sport', 'attivita', null, { data: oggi() }), 'primario')));
+  if (!at.length && !al.length && !voci('sport', 'massimale').length) return pannello('', vuoto('Cartella vuota. Le attività registrate con il Garmin (corsa, nuoto, mobilità…) arrivano qui da sole ogni notte; puoi anche registrarle a mano oppure mandare a Claude le schede di allenamento: le sedute le ricava lui.', btn('Aggiungi un\'attività', () => apriModulo('sport', 'attivita', null, { data: oggi() }), 'primario')));
   const tutte = [...at, ...al].sort(perData);
   const sett = []; if (tutte.length) { let l = lunedi(tutte[0].data); const fine = lunedi(oggi()); while (l <= fine) { sett.push(l); l = isoData(...((d) => [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()])(new Date(tempo(l) + 7 * MS_G))); } }
   const ultime = sett.slice(-12);
@@ -1981,7 +1996,8 @@ function cruscottoSport() {
     h('div', { class: 'dati' }, dato('Sedute nelle ultime 4 settimane', tutte.filter(v => giorniDa(v.data) < 28).length, 'obiettivo: almeno 3 a settimana'), at.length ? dato('Minuti nelle ultime 4 settimane', fmtNum(somma(at.filter(v => giorniDa(v.data) < 28).map(v => v.minuti)), 0)) : null),
     ultime.length > 1 ? pannello('Sedute per settimana', grafico('Sedute per settimana', w => graficoBarre(w, { categorie: ultime.map(s => fmtData(s).replace(/ \d{4}$/, '')), serie, alto: 160 }))) : null,
     perDisc.length ? pannello('Attività negli ultimi 90 giorni', barreOrizzontali(perDisc, v => fmtNum(v, 0))) : null,
-    at.length ? pannello('Ultime attività', tabella('sport', 'attivita', at, { limite: 8, filtro: false })) : null,
+    at.length ? pannello('Ultime attività', tabella('sport', 'attivita', at, { limite: 8, filtro: false }),
+      at.some(v => v.auto) ? h('p', { class: 'attenuato piccolo' }, 'Le attività registrate con il Garmin arrivano da sole ogni notte e si correggono nell\'app Garmin Connect; quelle aggiunte a mano si modificano qui.') : null) : null,
     pannelloAllenamenti(),
   ];
 }

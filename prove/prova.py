@@ -138,6 +138,9 @@ def repo_iniziale():
         "documenti/d-1.pdf": b"%PDF-1.4 finto referto",
         f"garmin/{oggi.year}.csv": ("\n".join(righe) + "\n").encode(),
         "garmin/stato.json": json.dumps(stato).encode(),
+        f"garmin/attivita-{oggi.year}.csv": ("data;ora;disciplina;minuti;distanza;calorie;fc_media;id\n"
+                                             f"{(oggi - dt.timedelta(days=1)).isoformat()};07:10;Corsa;46;7.42;512;148;9001\n"
+                                             f"{(oggi - dt.timedelta(days=4)).isoformat()};18:00;Nuoto in acque libere;35;1.6;300;;9002\n").encode(),
         "rapporti/2026-09.md": "# Rapporto di settembre 2026\n\nIn breve: **tutto stabile**.\n\n## Cosa fare\n\n- Ripetere LDL\n- Camminare\n\n| Metrica | Valore |\n|---|---|\n| Passi | 8.500 |\n".encode(),
     }
 
@@ -234,7 +237,7 @@ async def main():
         await A.wait_for_function("S.sync.stato === 'ok'")
         N0 = len(json.loads(repo["archivio.json"])["voci"])
         controlla(await A.evaluate("S.A.voci.length") == N0, "archivio scaricato dal repository")
-        controlla(await A.evaluate("S.estVoci.length") == 47, "dati Garmin letti dal repository (47 righe)")
+        controlla(await A.evaluate("S.estVoci.length") == 49, "dati Garmin letti dal repository (47 righe e 2 attività)")
         ind = await A.evaluate("(i => i && {v: i.valore, k: Object.keys(i.componenti)})(indiceSalute())")
         controlla(ind and 0 < ind["v"] <= 100 and sorted(ind["k"]) == ["attivita", "corpo", "esami", "recupero", "sonno"], f"indice di salute con cinque componenti {ind}")
         controlla(await A.locator(".scheda:has-text('Indice di salute')").count() == 1 and await A.locator("section:has(h2:has-text('Consigli principali')) li").count() == 2, "quadro generale: indice e consigli principali")
@@ -289,6 +292,10 @@ async def main():
         sez = A.locator("section:has(h2:has-text('Sedute da scheda'))")
         controlla(await sez.locator(".grafico svg").count() == 1 and await sez.locator("td:has-text('Scheda prova')").count() == 1 and await sez.locator("td:has-text('140')").count() == 1 and await sez.locator("td:has-text('sì')").count() == 1, "sport: grafico, sedute e massimali")
         controlla(await A.locator("section:has(h2:has-text('Ultime attività')) td:has-text('Padel')").count() == 1, "sport: attività registrate")
+        ua = A.locator("section:has(h2:has-text('Ultime attività'))")
+        controlla(await ua.locator("td:has-text('Corsa')").count() == 1 and await ua.locator("td:has-text('Nuoto in acque libere')").count() == 1 and await ua.locator("td:has-text('7,42')").count() == 1, "sport: attività ricevute da Garmin")
+        await ua.locator("tr:has(td:has-text('Corsa'))").click()
+        controlla(await A.locator("#modale").count() == 0 and await A.locator(".avviso:has-text('Garmin Connect')").count() >= 1, "sport: un'attività Garmin non si modifica dalla pagina")
         for area_, testo, nome in [("organizzazione", "Riserva di 6 mesi", "06-organizzazione"), ("mindfulness", "Meditazione", "07-mindfulness"), ("lettura", "Libro di prova", "08-lettura")]:
             await A.goto(URL + "#/a/" + area_)
             await A.wait_for_timeout(300)

@@ -127,17 +127,27 @@ function leggiCsvGarmin(testo) {
   const [id, it, im, iv, iu] = ['data', 'tipo', 'metrica', 'valore', 'unita'].map(i);
   return righe.map(r => [r[id], it >= 0 ? r[it] : 'sensore', r[im], Number(r[iv]), iu >= 0 ? r[iu] : '']).filter(r => /^\d{4}-\d{2}-\d{2}$/.test(r[0]) && r[2] && isFinite(r[3]));
 }
+/* Attività sportive Garmin (garmin/attivita-AAAA.csv): data;ora;disciplina;minuti;distanza;calorie;fc_media;id. */
+function leggiCsvAttivita(testo) {
+  const { intestazioni, righe } = leggiCsv(testo);
+  const n = x => (x === undefined || x === '' ? null : (isFinite(Number(x)) ? Number(x) : null));
+  return righe.map(r => { const o = {}; intestazioni.forEach((k, i) => { o[k] = r[i]; }); return o; })
+    .filter(o => /^\d{4}-\d{2}-\d{2}$/.test(o.data || '') && o.disciplina)
+    .map(o => ({ data: o.data, ora: o.ora || '', disciplina: o.disciplina, minuti: n(o.minuti), distanza: n(o.distanza), calorie: n(o.calorie), fc_media: n(o.fc_media), id: o.id || '' }));
+}
 async function leggiEsterni(g) {
   const E = S.est; let cambiato = false;
-  E.file = E.file || {}; E.sha = E.sha || {}; E.rapporti = E.rapporti || {};
+  E.file = E.file || {}; E.sha = E.sha || {}; E.rapporti = E.rapporti || {}; E.attivita = E.attivita || {};
   const garmin = await elencoCartella(g, 'garmin');
   const visti = new Set();
   for (const f of garmin.filter(x => /\.csv$/i.test(x.name))) {
     visti.add(f.name);
-    if (E.sha[f.name] === f.sha && E.file[f.name]) continue;
-    E.file[f.name] = leggiCsvGarmin(await ghLeggiTesto(g, 'garmin/' + f.name)); E.sha[f.name] = f.sha; cambiato = true;
+    const sport = /^attivita-/i.test(f.name), dove = sport ? E.attivita : E.file;
+    if (E.sha[f.name] === f.sha && dove[f.name]) continue;
+    const testo = await ghLeggiTesto(g, 'garmin/' + f.name);
+    dove[f.name] = sport ? leggiCsvAttivita(testo) : leggiCsvGarmin(testo); E.sha[f.name] = f.sha; cambiato = true;
   }
-  for (const n of Object.keys(E.file)) if (!visti.has(n)) { delete E.file[n]; delete E.sha[n]; cambiato = true; }
+  for (const d of [E.file, E.attivita]) for (const n of Object.keys(d)) if (!visti.has(n)) { delete d[n]; delete E.sha[n]; cambiato = true; }
   const st = garmin.find(x => x.name === 'stato.json');
   if (st && st.sha !== E.statoSha) {
     try { E.stato = JSON.parse(await ghLeggiTesto(g, 'garmin/stato.json')); } catch (e) { E.stato = { esito: 'errore', messaggio: 'garmin/stato.json non leggibile' }; }

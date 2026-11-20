@@ -154,14 +154,19 @@ const personaPredefinita = () => S.persona || (persone()[0] || {}).id || '';
 function voci(area, tipo, tutti = false) {
   const filtro = v => !v.canc && v.area === area && (!tipo || v.tipo === tipo) && (tutti || !S.persona || !v.persona || v.persona === S.persona);
   const l = S.A.voci.filter(filtro);
-  return area === 'salute' && S.estVoci.length ? l.concat(S.estVoci.filter(filtro)) : l;
+  return (area === 'salute' || area === 'sport') && S.estVoci.length ? l.concat(S.estVoci.filter(filtro)) : l;
 }
-/* Righe dei file garmin/*.csv trasformate in voci di sola lettura. */
+/* Righe dei file garmin/*.csv trasformate in voci di sola lettura: dati del dispositivo in Salute, attività sportive in Sport. */
 function ricostruisciEsterni() {
   const titolare = (S.A.persone.find(p => !p.canc && p.ruolo === 'titolare') || S.A.persone.find(p => !p.canc) || {}).id || '';
   const out = [];
   for (const righe of Object.values((S.est && S.est.file) || {})) for (const [data, tipo, metrica, valore, unita] of righe) {
     out.push({ id: 'g-' + data + '-' + nomeFile(metrica), area: 'salute', tipo: tipo === 'corpo' ? 'corpo' : 'sensore', persona: titolare, data, metrica, valore, unita, fonte: 'Garmin', auto: true, creato: data });
+  }
+  for (const righe of Object.values((S.est && S.est.attivita) || {})) for (const a of righe) {
+    const nota = ['Da Garmin', a.ora ? 'ore ' + a.ora : '', a.fc_media ? `frequenza cardiaca media ${a.fc_media} bpm` : '', a.calorie ? `${a.calorie} kcal` : ''].filter(Boolean).join(', ');
+    out.push({ id: 'ga-' + (a.id || a.data + '-' + (a.ora || '').replace(':', '') + '-' + nomeFile(a.disciplina)), area: 'sport', tipo: 'attivita', persona: titolare, data: a.data, ora: a.ora, disciplina: a.disciplina,
+      minuti: a.minuti, distanza: a.distanza, calorie: a.calorie, fc_media: a.fc_media, nota, fonte: 'Garmin', auto: true, creato: a.data });
   }
   S.estVoci = out;
 }

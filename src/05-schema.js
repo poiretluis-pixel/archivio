@@ -122,7 +122,7 @@ const AREE_BASE = [
       c('stato', 'Stato', 'scelta', { opzioni: ['aperta', 'in corso', 'chiusa'] }), c('origine', 'Scritta da')] },
   } },
   { id: 'sport', nome: 'Sport', tipi: {
-    attivita: { nome: 'Attività sportiva', plur: 'Attività sportive', titolo: v => v.disciplina, colonne: ['data', 'disciplina', 'minuti', 'intensita'], campi: [
+    attivita: { nome: 'Attività sportiva', plur: 'Attività sportive', titolo: v => v.disciplina, colonne: ['data', 'disciplina', 'minuti', 'distanza', 'intensita'], campi: [
       c('data', 'Data', 'data', { obbl: true }), c('disciplina', 'Disciplina', 'testo', { obbl: true, suggerisci: true, esempi: ['Palestra', 'Corsa', 'Camminata', 'Padel', 'Pilates', 'Nuoto', 'Bici'] }),
       c('minuti', 'Durata in minuti', 'numero'), c('intensita', 'Intensità', 'scelta', { opzioni: ['leggera', 'moderata', 'intensa'] }), c('distanza', 'Distanza in km', 'numero'), c('nota', 'Nota', 'lungo')] },
     allenamento: { nome: 'Seduta di allenamento', plur: 'Sedute da scheda', titolo: v => v.seduta || v.scheda, colonne: ['data', 'scheda', 'seduta', 'serie', 'stimato'], campi: [
