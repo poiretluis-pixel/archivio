@@ -242,7 +242,7 @@ function vistaSceltaAmbito() {
     h('h1', {}, 'Cosa vuoi aprire?'),
     h('div', { class: 'ambito-griglia' },
       scheda('lavoro', 'Task, gestione mail, personal trainer, siti e gestionali', contaLavoro()),
-      scheda('privata', 'Quadro generale, task personali, spese e finanze, salute, passioni', quantiOggi('personale') + speseDaPagareOggi())),
+      scheda('privata', 'Quadro generale, task personali, spese e finanze, salute, sport, mindfulness', quantiOggi('personale') + speseDaPagareOggi())),
     h('p', { class: 'sotto' }, 'Puoi cambiare in ogni momento dalle linguette in alto. Rapporti, scadenze, documenti e impostazioni sono in entrambi.'));
 }
 /* Il menu ha tre sezioni riconoscibili: Lavoro (blu scuro), Personale (verde) e Archivio (grigio). Ogni voce porta il colore della sua sezione. */
@@ -251,7 +251,7 @@ function menu(rotta) {
   const attiva = r => r === 'spese' ? rotta[0] === 'spese' || rt === 'a/finanze/spesa'
     : r === 'finanze' ? sezFin === ''
     : r.startsWith('fin:') ? sezFin === r.slice(4)
-    : rt.startsWith(r) || (r === 'passioni' && rotta[0] === 'a' && PASSIONI.includes(rotta[1])) || (r === 'pt' && rotta[0] === 'a' && rotta[1] === 'pt');
+    : rt.startsWith(r) || (r === 'pt' && rotta[0] === 'a' && rotta[1] === 'pt');
   const finAperta = sezFin != null || (rotta[0] === 'a' && ['finanze', ...DENTRO_FINANZE].includes(rotta[1]) && rt !== 'a/finanze/spesa');
   let sez = '';
   const v = (href, testo, chiave, n, sotto) => h('a', { href, class: [sez ? 'm-' + sez : '', sotto ? 'm-sotto' : '', attiva(chiave) ? 'attiva' : ''].filter(Boolean).join(' '), 'aria-current': attiva(chiave) ? 'page' : null }, h('span', { class: 'm-testo' }, testo), n ? h('span', { class: 'conta' }, n) : null);
@@ -272,7 +272,8 @@ function menu(rotta) {
       area('finanze') ? v('#/spese', 'Spese', 'spese', speseDaPagareOggi()) : null,
       area('finanze') ? (el => (finAperta && el.classList.add('aperta'), el))(v('#/a/finanze', 'Finanze', 'finanze')) : null,
       area('finanze') && finAperta ? Object.entries(SEZIONI_FINANZE).filter(([k]) => k).map(([k, nome]) => v('#/a/finanze/' + k, nome, 'fin:' + k, 0, true)) : null,
-      aree().map(a => (a.id === PASSIONI.find(id => area(id)) ? v('#/passioni', 'Passioni', 'passioni') : PASSIONI.includes(a.id) || AREE_LAVORO.includes(a.id) || DENTRO_FINANZE.includes(a.id) || ['organizzazione', 'finanze'].includes(a.id) ? null
+      /* Sport e Mindfulness sono voci proprie (prima Passioni e Progetti); Lettura, Viaggi e Progetti non sono nel menu. */
+      aree().map(a => (FUORI_MENU.includes(a.id) || AREE_LAVORO.includes(a.id) || DENTRO_FINANZE.includes(a.id) || ['organizzazione', 'finanze'].includes(a.id) ? null
         : v('#/a/' + a.id, a.nome, 'a/' + a.id)))] : null,
     gruppo('Archivio', 'archivio'),
     v('#/rapporti', 'Rapporti', 'rapporti'), v('#/scadenze', 'Scadenze', 'scadenze', scadute), v('#/documenti', 'Documenti', 'documenti', allegati().filter(a => a.stato === 'da elaborare').length), v('#/impostazioni', 'Impostazioni', 'impostazioni'));
@@ -324,7 +325,7 @@ function vistaPer(r) {
   if (r[0] === 'task' || r[0] === 'da-fare') return vistaLavoro('attivita', r[1]);
   if (r[0] === 'mail') return vistaLavoro('mail', r[1]);
   if (r[0] === 'siti') return vistaSiti();
-  if (r[0] === 'passioni') return vistaPassioni();
+  if (r[0] === 'passioni') return vistaArea(area('sport')); /* vecchi collegamenti a Passioni: aprono Sport */
   if (r[0] === 'pt') return vistaPt(r[1]);
   if (r[0] === 'spese') return vistaSpese(r[1]);
   if (r[0] === 'scadenze') return vistaScadenze();

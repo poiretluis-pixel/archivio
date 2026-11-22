@@ -289,13 +289,15 @@ async def main():
         await A.goto(URL + "#/a/sport")
         await A.wait_for_timeout(300)
         await scatta(A, "05-sport")
-        sez = A.locator("section:has(h2:has-text('Sedute da scheda'))")
-        controlla(await sez.locator(".grafico svg").count() == 1 and await sez.locator("td:has-text('Scheda prova')").count() == 1 and await sez.locator("td:has-text('140')").count() == 1 and await sez.locator("td:has-text('sì')").count() == 1, "sport: grafico, sedute e massimali")
-        controlla(await A.locator("section:has(h2:has-text('Ultime attività')) td:has-text('Padel')").count() == 1, "sport: attività registrate")
         ua = A.locator("section:has(h2:has-text('Ultime attività'))")
-        controlla(await ua.locator("td:has-text('Corsa')").count() == 1 and await ua.locator("td:has-text('Nuoto in acque libere')").count() == 1 and await ua.locator("td:has-text('7,42')").count() == 1, "sport: attività ricevute da Garmin")
-        await ua.locator("tr:has(td:has-text('Corsa'))").click()
-        controlla(await A.locator("#modale").count() == 0 and await A.locator(".avviso:has-text('Garmin Connect')").count() >= 1, "sport: un'attività Garmin non si modifica dalla pagina")
+        controlla(await ua.locator(".sp-attivita:has-text('Corsa')").count() >= 1 and await ua.locator(".sp-attivita:has-text('Nuoto in acque libere')").count() == 1 and await ua.locator(".sp-attivita:has-text('7,42 km')").count() == 1, "sport: attività ricevute da Garmin")
+        controlla(await ua.locator(":text('Padel')").count() == 0 and await A.locator("#vista :text('Scheda prova')").count() == 0, "sport: solo le attività del Garmin, niente voci a mano né sedute da scheda")
+        controlla(await A.locator("#vista button").count() == 0, "sport: nessun pulsante per aggiungere")
+        controlla(await A.locator("section:has(h2:has-text('Minuti per settimana')) .grafico svg").count() == 1 and await A.locator("section:has(h2:has-text('ultimi 90 giorni')) .rip-riga").count() >= 2, "sport: grafico dei minuti e ripartizione per disciplina")
+        await A.set_viewport_size({"width": 390, "height": 844})
+        await A.wait_for_timeout(200)
+        await scatta(A, "05b-sport-telefono")
+        await A.set_viewport_size({"width": 1280, "height": 900})
         for area_, testo, nome in [("organizzazione", "Riserva di 6 mesi", "06-organizzazione"), ("mindfulness", "Meditazione", "07-mindfulness"), ("lettura", "Libro di prova", "08-lettura")]:
             await A.goto(URL + "#/a/" + area_)
             await A.wait_for_timeout(300)
@@ -445,24 +447,22 @@ async def main():
         await A.click("li:has-text('Montare la mensola') >> button:has-text('In oggi')")
         controlla(await A.evaluate("S.A.voci.find(v => v.titolo === 'Montare la mensola').lista") == "Oggi", "task personale spostato in Oggi")
         controlla(await A.locator("section:has(h2:has-text('Obiettivi')) :text('Riserva di 6 mesi')").count() == 1 and await A.locator("section:has(h2:has-text('Revisione della settimana'))").count() == 1, "sotto i task restano obiettivi e revisione")
-        # --- Passioni: sport, mindfulness, lettura e viaggi sotto una voce sola; nome Life Planning
-        voci_menu = await A.locator(".menu a").all_inner_texts()
-        controlla("Passioni" in voci_menu and not any(x.startswith(("Sport", "Mindfulness", "Lettura", "Viaggi")) for x in voci_menu), f"una sola voce Passioni nel menu {voci_menu}")
+        # --- Sport e Mindfulness voci proprie (prima Passioni e Progetti); Lettura, Viaggi e Progetti fuori dal menu; nome Life Planning
+        voci_menu = [x.split("\n")[0] for x in await A.locator(".menu a").all_inner_texts()]
+        controlla("Sport" in voci_menu and "Mindfulness" in voci_menu and not any(x in voci_menu for x in ("Passioni", "Progetti", "Lettura", "Viaggi ed esperienze")), f"voci Sport e Mindfulness nel menu, senza Passioni e Progetti {voci_menu}")
         controlla(await A.locator(".barra .marchio").inner_text() == "Life Planning" and await A.title() == "Life Planning", "il gestionale si chiama Life Planning")
         icona = await A.evaluate("document.querySelector('link[rel=icon]').href")
         controlla(icona.startswith("data:image/svg+xml,") and "c9a54e" in icona and await A.evaluate("document.querySelector('link[rel=apple-touch-icon]').getAttribute('href')") == "icone/apple-touch-icon.png", "logo Life Planning come icona")
         controlla(await A.locator(".barra .marchio img.logo").evaluate("i => i.complete && i.naturalWidth > 0"), "logo accanto al nome in alto")
         await A.goto(URL + "#/passioni")
-        await A.wait_for_timeout(300)
-        await scatta(A, "22-passioni")
-        controlla(await A.locator("h1:has-text('Passioni')").count() == 1 and await A.locator(".griglia a.scheda").count() == 4 and await A.locator(".menu a.attiva").inner_text() == "Passioni", "pagina Passioni con le quattro cartelle")
-        controlla(await A.locator("a.scheda[href='#/a/lettura'] :text('Libro di prova')").count() == 1, "scheda Lettura con il libro in lettura")
-        await A.click("a.scheda[href='#/a/sport']")
         await A.wait_for_timeout(200)
-        controlla(await A.locator("h1:has-text('Sport')").count() == 1 and await A.locator(".menu a.attiva").inner_text() == "Passioni" and await A.locator(".briciole a[href='#/passioni']").count() == 1, "Sport si apre da Passioni e il menu resta su Passioni")
+        controlla(await A.locator("h1:has-text('Sport')").count() == 1, "il vecchio indirizzo Passioni apre Sport")
+        await A.goto(URL + "#/a/sport")
+        await A.wait_for_timeout(200)
+        controlla(await A.locator(".menu a.attiva").inner_text() == "Sport", "menu su Sport")
         await A.goto(URL + "#/")
         await A.wait_for_timeout(200)
-        controlla(await A.locator(".griglia a.scheda[href='#/passioni']").count() == 1 and await A.locator(".griglia a.scheda[href='#/a/sport']").count() == 0, "quadro generale con la scheda Passioni")
+        controlla(await A.locator(".griglia a.scheda[href='#/a/sport']").count() == 1 and await A.locator(".griglia a.scheda[href='#/a/mindfulness']").count() == 1 and await A.locator(".griglia a.scheda[href='#/passioni'], .griglia a.scheda[href='#/a/progetti']").count() == 0, "quadro generale con le schede Sport e Mindfulness")
         # --- Tema: chiaro anche con il dispositivo in modalità scura, scuro o automatico a scelta
         await A.emulate_media(color_scheme="dark")
         sfondo = "getComputedStyle(document.body).backgroundColor"
@@ -650,7 +650,7 @@ async def main():
         stato_ = "({n: S.A.voci.filter(v=>!v.canc).length, tokyo: S.A.voci.some(v=>v.titolo==='Tokyo'), press: S.A.voci.some(v=>v.metrica==='Pressione sistolica'), o1: !!voce('o-1')})"
         sa, sb = await A.evaluate(stato_), await B.evaluate(stato_)
         controlla(sa == sb and sa["tokyo"] and sa["press"] and not sa["o1"], f"modifiche contemporanee unite su entrambi i dispositivi {sa}")
-        for r, n in [("#/", "10-telefono-quadro"), ("#/a/salute", "11-telefono-salute"), ("#/a/finanze", "15-telefono-finanze"), ("#/a/organizzazione", "16-telefono-organizzazione"), ("#/task", "18-telefono-task"), ("#/mail", "19-telefono-mail"), ("#/siti", "21-telefono-siti"), ("#/passioni", "23-telefono-passioni"), ("#/pt", "25-telefono-pt"), ("#/spese", "28-telefono-spese"), ("#/a/sport", "17-telefono-sport"), ("#/rapporti", "12-telefono-rapporti"), ("#/documenti", "13-telefono-documenti"), ("#/impostazioni", "14-telefono-impostazioni")]:
+        for r, n in [("#/", "10-telefono-quadro"), ("#/a/salute", "11-telefono-salute"), ("#/a/finanze", "15-telefono-finanze"), ("#/a/organizzazione", "16-telefono-organizzazione"), ("#/task", "18-telefono-task"), ("#/mail", "19-telefono-mail"), ("#/siti", "21-telefono-siti"), ("#/a/mindfulness", "23-telefono-mindfulness"), ("#/pt", "25-telefono-pt"), ("#/spese", "28-telefono-spese"), ("#/a/sport", "17-telefono-sport"), ("#/rapporti", "12-telefono-rapporti"), ("#/documenti", "13-telefono-documenti"), ("#/impostazioni", "14-telefono-impostazioni")]:
             await B.goto(URL + r)
             await B.wait_for_timeout(300)
             await scatta(B, n)

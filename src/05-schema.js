@@ -30,8 +30,10 @@ const SERVIZI_PT = ['Personal', 'Corso posturale', 'Sostituzione corso'];
 const PAGAMENTI_PT = ['contanti', 'carta'];
 /* Cartelle di lavoro: stanno nel menu sotto Lavoro, non tra le cartelle personali. */
 const AREE_LAVORO = ['pt'];
-/* Cartelle raccolte nel menu sotto l'unica voce Passioni. */
-const PASSIONI = ['sport', 'mindfulness', 'lettura', 'viaggi'];
+/* Dal 22/11/2026 la voce Passioni è diventata Sport e la voce Progetti è diventata Mindfulness: due voci proprie nel menu personale.
+   Lettura, Viaggi ed esperienze e Progetti escono dal menu e dal quadro generale; i loro dati restano salvati e raggiungibili da #/a/<cartella>. */
+const PASSIONI = ['sport', 'mindfulness'];
+const FUORI_MENU = ['lettura', 'viaggi', 'progetti'];
 /* Il patrimonio sta dentro Finanze come sezione: niente voce di menu né scheda propria (i dati restano nella cartella patrimonio). */
 const DENTRO_FINANZE = ['patrimonio'];
 /* Sezioni della pagina Finanze, raggiungibili da #/a/finanze/<sezione> e come sottomenu. */

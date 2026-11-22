@@ -27,7 +27,7 @@ function riassuntiAree() {
     salute: mis.length || S.estVoci.length ? [(ind => (ind ? dato('Indice di salute', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceSalute()), mis.length ? dato('Fuori intervallo all\'ultima misura', nFuori, `su ${perPar.length} parametri seguiti`, nFuori ? 'allerta' : '') : null] : null,
     finanze: voci('finanze').length ? [(ind => (ind ? dato('Indice finanziario', `${Math.round(ind.valore)} su 100`, `${fascia(ind.valore).testo}, affidabilità ${ind.affidabilita}`) : null))(indiceFinanze()), voci('finanze', 'saldo').length ? dato('Disponibilità finanziaria', fmtEuro(totaleFinanze(voci('finanze', 'saldo')))) : null, voci('patrimonio').length ? dato('Patrimonio netto', fmtEuro(patrimonioNetto())) : null] : null,
     organizzazione: voci('organizzazione').length ? [dato('Obiettivi attivi', voci('organizzazione', 'obiettivo').filter(o => o.stato === 'attivo' || !o.stato).length), dato('Task personali aperti', voci('organizzazione', 'attivita').filter(x => x.stato !== 'fatta' && taskPersonale(x)).length)] : null,
-    sport: voci('sport').length ? [dato('Sedute nelle ultime 4 settimane', [...voci('sport', 'allenamento'), ...voci('sport', 'attivita')].filter(v => giorniDa(v.data) < 28).length)] : null,
+    sport: (l => (l.length ? [dato('Attività Garmin nelle ultime 4 settimane', l.filter(v => giorniDa(v.data) < 28).length, `${fmtNum(somma(l.filter(v => giorniDa(v.data) < 28).map(v => Number(v.minuti) || 0)), 0)} minuti`)] : null))(attivitaGarmin()),
     mindfulness: (g => (g.size ? [dato('Giorni di pratica negli ultimi 30', [...g.keys()].filter(d => giorniDa(d) < 30).length, `di fila: ${serieMeditazione(g).attuale}`)] : null))(giorniMeditazione()),
     lettura: voci('lettura').length ? [dato('Libri letti quest\'anno', voci('lettura', 'libro').filter(v => v.stato === 'letto' && (v.fine || '').startsWith(oggi().slice(0, 4))).length, (l => (l.length ? 'In lettura: ' + l.map(v => v.titolo).join(', ') : ''))(voci('lettura', 'libro').filter(v => v.stato === 'in lettura')))] : null,
     patrimonio: voci('patrimonio').length || voci('finanze', 'saldo').length ? [dato('Patrimonio netto', fmtEuro(patrimonioNetto()), 'beni e disponibilità meno debiti')] : null,
@@ -58,8 +58,7 @@ function vistaCasa() {
     h('div', { class: 'testa' }, h('div', {}, h('h1', {}, 'Quadro generale'), h('p', { class: 'sotto' }, new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })))),
     pannello('Da fare', daFare.length ? h('ul', { class: 'elenco' }, daFare.map(x => h('li', {}, h('a', { href: x.href }, stato(x.tipo, x.testo)), h('div', { class: 'elenco-nota' }, x.nota)))) : h('p', { class: 'attenuato' }, 'Niente in sospeso.')),
     consigliPrincipali(),
-    h('div', { class: 'griglia' }, aree().filter(a => !PASSIONI.includes(a.id) && !AREE_LAVORO.includes(a.id) && !DENTRO_FINANZE.includes(a.id)).map(a => schedaArea(a, schede)),
-      h('a', { class: 'scheda', href: '#/passioni' }, h('h3', {}, 'Passioni'), h('p', { class: 'attenuato' }, PASSIONI.map(area).filter(Boolean).map(a => a.nome).join(', ')))),
+    h('div', { class: 'griglia' }, aree().filter(a => !FUORI_MENU.includes(a.id) && !AREE_LAVORO.includes(a.id) && !DENTRO_FINANZE.includes(a.id)).map(a => schedaArea(a, schede))),
     pannello('Stato dei caricamenti', h('ul', { class: 'elenco' }, FONTI.map(f => { const st = statoFonte(f); return h('li', {}, h('div', { class: 'tra' }, h('strong', {}, f.nome), stato(st.stato, st.stato === 'ok' ? 'In regola' : st.stato === 'ritardo' ? 'In ritardo' : 'Mai caricati')), h('div', { class: 'elenco-nota' }, st.stato === 'ok' ? st.testo : (st.stato === 'ritardo' ? st.testo + '. ' : '') + f.come)); }))),
     ultimoRapporto(),
     pannello('Ultimi caricamenti', ultimiCaricamenti()));
@@ -143,26 +142,14 @@ function vistaRapporti(scelto) {
 const schedaArea = (a, schede) => h('a', { class: 'scheda', href: '#/a/' + a.id }, h('h3', {}, a.nome),
   schede[a.id] || (a.libera && voci(a.id).length ? dato('Voci', voci(a.id).length) : h('p', { class: 'attenuato' }, 'Ancora vuota.')));
 
-/* Passioni: sport, mindfulness, lettura, viaggi ed esperienze in una pagina sola. */
-function vistaPassioni() {
-  const schede = riassuntiAree(), pp = PASSIONI.map(area).filter(Boolean);
-  return h('div', {},
-    h('div', { class: 'testa' }, h('div', {}, h('h1', {}, 'Passioni'), h('p', { class: 'sotto' }, 'Il tempo per te: sport, mindfulness, lettura, viaggi ed esperienze.'))),
-    h('div', { class: 'griglia' }, pp.map(a => schedaArea(a, schede))),
-    pp.map(a => pannello(a.nome, h('div', { class: 'sezioni' }, Object.entries(a.tipi).filter(([k]) => k !== 'consiglio').map(([k, d]) => h('div', { class: 'sezione' },
-      h('a', { href: `#/a/${a.id}/${k}` }, d.plur), h('span', { class: 'attenuato' }, ` ${voci(a.id, k).length}`), btn('Aggiungi', () => apriModulo(a.id, k), 'piccolo')))),
-      h('div', { class: 'azioni' }, h('a', { class: 'btn piccolo', href: '#/a/' + a.id }, 'Apri ' + a.nome.toLowerCase())))));
-}
-
 function vistaArea(a, scheda) {
   const cr = { salute: cruscottoSalute, organizzazione: cruscottoOrganizzazione, sport: cruscottoSport, mindfulness: cruscottoMindfulness, lettura: cruscottoLettura, viaggi: cruscottoViaggi, progetti: cruscottoProgetti }[a.id] || cruscottoLibero;
   return h('div', {},
-    PASSIONI.includes(a.id) ? h('p', { class: 'briciole' }, h('a', { href: '#/passioni' }, '← Passioni')) : null,
     a.id === 'organizzazione' ? vistaLavoro('personale', scheda) : h('div', { class: 'testa' }, h('h1', {}, a.nome)),
     a.id === 'salute' ? pannelloIndice() : null,
-    pannelloConsigli(a.id),
+    a.id === 'sport' ? null : pannelloConsigli(a.id),
     cr(a),
-    a.id === 'progetti' ? null : pannello('Sezioni di questa cartella', h('div', { class: 'sezioni' }, Object.entries(a.tipi).map(([k, d]) => h('div', { class: 'sezione' },
+    a.id === 'progetti' || PASSIONI.includes(a.id) ? null : pannello('Sezioni di questa cartella', h('div', { class: 'sezioni' }, Object.entries(a.tipi).map(([k, d]) => h('div', { class: 'sezione' },
       h('a', { href: `#/a/${a.id}/${k}` }, d.plur), h('span', { class: 'attenuato' }, ` ${voci(a.id, k).length}`), btn('Aggiungi', () => apriModulo(a.id, k), 'piccolo'))))));
 }
 
@@ -270,22 +257,37 @@ function cruscottoOrganizzazione() {
   ];
 }
 
-/* --- Sport: attività e sedute da scheda --- */
+/* --- Sport: solo le attività registrate con il Garmin, in sola lettura (dal 22/11/2026 niente inserimenti a mano qui) --- */
+const attivitaGarmin = () => voci('sport', 'attivita').filter(v => v.auto).sort(perData);
+const ICONE_SPORT = [[/cors|run|trail/i, '🏃'], [/nuot|swim/i, '🏊'], [/bici|cicl|bike|ride/i, '🚴'], [/cammin|walk|escurs|hik/i, '🚶'], [/forza|palestra|strength|pesi/i, '🏋️'], [/yoga|pilates|mobilit|stretch/i, '🧘'], [/padel|tennis/i, '🎾']];
+const iconaSport = d => (ICONE_SPORT.find(([r]) => r.test(d || '')) || [0, '⌚'])[1];
 function cruscottoSport() {
-  const at = voci('sport', 'attivita').sort(perData), al = voci('sport', 'allenamento');
-  if (!at.length && !al.length && !voci('sport', 'massimale').length) return pannello('', vuoto('Cartella vuota. Le attività registrate con il Garmin (corsa, nuoto, mobilità…) arrivano qui da sole ogni notte; puoi anche registrarle a mano oppure mandare a Claude le schede di allenamento: le sedute le ricava lui.', btn('Aggiungi un\'attività', () => apriModulo('sport', 'attivita', null, { data: oggi() }), 'primario')));
-  const tutte = [...at, ...al].sort(perData);
-  const sett = []; if (tutte.length) { let l = lunedi(tutte[0].data); const fine = lunedi(oggi()); while (l <= fine) { sett.push(l); l = isoData(...((d) => [d.getUTCFullYear(), d.getUTCMonth() + 1, d.getUTCDate()])(new Date(tempo(l) + 7 * MS_G))); } }
-  const ultime = sett.slice(-12);
-  const serie = [{ nome: 'Sedute', classe: 'g-barra1', valori: ultime.map(s => tutte.filter(v => lunedi(v.data) === s).length) }];
-  const perDisc = [...raggruppa(at.filter(v => giorniDa(v.data) < 90), v => v.disciplina)].map(([nome, l]) => ({ nome, valore: l.length })).sort((a, b) => b.valore - a.valore);
+  const at = attivitaGarmin();
+  if (!at.length) return pannello('', vuoto('Nessuna attività ancora. Le attività registrate con il Garmin arrivano qui da sole ogni notte da Garmin Connect. Se non arrivano, guarda lo stato del Garmin in Impostazioni.'));
+  const num = x => Number(x) || 0, ult28 = at.filter(v => giorniDa(v.data) < 28), prec28 = at.filter(v => giorniDa(v.data) >= 28 && giorniDa(v.data) < 56);
+  const min28 = somma(ult28.map(v => num(v.minuti))), km28 = somma(ult28.map(v => num(v.distanza))), kcal28 = somma(ult28.map(v => num(v.calorie)));
+  const confronto = (a, b, u) => (b ? `${a >= b ? '+' : '−'}${fmtNum(Math.abs(a - b), 0)} ${u} rispetto alle 4 precedenti` : '');
+  /* Minuti per settimana, ultime 12 */
+  const sett = []; for (let i = 11; i >= 0; i--) sett.push(piuGiorni(lunedi(oggi()), -7 * i));
+  const minSett = sett.map(l => somma(at.filter(v => lunedi(v.data) === l).map(v => num(v.minuti))));
+  const perDisc = [...raggruppa(at.filter(v => giorniDa(v.data) < 90), v => v.disciplina || 'Altro')].map(([nome, l]) => ({ nome: iconaSport(nome) + ' ' + nome, valore: l.length })).sort((a, b) => b.valore - a.valore);
+  const ultima = at[at.length - 1];
+  const scheda = v => h('li', { class: 'sp-attivita' },
+    h('span', { class: 'sp-icona', 'aria-hidden': 'true' }, iconaSport(v.disciplina)),
+    h('div', { class: 'sp-testo' }, h('strong', {}, v.disciplina || 'Attività'), h('div', { class: 'attenuato piccolo' }, [fmtData(v.data), v.ora ? 'ore ' + v.ora : ''].filter(Boolean).join(', '))),
+    h('div', { class: 'sp-numeri' }, [v.minuti ? `${fmtNum(num(v.minuti), 0)} min` : '', v.distanza ? `${fmtNum(num(v.distanza), 2)} km` : '', v.fc_media ? `${fmtNum(num(v.fc_media), 0)} bpm` : '', v.calorie ? `${fmtNum(num(v.calorie), 0)} kcal` : ''].filter(Boolean).map(x => h('span', {}, x))));
   return [
-    h('div', { class: 'dati' }, dato('Sedute nelle ultime 4 settimane', tutte.filter(v => giorniDa(v.data) < 28).length, 'obiettivo: almeno 3 a settimana'), at.length ? dato('Minuti nelle ultime 4 settimane', fmtNum(somma(at.filter(v => giorniDa(v.data) < 28).map(v => v.minuti)), 0)) : null),
-    ultime.length > 1 ? pannello('Sedute per settimana', grafico('Sedute per settimana', w => graficoBarre(w, { categorie: ultime.map(s => fmtData(s).replace(/ \d{4}$/, '')), serie, alto: 160 }))) : null,
-    perDisc.length ? pannello('Attività negli ultimi 90 giorni', barreOrizzontali(perDisc, v => fmtNum(v, 0))) : null,
-    at.length ? pannello('Ultime attività', tabella('sport', 'attivita', at, { limite: 8, filtro: false }),
-      at.some(v => v.auto) ? h('p', { class: 'attenuato piccolo' }, 'Le attività registrate con il Garmin arrivano da sole ogni notte e si correggono nell\'app Garmin Connect; quelle aggiunte a mano si modificano qui.') : null) : null,
-    pannelloAllenamenti(),
+    h('p', { class: 'sotto sp-intro' }, `Le attività registrate con il Garmin, aggiornate ogni notte. Ultima: ${ultima.disciplina || 'attività'}, ${fmtData(ultima.data)}.`),
+    h('div', { class: 'dati' },
+      dato('Attività, ultime 4 settimane', ult28.length, confronto(ult28.length, prec28.length, 'attività')),
+      dato('Minuti, ultime 4 settimane', fmtNum(min28, 0), confronto(min28, somma(prec28.map(v => num(v.minuti))), 'min')),
+      km28 ? dato('Chilometri, ultime 4 settimane', fmtNum(km28, 1)) : null,
+      kcal28 ? dato('Calorie, ultime 4 settimane', fmtNum(kcal28, 0)) : null),
+    pannello('Minuti per settimana', grafico('Minuti di attività per settimana', w => graficoBarre(w, { categorie: sett.map(l => fmtData(l).replace(/ \d{4}$/, '')), serie: [{ nome: 'Minuti', classe: 'g-barra1', valori: minSett }], alto: 170 })),
+      h('p', { class: 'attenuato piccolo' }, `Ultime 12 settimane. Questa settimana: ${fmtNum(minSett[11], 0)} minuti.`)),
+    perDisc.length ? pannello('Cosa hai fatto negli ultimi 90 giorni', barreOrizzontali(perDisc, v => fmtNum(v, 0))) : null,
+    pannello('Ultime attività', h('ul', { class: 'sp-elenco' }, [...at].reverse().slice(0, 10).map(scheda)),
+      h('p', { class: 'attenuato piccolo' }, 'Si correggono nell\'app Garmin Connect.')),
   ];
 }
 

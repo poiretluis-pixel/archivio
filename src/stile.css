@@ -340,3 +340,12 @@ a.sito-link:hover strong{color:var(--marca)}
 .med-cella.l4{background:var(--marca);border-color:transparent}
 .med-legenda{display:flex;align-items:center;gap:4px;margin-top:.5rem}
 .med-legenda .med-cella{width:12px;height:12px;border-radius:3px}
+/* Sport: elenco delle attività Garmin, una riga per attività */
+.sp-elenco{list-style:none;margin:0;padding:0}
+.sp-attivita{display:flex;align-items:center;gap:.8rem;padding:.65rem 0;border-bottom:1px solid var(--linea2)}
+.sp-attivita:last-child{border-bottom:0}
+.sp-icona{flex:none;width:2.4rem;height:2.4rem;border-radius:50%;background:var(--marca-tenue);display:grid;place-items:center;font-size:1.25rem}
+.sp-testo{flex:1;min-width:0}
+.sp-numeri{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:.25rem .9rem;font-variant-numeric:tabular-nums;color:var(--inchiostro2);font-size:.92rem}
+@media (max-width:560px){.sp-attivita{flex-wrap:wrap}.sp-numeri{width:100%;justify-content:flex-start;padding-left:3.2rem}}
+.sp-intro{margin:.25rem 0 1rem}
