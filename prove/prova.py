@@ -128,7 +128,7 @@ def repo_iniziale():
     for i in range(10):
         d = (oggi - dt.timedelta(days=9 - i)).isoformat()
         righe += [f"{d};sensore;Frequenza cardiaca a riposo;{52 + i % 3};bpm", f"{d};sensore;Passi;{8000 + 100 * i};passi", f"{d};sensore;Punteggio del sonno;{75 + i};", f"{d};sensore;Stress medio;{30 + i};"]
-    for i in (3, 7, 8):  # sessioni di meditazione dal Garmin: con la pratica a mano di oggi fanno 3 giorni di fila
+    for i in (3, 7, 8, 9):  # sessioni di meditazione dal Garmin: 3 giorni di fila fino a oggi; la pratica a mano non conta
         d = (oggi - dt.timedelta(days=9 - i)).isoformat()
         righe += [f"{d};mindfulness;Meditazione (minuti);{6 + i};min", f"{d};mindfulness;Meditazione (sessioni);1;"]
     righe.append(f"{oggi.isoformat()};corpo;Peso;78.4;kg")
@@ -140,7 +140,9 @@ def repo_iniziale():
         "garmin/stato.json": json.dumps(stato).encode(),
         f"garmin/attivita-{oggi.year}.csv": ("data;ora;disciplina;minuti;distanza;calorie;fc_media;id\n"
                                              f"{(oggi - dt.timedelta(days=1)).isoformat()};07:10;Corsa;46;7.42;512;148;9001\n"
-                                             f"{(oggi - dt.timedelta(days=4)).isoformat()};18:00;Nuoto in acque libere;35;1.6;300;;9002\n").encode(),
+                                             f"{(oggi - dt.timedelta(days=4)).isoformat()};18:00;Nuoto in acque libere;35;1.6;300;;9002\n"
+                                             f"{(oggi - dt.timedelta(days=2)).isoformat()};12:00;Camminata;30;2.1;120;95;9003\n"
+                                             f"{(oggi - dt.timedelta(days=3)).isoformat()};09:00;Cronometro;10;;;;9004\n").encode(),
         "rapporti/2026-09.md": "# Rapporto di settembre 2026\n\nIn breve: **tutto stabile**.\n\n## Cosa fare\n\n- Ripetere LDL\n- Camminare\n\n| Metrica | Valore |\n|---|---|\n| Passi | 8.500 |\n".encode(),
     }
 
@@ -237,7 +239,7 @@ async def main():
         await A.wait_for_function("S.sync.stato === 'ok'")
         N0 = len(json.loads(repo["archivio.json"])["voci"])
         controlla(await A.evaluate("S.A.voci.length") == N0, "archivio scaricato dal repository")
-        controlla(await A.evaluate("S.estVoci.length") == 49, "dati Garmin letti dal repository (47 righe e 2 attività)")
+        controlla(await A.evaluate("S.estVoci.length") == 53, "dati Garmin letti dal repository (49 righe e 4 attività)")
         ind = await A.evaluate("(i => i && {v: i.valore, k: Object.keys(i.componenti)})(indiceSalute())")
         controlla(ind and 0 < ind["v"] <= 100 and sorted(ind["k"]) == ["attivita", "corpo", "esami", "recupero", "sonno"], f"indice di salute con cinque componenti {ind}")
         controlla(await A.locator(".scheda:has-text('Indice di salute')").count() == 1 and await A.locator("section:has(h2:has-text('Consigli principali')) li").count() == 2, "quadro generale: indice e consigli principali")
@@ -293,6 +295,7 @@ async def main():
         controlla(await ua.locator(".sp-attivita:has-text('Corsa')").count() >= 1 and await ua.locator(".sp-attivita:has-text('Nuoto in acque libere')").count() == 1 and await ua.locator(".sp-attivita:has-text('7,42 km')").count() == 1, "sport: attività ricevute da Garmin")
         controlla(await ua.locator(":text('Padel')").count() == 0 and await A.locator("#vista :text('Scheda prova')").count() == 0, "sport: solo le attività del Garmin, niente voci a mano né sedute da scheda")
         controlla(await A.locator("#vista button").count() == 0, "sport: nessun pulsante per aggiungere")
+        controlla(await A.locator("#vista :text('Camminata')").count() == 0 and await A.locator("#vista :text('Cronometro')").count() == 0, "sport: camminata, cronometro, mobilità e cardio non si mostrano")
         controlla(await A.locator("section:has(h2:has-text('Minuti per settimana')) .grafico svg").count() == 1 and await A.locator("section:has(h2:has-text('ultimi 90 giorni')) .rip-riga").count() >= 2, "sport: grafico dei minuti e ripartizione per disciplina")
         await A.set_viewport_size({"width": 390, "height": 844})
         await A.wait_for_timeout(200)
@@ -305,11 +308,14 @@ async def main():
             controlla(await A.locator(f"#vista :text('{testo}')").count() >= 1 and await A.locator("#vista .errore").count() == 0, f"cartella {area_} mostrata")
         await A.goto(URL + "#/a/mindfulness")
         await A.wait_for_timeout(200)
-        controlla(await A.locator("#vista .dato:has-text('Stress medio Garmin')").count() == 1, "mindfulness: stress dal Garmin")
-        controlla(await A.locator("#vista .med-frase").count() == 1 and await A.locator("#vista .med-frase:has-text('3 giorni di fila')").count() == 1, "mindfulness: frase del giorno con la serie (Garmin e pratica a mano)")
+        controlla(await A.locator("#vista .dato:has-text('Stress medio, 14 giorni')").count() == 1, "mindfulness: stress dal Garmin")
+        controlla(await A.locator("#vista .med-frase").count() == 1 and await A.locator("#vista .med-frase:has-text('3 giorni di fila')").count() == 1, "mindfulness: frase del giorno con la serie")
+        controlla(await A.locator("#vista .med-num").inner_text() == "3" and await A.locator("#vista .med-testa.fatto").count() == 1, "mindfulness: serie in evidenza e fatto oggi")
+        controlla(await A.locator("#vista .med-sett .med-giorno").count() == 7 and await A.locator("#vista .med-giorno.e-oggi.fatto").count() == 1, "mindfulness: settimana in corso con oggi fatto")
+        controlla(await A.locator("#vista button").count() == 0 and await A.locator("#vista :text('a mano')").count() == 0 and await A.locator("#vista :text('Umore')").count() == 0, "mindfulness: niente inserimento a mano")
         controlla(await A.locator("#vista .med-cella.oggi.l3").count() == 1 and await A.locator("#vista .med-griglia .med-cella[class*=' l']").count() == 4, "mindfulness: griglia con i 4 giorni di pratica")
         controlla(await A.locator("section:has(h2:has-text('Minuti per settimana')) .grafico svg").count() == 1, "mindfulness: grafico dei minuti per settimana")
-        controlla(await A.locator("section:has(h2:has-text('Stress nei giorni in cui mediti')) .dato").count() == 2, "mindfulness: stress con e senza meditazione")
+        controlla(await A.locator("section:has(h2:has-text('Stress nei giorni in cui mediti')) .rip-riga").count() == 2, "mindfulness: stress con e senza meditazione")
         await A.set_viewport_size({"width": 390, "height": 844})
         await A.wait_for_timeout(200)
         await scatta(A, "07b-mindfulness-telefono")
