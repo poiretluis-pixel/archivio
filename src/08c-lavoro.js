@@ -1,5 +1,5 @@
-/* ===== 8c. Task, Gestione mail e task personali: liste Oggi, Coda e Archivio =====
-   Le cose da fare sono le voci organizzazione/attivita, le mail sono organizzazione/mail (le carica Claude da Gmail).
+/* ===== 8c. Task e task personali: liste Oggi, Coda e Archivio =====
+   Le cose da fare sono le voci organizzazione/attivita. Le vecchie voci organizzazione/mail restano nei dati ma non si mostrano più (pagina Gestione mail tolta il 24/11/2026).
    I task con etichetta CASA, GIARDINO o PROGETTI sono personali: stanno nella pagina Task personali (cartella organizzazione), non nella pagina Task di lavoro.
    Per i task la scadenza si mette con il calendario della riga; il calendario Google TASK lo aggiorna Claude. */
 const listaSalvata = x => (x.lista === 'Domani' ? 'Coda' : x.lista);
@@ -13,7 +13,7 @@ function listaDi(x) {
 }
 const apertaLavoro = x => (x.tipo === 'mail' ? x.stato !== 'gestita' : x.stato !== 'fatta');
 function lavoriAperti() {
-  return [...voci('organizzazione', 'attivita'), ...voci('organizzazione', 'mail')].filter(apertaLavoro);
+  return voci('organizzazione', 'attivita').filter(apertaLavoro);
 }
 /* Tipo di pagina: 'attivita' (task di lavoro), 'personale' (task personali) o 'mail'. */
 const taskPersonale = x => x.tipo === 'attivita' && ETICHETTE_PERSONALI.includes(x.casella);
@@ -87,7 +87,7 @@ function rigaLavoro(x) {
       btn('Modifica', () => apriModulo('organizzazione', x.tipo, x), 'piccolo')));
 }
 
-/* Tre pagine: Task (lavoro), Gestione mail e Task personali (cartella organizzazione). Stesse liste, stesso comportamento. */
+/* Due pagine: Task (lavoro) e Task personali (cartella organizzazione). Stesse liste, stesso comportamento. */
 const fonteDi = x => (x.tipo === 'mail' ? x.casella : (x.casella || x.ambito));
 const SCHEDE_LAVORO = { oggi: 'Oggi', coda: 'Coda', archivio: 'Archivio', tutti: 'Tutti' };
 function vistaLavoro(tipo, scheda) {

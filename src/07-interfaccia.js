@@ -233,7 +233,7 @@ function ambitoDi(r) {
   if (!r.length || r[0] === 'a' || r[0] === 'passioni' || r[0] === 'spese') return 'privata';
   return '';
 }
-const contaLavoro = () => quantiOggi('attivita') + quantiOggi('mail');
+const contaLavoro = () => quantiOggi('attivita');
 const contaPt = () => voci('pt', 'presenza').filter(x => ['da abbinare', 'da confermare'].includes(x.stato)).length;
 function vistaSceltaAmbito() {
   const scheda = (a, descr, n) => h('button', { type: 'button', class: 'ambito-scelta ambito-' + a, onclick: () => { scegliAmbito(a); location.hash === PRIMA_PAGINA[a] || (a === 'privata' && !leggiRotta().length) ? disegna() : (location.hash = PRIMA_PAGINA[a]); } },
@@ -241,7 +241,7 @@ function vistaSceltaAmbito() {
   return h('div', { class: 'ambito-pagina' },
     h('h1', {}, 'Cosa vuoi aprire?'),
     h('div', { class: 'ambito-griglia' },
-      scheda('lavoro', 'Task, gestione mail, personal trainer, siti e gestionali', contaLavoro()),
+      scheda('lavoro', 'Task, personal trainer, siti e gestionali', contaLavoro()),
       scheda('privata', 'Quadro generale, task personali, spese e finanze, salute, sport, mindfulness', quantiOggi('personale') + speseDaPagareOggi())),
     h('p', { class: 'sotto' }, 'Puoi cambiare in ogni momento dalle linguette in alto. Rapporti, scadenze, documenti e impostazioni sono in entrambi.'));
 }
@@ -263,7 +263,6 @@ function menu(rotta) {
     privata ? v('#/', 'Quadro generale', 'casa') : null,
     lavoro ? [gruppo('Lavoro', 'lavoro'),
       v('#/task', 'Task', 'task', quantiOggi('attivita')),
-      v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
       v('#/pt', 'Personal trainer', 'pt', contaPt()),
       v('#/siti', 'Siti e gestionali', 'siti')] : null,
     privata ? [gruppo('Personale', 'personale'),
@@ -323,7 +322,7 @@ function vistaPer(r) {
     return vistaArea(a);
   }
   if (r[0] === 'task' || r[0] === 'da-fare') return vistaLavoro('attivita', r[1]);
-  if (r[0] === 'mail') return vistaLavoro('mail', r[1]);
+  if (r[0] === 'mail') return vistaLavoro('attivita'); /* la pagina Gestione mail non c'è più: i vecchi collegamenti aprono Task */
   if (r[0] === 'siti') return vistaSiti();
   if (r[0] === 'passioni') return vistaArea(area('sport')); /* vecchi collegamenti a Passioni: aprono Sport */
   if (r[0] === 'pt') return vistaPt(r[1]);

@@ -10,7 +10,7 @@
 <title>Life Planning</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2231%22 fill=%22%2326321f%22/%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2227%22 fill=%22none%22 stroke=%22%23c9a54e%22 stroke-width=%221.6%22/%3E%3Cpath d=%22M22 18v28h12M28.5 46V22h7.5a6.8 6.8 0 0 1 0 13.6h-7.5%22 fill=%22none%22 stroke=%22%23c9a54e%22 stroke-width=%224.2%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3Ccircle cx=%2241.5%22 cy=%2246%22 r=%222.6%22 fill=%22%23c9a54e%22/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="icone/apple-touch-icon.png">
-<!-- Versione costruita il 2026-11-23. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
+<!-- Versione costruita il 2026-11-24. Sorgenti e formato dei dati: vedi LEGGIMI.md -->
 <style>
 :root{
   --fondo:#ece6d9; --carta:#fbf9f4; --inchiostro:#2a2620; --inchiostro2:#5a5348; --tenue:#7d7466; --linea:#ddd5c6; --linea2:#ebe5d8;
@@ -451,7 +451,7 @@ a.sito-link:hover strong{color:var(--marca)}
 <div id="app"></div>
 <noscript>Questa pagina ha bisogno di JavaScript per decifrare i dati.</noscript>
 <script>
-const VERSIONE_PAGINA = '71fed682c695';
+const VERSIONE_PAGINA = '5264cf393472';
 'use strict';
 /* ===== 1. Utilità di base ===== */
 const $ = (s, r = document) => r.querySelector(s);
@@ -1702,7 +1702,7 @@ function ambitoDi(r) {
   if (!r.length || r[0] === 'a' || r[0] === 'passioni' || r[0] === 'spese') return 'privata';
   return '';
 }
-const contaLavoro = () => quantiOggi('attivita') + quantiOggi('mail');
+const contaLavoro = () => quantiOggi('attivita');
 const contaPt = () => voci('pt', 'presenza').filter(x => ['da abbinare', 'da confermare'].includes(x.stato)).length;
 function vistaSceltaAmbito() {
   const scheda = (a, descr, n) => h('button', { type: 'button', class: 'ambito-scelta ambito-' + a, onclick: () => { scegliAmbito(a); location.hash === PRIMA_PAGINA[a] || (a === 'privata' && !leggiRotta().length) ? disegna() : (location.hash = PRIMA_PAGINA[a]); } },
@@ -1710,7 +1710,7 @@ function vistaSceltaAmbito() {
   return h('div', { class: 'ambito-pagina' },
     h('h1', {}, 'Cosa vuoi aprire?'),
     h('div', { class: 'ambito-griglia' },
-      scheda('lavoro', 'Task, gestione mail, personal trainer, siti e gestionali', contaLavoro()),
+      scheda('lavoro', 'Task, personal trainer, siti e gestionali', contaLavoro()),
       scheda('privata', 'Quadro generale, task personali, spese e finanze, salute, sport, mindfulness', quantiOggi('personale') + speseDaPagareOggi())),
     h('p', { class: 'sotto' }, 'Puoi cambiare in ogni momento dalle linguette in alto. Rapporti, scadenze, documenti e impostazioni sono in entrambi.'));
 }
@@ -1732,7 +1732,6 @@ function menu(rotta) {
     privata ? v('#/', 'Quadro generale', 'casa') : null,
     lavoro ? [gruppo('Lavoro', 'lavoro'),
       v('#/task', 'Task', 'task', quantiOggi('attivita')),
-      v('#/mail', 'Gestione mail', 'mail', quantiOggi('mail')),
       v('#/pt', 'Personal trainer', 'pt', contaPt()),
       v('#/siti', 'Siti e gestionali', 'siti')] : null,
     privata ? [gruppo('Personale', 'personale'),
@@ -1792,7 +1791,7 @@ function vistaPer(r) {
     return vistaArea(a);
   }
   if (r[0] === 'task' || r[0] === 'da-fare') return vistaLavoro('attivita', r[1]);
-  if (r[0] === 'mail') return vistaLavoro('mail', r[1]);
+  if (r[0] === 'mail') return vistaLavoro('attivita'); /* la pagina Gestione mail non c'è più: i vecchi collegamenti aprono Task */
   if (r[0] === 'siti') return vistaSiti();
   if (r[0] === 'passioni') return vistaArea(area('sport')); /* vecchi collegamenti a Passioni: aprono Sport */
   if (r[0] === 'pt') return vistaPt(r[1]);
@@ -1853,7 +1852,7 @@ function vistaCasa() {
     daFare.push({ tipo: x.priorita === 'alta' || g < 0 ? 'ritardo' : 'vuota', testo: (mail ? 'Mail: ' : '') + x.titolo,
       nota: [mail ? x.casella : (x.casella || x.ambito), mail ? (x.mittente ? 'da ' + x.mittente : '') : !x.data ? '' : g < 0 ? `in ritardo dal ${fmtData(x.data)}` : g === 0 ? 'entro oggi' : `entro il ${fmtData(x.data)}`].filter(Boolean).join(', '), href: mail ? '#/mail' : taskPersonale(x) ? '#/a/organizzazione' : '#/task' });
   }
-  if (lav.length > 6) daFare.push({ tipo: 'vuota', testo: `Altre ${lav.length - 6} cose per oggi`, nota: 'Tutte nelle pagine Task, Gestione mail e Task personali.', href: '#/task' });
+  if (lav.length > 6) daFare.push({ tipo: 'vuota', testo: `Altre ${lav.length - 6} cose per oggi`, nota: 'Tutte nelle pagine Task e Task personali.', href: '#/task' });
   const daElab = allegati().filter(a => a.stato === 'da elaborare').length;
   if (daElab) daFare.push({ tipo: 'vuota', testo: daElab === 1 ? '1 documento in attesa che Claude ne inserisca i valori' : `${daElab} documenti in attesa che Claude ne inserisca i valori`, nota: 'Sono al sicuro. Li elabora alla verifica del lunedì, oppure subito se glielo chiedi in chat.', href: '#/documenti' });
   if (!ghPronto()) daFare.push({ tipo: 'ritardo', testo: 'I dati sono solo su questo dispositivo', nota: 'Collega il repository dei dati in Impostazioni.', href: '#/impostazioni' });
@@ -2549,8 +2548,8 @@ function consigliPrincipali() {
     h('p', { class: 'attenuato piccolo' }, 'I primi due di ogni cartella. L\'elenco completo è in ciascuna cartella.'));
 }
 
-/* ===== 8c. Task, Gestione mail e task personali: liste Oggi, Coda e Archivio =====
-   Le cose da fare sono le voci organizzazione/attivita, le mail sono organizzazione/mail (le carica Claude da Gmail).
+/* ===== 8c. Task e task personali: liste Oggi, Coda e Archivio =====
+   Le cose da fare sono le voci organizzazione/attivita. Le vecchie voci organizzazione/mail restano nei dati ma non si mostrano più (pagina Gestione mail tolta il 24/11/2026).
    I task con etichetta CASA, GIARDINO o PROGETTI sono personali: stanno nella pagina Task personali (cartella organizzazione), non nella pagina Task di lavoro.
    Per i task la scadenza si mette con il calendario della riga; il calendario Google TASK lo aggiorna Claude. */
 const listaSalvata = x => (x.lista === 'Domani' ? 'Coda' : x.lista);
@@ -2564,7 +2563,7 @@ function listaDi(x) {
 }
 const apertaLavoro = x => (x.tipo === 'mail' ? x.stato !== 'gestita' : x.stato !== 'fatta');
 function lavoriAperti() {
-  return [...voci('organizzazione', 'attivita'), ...voci('organizzazione', 'mail')].filter(apertaLavoro);
+  return voci('organizzazione', 'attivita').filter(apertaLavoro);
 }
 /* Tipo di pagina: 'attivita' (task di lavoro), 'personale' (task personali) o 'mail'. */
 const taskPersonale = x => x.tipo === 'attivita' && ETICHETTE_PERSONALI.includes(x.casella);
@@ -2638,7 +2637,7 @@ function rigaLavoro(x) {
       btn('Modifica', () => apriModulo('organizzazione', x.tipo, x), 'piccolo')));
 }
 
-/* Tre pagine: Task (lavoro), Gestione mail e Task personali (cartella organizzazione). Stesse liste, stesso comportamento. */
+/* Due pagine: Task (lavoro) e Task personali (cartella organizzazione). Stesse liste, stesso comportamento. */
 const fonteDi = x => (x.tipo === 'mail' ? x.casella : (x.casella || x.ambito));
 const SCHEDE_LAVORO = { oggi: 'Oggi', coda: 'Coda', archivio: 'Archivio', tutti: 'Tutti' };
 function vistaLavoro(tipo, scheda) {
